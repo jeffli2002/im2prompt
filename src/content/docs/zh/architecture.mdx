@@ -1,0 +1,523 @@
+---
+title: 项目架构
+---
+
+# 架构概述
+
+Better SaaS 采用现代化、可扩展的架构构建，遵循行业最佳实践。本文档深入介绍了应用程序中使用的系统设计、组件和架构模式。
+
+## 系统架构
+
+### 高级架构
+
+<svg viewBox="0 0 800 400" className="w-full h-auto border rounded-lg bg-white dark:bg-gray-900">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
+    </marker>
+  </defs>
+  
+  {/* Client Layer */}
+  <rect x="50" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">客户端 (Web)</text>
+  <text x="125" y="95" textAnchor="middle" className="text-sm fill-current">Next.js 应用</text>
+  <text x="125" y="115" textAnchor="middle" className="text-sm fill-current">(前端)</text>
+  
+  {/* API Gateway */}
+  <rect x="325" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">API 网关</text>
+  <text x="400" y="95" textAnchor="middle" className="text-sm fill-current">Next.js API</text>
+  <text x="400" y="115" textAnchor="middle" className="text-sm fill-current">(后端)</text>
+  
+  {/* Database */}
+  <rect x="600" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">数据库</text>
+  <text x="675" y="95" textAnchor="middle" className="text-sm fill-current">PostgreSQL</text>
+  
+  {/* CDN/Assets */}
+  <rect x="50" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">CDN/静态资源</text>
+  <text x="125" y="315" textAnchor="middle" className="text-sm fill-current">Vercel/静态</text>
+  
+  {/* External APIs */}
+  <rect x="325" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">外部 API</text>
+  <text x="400" y="315" textAnchor="middle" className="text-sm fill-current">Stripe, OAuth</text>
+  
+  {/* File Storage */}
+  <rect x="600" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">文件存储</text>
+  <text x="675" y="315" textAnchor="middle" className="text-sm fill-current">Cloudflare R2</text>
+  
+  {/* Arrows */}
+  <line x1="200" y1="90" x2="325" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead)" />
+  <line x1="325" y1="90" x2="200" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead)" />
+  
+  <line x1="475" y1="90" x2="600" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead)" />
+  <line x1="600" y1="90" x2="475" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead)" />
+  
+  <line x1="125" y1="130" x2="125" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead)" />
+  <line x1="400" y1="130" x2="400" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead)" />
+  <line x1="675" y1="130" x2="675" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead)" />
+</svg>
+
+### 核心组件
+
+#### 1. 前端层 (Next.js App Router)
+- **页面和路由**: 使用国际化路由的 App Router
+- **组件**: 基于 Radix UI 的可重用 UI 组件
+- **状态管理**: 使用 Zustand 进行客户端状态管理
+- **样式**: 使用自定义设计系统的 Tailwind CSS
+- **数据获取**: 使用 SWR 进行缓存和同步
+
+#### 2. 后端层 (Next.js API Routes)
+- **API 端点**: 具有类型安全路由的 RESTful API
+- **身份认证**: 支持多提供商的 Better Auth
+- **数据库**: 使用 PostgreSQL 的 Drizzle ORM
+- **文件处理**: 安全的上传和存储管理
+- **支付处理**: 带有 Webhook 的 Stripe 集成
+
+#### 3. 数据层
+- **数据库**: 具有优化模式的 PostgreSQL
+- **ORM**: 用于类型安全数据库操作的 Drizzle
+- **缓存**: 用于会话和数据缓存的 Redis
+- **文件存储**: 用于静态资源的 Cloudflare R2
+
+## 身份认证流程
+
+### 多提供商身份认证
+
+<svg viewBox="0 0 800 400" className="w-full h-auto border rounded-lg bg-white dark:bg-gray-900">
+  <defs>
+    <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
+    </marker>
+  </defs>
+  
+  {/* User Login */}
+  <rect x="50" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">用户登录</text>
+  <text x="125" y="95" textAnchor="middle" className="text-sm fill-current">(邮箱/OAuth)</text>
+  
+  {/* Better Auth */}
+  <rect x="325" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">Better Auth</text>
+  <text x="400" y="95" textAnchor="middle" className="text-sm fill-current">中间件</text>
+  
+  {/* Database */}
+  <rect x="600" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">数据库</text>
+  <text x="675" y="95" textAnchor="middle" className="text-sm fill-current">会话</text>
+  
+  {/* JWT Token */}
+  <rect x="50" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">JWT 令牌</text>
+  <text x="125" y="315" textAnchor="middle" className="text-sm fill-current">生成</text>
+  
+  {/* Role-Based Access */}
+  <rect x="325" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="285" textAnchor="middle" className="text-sm font-semibold fill-current">基于角色的</text>
+  <text x="400" y="305" textAnchor="middle" className="text-sm fill-current">访问控制</text>
+  
+  {/* User Profile */}
+  <rect x="600" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">用户资料</text>
+  <text x="675" y="315" textAnchor="middle" className="text-sm fill-current">管理</text>
+  
+  {/* Arrows */}
+  <line x1="200" y1="90" x2="325" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead2)" />
+  <line x1="475" y1="90" x2="600" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead2)" />
+  
+  <line x1="125" y1="130" x2="125" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead2)" />
+  <line x1="400" y1="130" x2="400" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead2)" />
+  <line x1="675" y1="130" x2="675" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead2)" />
+</svg>
+
+### 身份认证功能
+- **会话管理**: 数据库持久化会话，可配置过期时间
+- **基于角色的访问控制**: 管理员、用户和自定义角色权限
+- **社交登录**: GitHub、Google OAuth 集成
+- **安全**: 密码哈希、CSRF 保护、安全 Cookie
+- **密码重置**: 基于邮箱的密码恢复流程
+
+## 数据库设计
+
+### 核心表
+
+#### 用户表
+```sql
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(255),
+  image TEXT,
+  role VARCHAR(50) DEFAULT 'user',
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+#### 会话表
+```sql
+CREATE TABLE sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  token VARCHAR(255) UNIQUE NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+#### 文件表
+```sql
+CREATE TABLE files (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  filename VARCHAR(255) NOT NULL,
+  original_name VARCHAR(255) NOT NULL,
+  mime_type VARCHAR(100) NOT NULL,
+  size INTEGER NOT NULL,
+  url TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+#### 支付表
+```sql
+CREATE TABLE payments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  stripe_customer_id VARCHAR(255),
+  stripe_subscription_id VARCHAR(255),
+  status VARCHAR(50) NOT NULL,
+  plan VARCHAR(50) NOT NULL,
+  amount INTEGER NOT NULL,
+  currency VARCHAR(3) DEFAULT 'usd',
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### 数据库关系
+
+<svg viewBox="0 0 600 300" className="w-full h-auto border rounded-lg bg-white dark:bg-gray-900">
+  <defs>
+    <marker id="arrowhead3" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
+    </marker>
+  </defs>
+  
+  {/* Users */}
+  <rect x="50" y="100" width="120" height="60" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="110" y="125" textAnchor="middle" className="text-sm font-semibold fill-current">用户</text>
+  <text x="110" y="145" textAnchor="middle" className="text-xs fill-current">(1)</text>
+  
+  {/* Sessions */}
+  <rect x="250" y="50" width="120" height="60" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="310" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">会话</text>
+  <text x="310" y="95" textAnchor="middle" className="text-xs fill-current">(N)</text>
+  
+  {/* Files */}
+  <rect x="250" y="130" width="120" height="60" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="310" y="155" textAnchor="middle" className="text-sm font-semibold fill-current">文件</text>
+  <text x="310" y="175" textAnchor="middle" className="text-xs fill-current">(N)</text>
+  
+  {/* Payments */}
+  <rect x="250" y="210" width="120" height="60" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="310" y="235" textAnchor="middle" className="text-sm font-semibold fill-current">支付</text>
+  <text x="310" y="255" textAnchor="middle" className="text-xs fill-current">(N)</text>
+  
+  {/* Relationship lines */}
+  <line x1="170" y1="120" x2="250" y2="80" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead3)" />
+  <line x1="170" y1="130" x2="250" y2="160" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead3)" />
+  <line x1="170" y1="140" x2="250" y2="240" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead3)" />
+</svg>
+
+## 文件管理架构
+
+### 上传流程
+
+<svg viewBox="0 0 800 400" className="w-full h-auto border rounded-lg bg-white dark:bg-gray-900">
+  <defs>
+    <marker id="arrowhead4" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
+    </marker>
+  </defs>
+  
+  {/* Client Upload */}
+  <rect x="50" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">客户端上传</text>
+  <text x="125" y="95" textAnchor="middle" className="text-sm fill-current">(表单/拖拽)</text>
+  
+  {/* API Endpoint */}
+  <rect x="325" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">API 端点</text>
+  <text x="400" y="95" textAnchor="middle" className="text-sm fill-current">/api/upload</text>
+  
+  {/* Validation */}
+  <rect x="600" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">验证</text>
+  <text x="675" y="95" textAnchor="middle" className="text-sm fill-current">大小/类型</text>
+  
+  {/* File Storage */}
+  <rect x="50" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">文件存储</text>
+  <text x="125" y="315" textAnchor="middle" className="text-sm fill-current">(R2/S3)</text>
+  
+  {/* Database */}
+  <rect x="325" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">数据库</text>
+  <text x="400" y="315" textAnchor="middle" className="text-sm fill-current">元数据</text>
+  
+  {/* Response */}
+  <rect x="600" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">响应</text>
+  <text x="675" y="315" textAnchor="middle" className="text-sm fill-current">URL/状态</text>
+  
+  {/* Arrows */}
+  <line x1="200" y1="90" x2="325" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead4)" />
+  <line x1="475" y1="90" x2="600" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead4)" />
+  
+  <line x1="125" y1="130" x2="125" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead4)" />
+  <line x1="400" y1="130" x2="400" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead4)" />
+  <line x1="675" y1="130" x2="675" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead4)" />
+</svg>
+
+### 文件管理功能
+- **安全上传**: 验证、大小限制和类型限制
+- **图像处理**: 缩略图生成和优化
+- **访问控制**: 基于用户的文件权限
+- **云存储**: 与 Cloudflare R2/AWS S3 集成
+- **元数据跟踪**: 文件信息和使用分析
+
+## 支付系统架构
+
+### Stripe 集成
+
+<svg viewBox="0 0 800 400" className="w-full h-auto border rounded-lg bg-white dark:bg-gray-900">
+  <defs>
+    <marker id="arrowhead5" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
+    </marker>
+  </defs>
+  
+  {/* Checkout Flow */}
+  <rect x="50" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">结账流程</text>
+  <text x="125" y="95" textAnchor="middle" className="text-sm fill-current">(前端)</text>
+  
+  {/* Stripe API */}
+  <rect x="325" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">Stripe API</text>
+  <text x="400" y="95" textAnchor="middle" className="text-sm fill-current">(支付)</text>
+  
+  {/* Webhook */}
+  <rect x="600" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">Webhook</text>
+  <text x="675" y="95" textAnchor="middle" className="text-sm fill-current">处理程序</text>
+  
+  {/* Subscription */}
+  <rect x="50" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">订阅管理</text>
+  <text x="125" y="315" textAnchor="middle" className="text-sm fill-current"></text>
+  
+  {/* Database */}
+  <rect x="325" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">数据库</text>
+  <text x="400" y="315" textAnchor="middle" className="text-sm fill-current">更新</text>
+  
+  {/* Email */}
+  <rect x="600" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">邮件</text>
+  <text x="675" y="315" textAnchor="middle" className="text-sm fill-current">通知</text>
+  
+  {/* Arrows */}
+  <line x1="200" y1="90" x2="325" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead5)" />
+  <line x1="475" y1="90" x2="600" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead5)" />
+  
+  <line x1="125" y1="130" x2="125" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead5)" />
+  <line x1="400" y1="130" x2="400" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead5)" />
+  <line x1="675" y1="130" x2="675" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead5)" />
+</svg>
+
+### 支付功能
+- **订阅管理**: 多种计划和计费周期
+- **Webhook 处理**: 实时支付事件处理
+- **发票生成**: 自动计费和收据
+- **试用期**: 可配置的免费试用功能
+- **支付恢复**: 失败支付重试逻辑
+
+## 测试架构
+
+### 测试结构
+- **单元测试**: 组件逻辑和工具函数
+- **集成测试**: API 端点和数据库操作
+- **E2E 测试**: 完整的用户工作流程和场景
+- **视觉测试**: UI 一致性的截图比较
+- **性能测试**: 负载测试和优化
+
+## 国际化架构
+
+### i18n 结构
+
+<svg viewBox="0 0 800 400" className="w-full h-auto border rounded-lg bg-white dark:bg-gray-900">
+  <defs>
+    <marker id="arrowhead6" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
+    </marker>
+  </defs>
+  
+  {/* Route Locale */}
+  <rect x="50" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">路由语言</text>
+  <text x="125" y="95" textAnchor="middle" className="text-sm fill-current">[locale]/</text>
+  
+  {/* Message Resolution */}
+  <rect x="325" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">消息</text>
+  <text x="400" y="95" textAnchor="middle" className="text-sm fill-current">解析</text>
+  
+  {/* Content Rendering */}
+  <rect x="600" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">内容</text>
+  <text x="675" y="95" textAnchor="middle" className="text-sm fill-current">渲染</text>
+  
+  {/* Language Detection */}
+  <rect x="50" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">语言</text>
+  <text x="125" y="315" textAnchor="middle" className="text-sm fill-current">检测</text>
+  
+  {/* Translation Files */}
+  <rect x="325" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">翻译</text>
+  <text x="400" y="315" textAnchor="middle" className="text-sm fill-current">文件</text>
+  
+  {/* Localized Components */}
+  <rect x="600" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">本地化</text>
+  <text x="675" y="315" textAnchor="middle" className="text-sm fill-current">组件</text>
+  
+  {/* Arrows */}
+  <line x1="200" y1="90" x2="325" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead6)" />
+  <line x1="475" y1="90" x2="600" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead6)" />
+  
+  <line x1="125" y1="130" x2="125" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead6)" />
+  <line x1="400" y1="130" x2="400" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead6)" />
+  <line x1="675" y1="130" x2="675" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead6)" />
+</svg>
+
+### i18n 功能
+- **基于路由的本地化**: 自动语言检测
+- **消息管理**: 集中化翻译文件
+- **动态内容**: 运行时语言切换
+- **SEO 优化**: 本地化元标签和 URL
+- **回退处理**: 默认语言回退
+
+## 安全架构
+
+### 安全层
+
+1. **应用程序安全**
+   - 使用令牌的 CSRF 保护
+   - 使用清理的 XSS 防护
+   - 使用 ORM 的 SQL 注入保护
+   - API 端点的速率限制
+
+2. **身份认证安全**
+   - 安全密码哈希 (bcrypt)
+   - JWT 令牌验证
+   - 使用安全 Cookie 的会话管理
+   - OAuth 提供商集成
+
+3. **数据安全**
+   - 数据库静态加密
+   - 安全文件上传验证
+   - 环境变量保护
+   - API 密钥管理
+
+4. **基础设施安全**
+   - HTTPS 强制执行
+   - 安全头部 (CSP, HSTS)
+   - 依赖漏洞扫描
+   - 定期安全更新
+
+## 性能优化
+
+### 前端优化
+- **代码分割**: 动态导入和基于路由的分割
+- **图像优化**: 使用 WebP 的 Next.js Image 组件
+- **缓存**: 浏览器缓存和 CDN 优化
+- **包分析**: Tree shaking 和死代码消除
+
+### 后端优化
+- **数据库索引**: 优化查询和索引
+- **API 缓存**: 使用 Redis 的响应缓存
+- **连接池**: 数据库连接优化
+- **懒加载**: 按需资源加载
+
+## 部署架构
+
+### 生产部署
+
+<svg viewBox="0 0 800 400" className="w-full h-auto border rounded-lg bg-white dark:bg-gray-900">
+  <defs>
+    <marker id="arrowhead7" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" />
+    </marker>
+  </defs>
+  
+  {/* GitHub Repo */}
+  <rect x="50" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">GitHub 仓库</text>
+  <text x="125" y="95" textAnchor="middle" className="text-sm fill-current">(源代码)</text>
+  
+  {/* Vercel */}
+  <rect x="325" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">Vercel</text>
+  <text x="400" y="95" textAnchor="middle" className="text-sm fill-current">(构建/部署)</text>
+  
+  {/* Production */}
+  <rect x="600" y="50" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="75" textAnchor="middle" className="text-sm font-semibold fill-current">生产</text>
+  <text x="675" y="95" textAnchor="middle" className="text-sm fill-current">环境</text>
+  
+  {/* CI/CD */}
+  <rect x="50" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="125" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">CI/CD</text>
+  <text x="125" y="315" textAnchor="middle" className="text-sm fill-current">流水线</text>
+  
+  {/* Environment Variables */}
+  <rect x="325" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="400" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">环境</text>
+  <text x="400" y="315" textAnchor="middle" className="text-sm fill-current">变量</text>
+  
+  {/* Monitoring */}
+  <rect x="600" y="270" width="150" height="80" rx="8" fill="none" stroke="currentColor" strokeWidth="2" />
+  <text x="675" y="295" textAnchor="middle" className="text-sm font-semibold fill-current">监控</text>
+  <text x="675" y="315" textAnchor="middle" className="text-sm fill-current">& 分析</text>
+  
+  {/* Arrows */}
+  <line x1="200" y1="90" x2="325" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead7)" />
+  <line x1="475" y1="90" x2="600" y2="90" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead7)" />
+  
+  <line x1="125" y1="130" x2="125" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead7)" />
+  <line x1="400" y1="130" x2="400" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead7)" />
+  <line x1="675" y1="130" x2="675" y2="270" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowhead7)" />
+</svg>
+
+### 部署功能
+- **自动化部署**: GitHub Actions CI/CD 流水线
+- **环境管理**: 测试和生产环境
+- **健康监控**: 应用程序性能监控
+- **回滚功能**: 部署问题的快速回滚
+- **可扩展性**: 基于流量的自动扩展
+
+## 监控与分析
+
+### 应用程序监控
+- **错误跟踪**: 实时错误监控和警报
+- **性能指标**: 响应时间和资源使用
+- **用户分析**: 用户行为和参与度跟踪
+- **业务指标**: 收入、转化率和增长指标
+
+这种架构为构建可扩展、安全和可维护的 SaaS 应用程序提供了坚实的基础。模块化设计允许根据特定业务需求轻松扩展和自定义。

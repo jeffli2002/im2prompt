@@ -1,0 +1,395 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "language": "Language"
+  },
+  "toast": {
+    "success": {
+      "nameUpdated": "Name updated successfully",
+      "avatarUpdated": "Avatar updated successfully",
+      "loginSuccess": "Login successful"
+    },
+    "error": {
+      "nameEmpty": "Name cannot be empty",
+      "nameUpdateFailed": "Name update failed",
+      "avatarUpdateFailed": "Avatar update failed",
+      "fileUploadFailed": "File upload failed",
+      "loginFailed": "Login failed",
+      "socialLoginFailed": "Social login failed"
+    },
+    "info": {
+      "nameNotChanged": "Name has not changed"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot Password?",
+    "signInToAccount": "Sign in to your account",
+    "createAccount": "Create a new account",
+    "enterEmail": "Enter your email address",
+    "enterPassword": "Enter your password",
+    "githubSignIn": "Sign in with GitHub",
+    "googleSignIn": "Sign in with Google",
+    "loading": "Verifying identity...",
+    "error": "Authentication Error",
+    "accessDenied": "Access Denied",
+    "loginRequired": "Please login to access this page",
+    "goToLogin": "Go to Login",
+    "retry": "Retry",
+    "refreshSession": "Refresh Session",
+    "welcomeBack": "Welcome back",
+    "loginWithSocial": "Sign in with your GitHub or Google account",
+    "loggingIn": "Signing in...",
+    "orUseEmail": "Or continue with email",
+    "emailPlaceholder": "m@example.com",
+    "closeError": "Close",
+    "name": "Name",
+    "namePlaceholder": "John Doe",
+    "confirmPassword": "Confirm Password",
+    "passwordMismatch": "Passwords do not match",
+    "signupWithSocial": "Sign up with your GitHub or Google account",
+    "githubSignUp": "Sign up with GitHub",
+    "googleSignUp": "Sign up with Google",
+    "signingUp": "Signing up...",
+    "orContinueWith": "Or continue with",
+    "signUpButton": "Sign Up",
+    "noAccount": "Don't have an account?",
+    "signUpLink": "Sign up",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginLink": "Sign in",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "termsAndPrivacy": {
+      "prefix": "By clicking continue, you agree to our",
+      "middle": "and",
+      "suffix": "."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back! Here's what's happening with your account.",
+    "totalRevenue": "Total Revenue",
+    "subscriptions": "Subscriptions",
+    "sales": "Sales",
+    "activeNow": "Active Now",
+    "downloadReport": "Download Report",
+    "addUser": "Add User",
+    "notificationSettings": "Notification Settings",
+    "manageNotifications": "Manage your notification preferences",
+    "newsletterSubscription": "Newsletter Subscription",
+    "manageNewsletter": "Manage your newsletter subscription preferences",
+    "subscribeToNewsletter": "Subscribe to newsletter",
+    "changeAnytime": "You can change your subscription preferences at any time",
+    "emailNotifications": "Email Notifications",
+    "chooseNotifications": "Choose what email notifications you'd like to receive",
+    "marketingEmails": "Marketing emails",
+    "securityAlerts": "Security alerts",
+    "productUpdates": "Product updates",
+    "recentActivity": "Recent Activity",
+    "latestActivity": "Your latest account activity"
+  },
+  "fileManager": {
+    "title": "R2 Image/Video Management",
+    "description": "Browse all files uploaded by users (Admin only).",
+    "uploadFile": "Upload File",
+    "uploadFiles": "Upload Files",
+    "cancel": "Cancel",
+    "uploading": "Uploading...",
+    "dragDropText": "Drag images here, or click to select images",
+    "dragActiveText": "Drop images to upload",
+    "supportedFormats": "Only JPEG and PNG images are supported, maximum {maxSize}MB per file",
+    "selectImages": "Select Images",
+    "uploadFailed": "File upload failed",
+    "fileTooLarge": "File too large",
+    "invalidFileType": "Only JPEG and PNG images are supported",
+    "tooManyFiles": "Too many files",
+    "noFiles": "No image files",
+    "uploadSomeFiles": "Upload some images to start managing your files",
+    "searchPlaceholder": "Filter by filename prefix...",
+    "preview": "Preview",
+    "download": "Download",
+    "delete": "Delete",
+    "type": "Type",
+    "size": "Size",
+    "uploadUser": "Upload User",
+    "lastModified": "Last Modified",
+    "image": "IMAGE"
+  },
+  "hero": {
+    "heading": "The Ultimate Scalable Next.js SaaS Boilerplate",
+    "description": "Start your SaaS journey with our production-ready Next.js boilerplate. Slash development time and deliver value to your customers faster. Build, launch, and scale with unmatched speed and confidence.",
+    "buttonText": "Get Started",
+    "buttonUrl": "/docs",
+    "reviewsText": "from {count}+ reviews",
+    "avatarAlt": "Avatar {index}"
+  },
+  "pricing": {
+    "heading": "Choose Your Plan",
+    "description": "Select the perfect plan for your needs. Upgrade or downgrade at any time.",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "processingText": "Processing...",
+    "getStartedText": "Get Started",
+    "purchaseText": "Purchase",
+    "purchaseDialog": {
+      "title": "Test Payment Notice",
+      "description": "better-saas is an open-source and free software. Please use the test card number 5555555555554444 for payment testing. Do not make real payments.",
+      "testCardNumber": "Test Card Number: 5555555555554444",
+      "warning": "⚠️ This is for testing purposes only",
+      "continueButton": "Continue to Payment",
+      "cancelButton": "Cancel",
+      "purchaseInfo": "You are about to purchase: {planName}",
+      "processing": "Processing..."
+    }
+  },
+  "techstack": {
+    "heading": "Build With Modern Stack",
+    "description": "Build your SaaS application with the latest technology stack"
+  },
+  "faq": {
+    "heading": "Frequently asked questions",
+    "description": "Find answers to common questions about our products. Can't find what you're looking for? Contact our support team.",
+    "supportHeading": "Need more support?",
+    "supportDescription": "Our dedicated support team is here to help you with any questions or concerns. Get in touch with us for personalized assistance.",
+    "supportButtonText": "Contact Support",
+    "items": [
+      {
+        "question": "What is the return policy?",
+        "answer": "You can return any item within 30 days of purchase for a full refund, provided it is in its original condition."
+      },
+      {
+        "question": "How do I track my order?",
+        "answer": "Once your order is shipped, you will receive an email with a tracking number. You can use this number on our website to track your order."
+      },
+      {
+        "question": "Do you offer international shipping?",
+        "answer": "Yes, we ship to most countries worldwide. Shipping costs and delivery times vary depending on the destination."
+      },
+      {
+        "question": "Can I change my order after it has been placed?",
+        "answer": "You can change your order within 24 hours of placing it by contacting our customer service team."
+      },
+      {
+        "question": "What payment methods do you accept?",
+        "answer": "We accept all major credit cards, PayPal, and Apple Pay."
+      },
+      {
+        "question": "How can I contact customer support?",
+        "answer": "You can reach our customer support team via email at support@example.com or by calling 1-800-123-4567."
+      },
+      {
+        "question": "Are there any discounts for bulk purchases?",
+        "answer": "Yes, we offer discounts for bulk purchases. Please contact our sales team for more information."
+      }
+    ]
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "files": "File Management",
+    "settings": "Settings",
+    "profile": "Profile",
+    "billing": "Billing",
+    "security": "Security",
+    "credits": "Credits",
+    "balance": "Balance",
+    "history": "History",
+    "apiKeys": "API Keys"
+  },
+  "navbar": {
+    "logo": {
+      "title": "Better SaaS",
+      "alt": "logo"
+    },
+    "menu": {
+      "blog": "Blog",
+      "document": "Document",
+      "components": "Components",
+      "pricing": "Pricing",
+      "resources": "Resources",
+      "helpCenter": "Help Center",
+      "helpCenterDescription": "Get help and support",
+      "contactUs": "Contact Us",
+      "contactUsDescription": "Get in touch with our team",
+      "status": "Status",
+      "statusDescription": "Check system status",
+      "termsOfService": "Terms of Service",
+      "termsOfServiceDescription": "Read our terms and conditions"
+    },
+    "auth": {
+      "login": "Log in",
+      "signup": "Sign up"
+    }
+  },
+  "userMenu": {
+    "user": "User",
+    "security": "Security",
+    "profile": "Profile",
+    "billing": "Billing",
+    "settings": "Settings",
+    "logout": "Log out",
+    "creditBalance": "Credit"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account settings and preferences",
+    "profile": {
+      "title": "Profile",
+      "description": "Manage your personal information"
+    },
+    "security": {
+      "title": "Security",
+      "description": "Manage your security settings"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Manage your notification preferences"
+    },
+    "billing": {
+      "title": "Billing",
+      "description": "Manage your subscription and payments"
+    },
+    "apiKeys": {
+      "title": "API Keys",
+      "description": "Manage your API keys and access permissions"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "description": "Manage your personal information and preferences",
+    "save": "Save",
+    "saving": "Saving...",
+    "avatar": {
+      "title": "Your Avatar",
+      "description": "To change your avatar, click on the image in this block and select a file from your computer to upload."
+    },
+    "language": {
+      "title": "Your Language",
+      "description": "To change the language of the application, select a language from the list and click save.",
+      "label": "Language"
+    },
+    "name": {
+      "title": "Your Name",
+      "placeholder": "Enter your name"
+    },
+    "email": {
+      "title": "Your Email",
+      "description": "To change your email, enter a new email and click save. You will need to confirm the new email for it to take effect.",
+      "placeholder": "Enter your email address"
+    }
+  },
+  "security": {
+    "title": "Security",
+    "description": "Manage your security settings",
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Reset password to enable email login",
+      "description": "Resetting your password will allow you to sign in using your email and password in addition to your social login methods. You will receive an email with instructions to reset your password",
+      "button": "Reset Password"
+    },
+    "deleteAccount": {
+      "title": "Delete Account",
+      "subtitle": "Permanently remove your account and all of its contents",
+      "description": "This action is not reversible, so please continue with caution",
+      "button": "Delete Account"
+    }
+  },
+  "blog": {
+    "title": "Tech Blog",
+    "description": "Share technical insights, best practices, and development experiences",
+    "backToList": "Back to Blog List",
+    "readingTime": "min read",
+    "aboutReadingTime": "About {time} min read",
+    "noArticles": "No blog articles yet",
+    "shareArticle": "Like this article? Share it with more people!",
+    "backToBlog": "Back to Blog",
+    "author": "Author",
+    "publishedOn": "Published on",
+    "tags": "Tags"
+  },
+  "legal": {
+    "terms": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated: {date}",
+      "introduction": "Welcome to our service. These terms and conditions outline the rules and regulations for the use of our website and services.",
+      "acceptance": {
+        "title": "Acceptance of Terms",
+        "content": "By accessing and using this service, you accept and agree to be bound by the terms and provision of this agreement."
+      },
+      "useOfService": {
+        "title": "Use of Service",
+        "content": "You may use our service for lawful purposes only. You agree not to use the service in any way that violates any applicable federal, state, local, or international law or regulation."
+      },
+      "userAccounts": {
+        "title": "User Accounts",
+        "content": "When you create an account with us, you must provide information that is accurate, complete, and current at all times. You are responsible for safeguarding the password and for all activities that occur under your account."
+      },
+      "privacy": {
+        "title": "Privacy Policy",
+        "content": "Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the service, to understand our practices."
+      },
+      "termination": {
+        "title": "Termination",
+        "content": "We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms."
+      },
+      "changes": {
+        "title": "Changes to Terms",
+        "content": "We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will try to provide at least 30 days notice prior to any new terms taking effect."
+      },
+      "contact": {
+        "title": "Contact Information",
+        "content": "If you have any questions about these Terms of Service, please contact us."
+      }
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: {date}",
+      "introduction": "This Privacy Policy describes how we collect, use, and protect your information when you use our service.",
+      "informationCollection": {
+        "title": "Information We Collect",
+        "content": "We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support."
+      },
+      "howWeUse": {
+        "title": "How We Use Your Information",
+        "content": "We use the information we collect to provide, maintain, and improve our services, process transactions, and communicate with you."
+      },
+      "informationSharing": {
+        "title": "Information Sharing",
+        "content": "We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy."
+      },
+      "dataSecurity": {
+        "title": "Data Security",
+        "content": "We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction."
+      },
+      "cookies": {
+        "title": "Cookies and Tracking",
+        "content": "We use cookies and similar tracking technologies to enhance your experience and analyze how our service is used."
+      },
+      "yourRights": {
+        "title": "Your Rights",
+        "content": "You have the right to access, update, or delete your personal information. You may also opt out of certain communications from us."
+      },
+      "changes": {
+        "title": "Changes to Privacy Policy",
+        "content": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page."
+      },
+      "contact": {
+        "title": "Contact Information",
+        "content": "If you have any questions about this Privacy Policy, please contact us."
+      }
+    }
+  },
+  "blocks": {
+    "title": "Component Library",
+    "description": "Explore our carefully designed component collection, each optimized for direct use in your projects",
+    "viewComponents": "View components",
+    "backToBlocks": "Back to Blocks"
+  }
+}

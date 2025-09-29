@@ -1,0 +1,102 @@
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { 
+  useAuthLoading, 
+  useAuthError, 
+  useIsAuthenticated,
+  useEmailLogin,
+  useClearError,
+  useSignInWithGithub,
+  useSignInWithGoogle
+} from '@/store/auth-store';
+import type { LoginFormData, UseLoginReturn } from '@/types/login';
+import { useToastMessages } from './use-toast-messages';
+import { ErrorLogger } from '@/lib/logger/logger-utils';
+
+const loginErrorLogger = new ErrorLogger('use-login');
+
+export function useLogin(): UseLoginReturn {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const toastMessages = useToastMessages();
+  
+  const isLoading = useAuthLoading();
+  const error = useAuthError();
+  const isAuthenticated = useIsAuthenticated();
+  const emailLogin = useEmailLogin();
+  const clearError = useClearError();
+  const signInWithGithub = useSignInWithGithub();
+  const signInWithGoogle = useSignInWithGoogle();
+
+  const [formData, setFormData] = useState<LoginFormData>({
+    email: '',
+    password: '',
+  });
+
+  // Get callback URL
+  const getRedirectUrl = useCallback(() => {
+    const callbackUrl = searchParams.get('callbackUrl');
+    return callbackUrl || '/settings/profile';
+  }, [searchParams]);
+
+  // Auto redirect after successful login
+  useEffect(() => {
+    if (isAuthenticated) {
+      const redirectUrl = getRedirectUrl();
+      router.push(redirectUrl);
+    }
+  }, [isAuthenticated, router, getRedirectUrl]);
+
+  // Handle social login
+  const handleSocialLogin = async (provider: 'github' | 'google') => {
+    try {
+      clearError();
+      const redirectUrl = getRedirectUrl();
+      // The social login functions now handle redirect internally
+      if (provider === 'github') {
+        await signInWithGithub(redirectUrl);
+      } else {
+        await signInWithGoogle(redirectUrl);
+      }
+      // No need to manually redirect - Better Auth handles it
+    } catch (error) {
+      loginErrorLogger.logError(error as Error, {
+        operation: 'socialLogin',
+        provider,
+      });
+      toastMessages.error.socialLoginFailed();
+    }
+  };
+
+  // Handle email login
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearError(); 
+
+    const result = await emailLogin(formData.email, formData.password);
+    if (result.success) {
+      toastMessages.success.loginSuccess();
+      const redirectUrl = getRedirectUrl();
+      router.push(redirectUrl);
+    } else {
+      toastMessages.error.loginFailed(result.error);
+    }
+  };
+
+  // Clear error
+  const handleClearError = () => {
+    clearError();
+  };
+
+  return {
+    formData,
+    setFormData,
+    isLoading,
+    error,
+    isAuthenticated,
+    handleEmailLogin,
+    handleSocialLogin,
+    handleClearError,
+    getRedirectUrl,
+  };
+} 

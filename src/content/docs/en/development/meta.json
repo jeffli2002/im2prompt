@@ -1,0 +1,11 @@
+{
+  "title": "Developer Guide",
+  "defaultOpen": true,
+  "pages": [
+    "configuration",
+    "project-structure",
+    "database-development",
+    "credit",
+    "api-key"
+  ]
+}

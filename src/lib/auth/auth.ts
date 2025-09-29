@@ -1,0 +1,66 @@
+import { env } from '@/env';
+import db from '@/server/db';
+import { betterAuth } from 'better-auth';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { admin, apiKey } from 'better-auth/plugins';
+
+
+
+export const auth = betterAuth({
+  database: drizzleAdapter(db, {
+    provider: 'pg',
+  }),
+  baseURL: env.NEXT_PUBLIC_APP_URL,
+  secret: env.BETTER_AUTH_SECRET,
+  emailAndPassword: {
+    enabled: true,
+  },
+  socialProviders: {
+    github: {
+      clientId: env.GITHUB_CLIENT_ID,
+      clientSecret: env.GITHUB_CLIENT_SECRET,
+    },
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    },
+  },
+  advanced: {
+    httpClient: {
+      timeout: 30000, // Increase timeout to 30 seconds
+      retry: {
+        maxAttempts: 3,
+        backoff: 'exponential',
+      },
+    },
+    customFetch: async (url: string, options?: RequestInit) => {
+      // Add timeout to fetch requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
+    },
+  },
+  session: {
+    expiresIn: 60 * 60 * 24 * 30,
+    updateAge: 60 * 60 * 24 * 3,
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 60 
+    },
+  },
+  plugins: [
+    admin(),
+    apiKey()
+  ]
+});
