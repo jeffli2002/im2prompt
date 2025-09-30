@@ -13,7 +13,9 @@ import { paymentConfig } from '@/config/payment.config';
 const webhookErrorLogger = new ErrorLogger('stripe-webhook');
 const webhookLogger = createChildLogger('stripe-webhook');
 
-const stripeProvider = new StripeProvider();
+// Check if Stripe is configured
+const isStripeConfigured = !!paymentConfig.stripe?.secretKey;
+const stripeProvider = isStripeConfigured ? new StripeProvider() : null;
 
 /**
  * Helper function to find payment plan by price ID
@@ -246,6 +248,14 @@ async function handlePlanUpgrade(userId: string, oldPriceId: string, newPriceId:
 
 export async function POST(request: NextRequest) {
   try {
+    // If Stripe is not configured, return early
+    if (!isStripeConfigured || !stripeProvider) {
+      webhookLogger.warn({
+        status: 'stripe_not_configured'
+      }, 'Stripe webhook called but Stripe is not configured');
+      return NextResponse.json({ received: true, message: 'Stripe not configured' });
+    }
+
     const body = await request.text();
     const signature = request.headers.get('stripe-signature');
 
