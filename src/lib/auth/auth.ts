@@ -26,13 +26,6 @@ export const auth = betterAuth({
     },
   },
   advanced: {
-    httpClient: {
-      timeout: 30000, // Increase timeout to 30 seconds
-      retry: {
-        maxAttempts: 3,
-        backoff: 'exponential',
-      },
-    },
     customFetch: async (url: string, options?: RequestInit) => {
       // Add timeout to fetch requests
       const controller = new AbortController();
