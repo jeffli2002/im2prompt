@@ -3,23 +3,23 @@ import type { AppConfig } from "@/types";
 export const appConfig: AppConfig = {
   // Application basic information
   app: {
-    name: 'Better-SaaS',
+    name: 'im2Prompt',
     version: '0.1.0',
-    description: 'A better SaaS application template',
+    description: 'Extract AI prompts from any image and create stunning new visuals',
     url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    domain: 'better-saas.com',
+    domain: 'im2prompt.com',
   },
 
   // SEO and metadata
   metadata: {
     title: {
-      default: 'Better-SaaS',
-      template: '%s | Better-SaaS',
+      default: 'im2Prompt - AI Image to Prompt Extraction',
+      template: '%s | im2Prompt',
     },
-    description: 'A modern, full-stack SaaS application built with Next.js 15, featuring authentication, payments, file management, and internationalization.',
-    keywords: ['SaaS', 'Next.js', 'React', 'TypeScript', 'Authentication', 'Payments', 'Stripe'],
-    authors: [{ name: 'Better-SaaS Team' }],
-    creator: 'Better-SaaS Team',
+    description: 'Extract AI prompts from images, refine them, and generate new visuals. Support for Midjourney, Stable Diffusion, and FLUX. Start free today!',
+    keywords: ['AI', 'Image to Prompt', 'Midjourney', 'Stable Diffusion', 'FLUX', 'AI Art', 'Prompt Engineering', 'Creative AI'],
+    authors: [{ name: 'im2Prompt Team' }],
+    creator: 'im2Prompt Team',
     robots: {
       index: true,
       follow: true,
@@ -28,11 +28,11 @@ export const appConfig: AppConfig = {
       type: 'website',
       locale: 'en_US',
       url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-      siteName: 'Better-SaaS',
+      siteName: 'im2Prompt',
     },
     twitter: {
       card: 'summary_large_image',
-      creator: '@better_saas',
+      creator: '@im2prompt',
     },
   },
 

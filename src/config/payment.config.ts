@@ -19,93 +19,94 @@ export const paymentConfig: PaymentConfig = {
     {
       id: 'free',
       name: 'Free',
-      description: 'Perfect for getting started',
+      description: 'Perfect for trying out im2Prompt',
       price: 0,
       interval: null,
       credits: {
-        monthly: 50,    // 每月免费积分
-        onSignup: 50,   // 注册赠送积分
+        monthly: 20,    // 20 extractions
+        onSignup: 20,   // Start immediately
       },
       features: [
-        '50 credits per month',
-        'Basic API access',
-        '1GB storage',
-        'Basic support',
-        'Community access',
+        '20 prompt extractions/month',
+        '10 preview generations',
+        '2 HD image renders',
+        'Basic prompt variations',
+        'Community support',
       ],
       popular: false,
       limits: {
-        storage: 1,
-        users: 1,
-        projects: 3,
-        apiCalls: 50,
+        extractions: 20,
+        previews: 10,
+        hdRenders: 2,
+        batchSize: 1,
       },
     },
     {
       id: 'pro',
       name: 'Pro',
-      description: 'Best for professionals',
-      price: 49,
-      yearlyPrice: 499, // $49 * 10 months (2 months free)
+      description: 'For professional creators',
+      price: 15,
+      yearlyPrice: 150, // $15 * 10 months (2 months free)
       interval: 'month',
       stripePriceIds: {
         monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY || 'price_pro_monthly',
         yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY || 'price_pro_yearly',
       },
       credits: {
-        monthly: 1000,     // 每月积分
-        yearly: 12000,     // 年付积分（多送2个月）
-        onSubscribe: 1000, // 订阅时立即获得
+        monthly: 999999,     // Unlimited extractions
+        onSubscribe: 300,    // 300 preview generations
       },
       features: [
-        '1,000 credits per month',
-        'Advanced API access',
-        '10GB storage',
+        'Unlimited prompt extractions',
+        '300 preview generations/month',
+        '50 HD image renders/month',
+        'Advanced prompt variations',
+        'Custom style packs',
+        'Batch processing (up to 10)',
         'Priority support',
-        'Advanced analytics',
-        'Custom integrations',
-        'Team collaboration',
+        'API access',
       ],
       popular: true,
       limits: {
-        storage: 10,
-        users: 5,
-        projects: -1, // unlimited
-        apiCalls: 10000,
+        extractions: -1, // unlimited
+        previews: 300,
+        hdRenders: 50,
+        batchSize: 10,
       },
     },
     {
-      id: 'enterprise',
-      name: 'Enterprise',
-      description: 'For large organizations',
-      price: 199,
-      yearlyPrice: 1999, // Updated pricing to match design document
+      id: 'team',
+      name: 'Team',
+      description: 'For teams and agencies',
+      price: 49,
+      yearlyPrice: 490, // $49 * 10 months (2 months free)
       interval: 'month',
       stripePriceIds: {
-        monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE_MONTHLY || 'price_enterprise_monthly',
-        yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE_YEARLY || 'price_enterprise_yearly',
+        monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_TEAM_MONTHLY || 'price_team_monthly',
+        yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_TEAM_YEARLY || 'price_team_yearly',
       },
       credits: {
-        monthly: 5000,     // 每月积分
-        yearly: 60000,     // 年付积分
-        onSubscribe: 5000, // 订阅时立即获得
+        monthly: 999999,     // Unlimited
+        onSubscribe: 1000,   // 1000 preview generations
       },
       features: [
-        '5,000 credits per month',
-        'Enterprise API access',
-        'Unlimited storage',
-        '24/7 dedicated support',
-        'Custom integrations',
-        'Advanced security',
-        'SLA guarantee',
-        'On-premise deployment',
+        'Everything in Pro',
+        '1000 preview generations/month',
+        '200 HD image renders/month',
+        'Shared prompt libraries',
+        'Team collaboration tools',
+        'Brand style packs',
+        'Advanced analytics',
+        'Dedicated support',
+        'SSO authentication',
       ],
       popular: false,
       limits: {
-        storage: -1, // unlimited
-        users: -1, // unlimited
-        projects: -1, // unlimited
-        apiCalls: 100000,
+        extractions: -1, // unlimited
+        previews: 1000,
+        hdRenders: 200,
+        batchSize: 50,
+        teamMembers: 10,
       },
     },
   ],

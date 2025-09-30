@@ -1,65 +1,79 @@
 import { cn } from '@/lib/utils';
 import {
-  IconAdjustmentsBolt,
-  IconCloud,
-  IconCurrencyDollar,
-  IconEaseInOut,
-  IconHeart,
-  IconHelp,
-  IconRouteAltLeft,
-  IconTerminal2,
-} from '@/lib/icons';
+  Sparkles,
+  Image,
+  Wand2,
+  Layers,
+  Globe,
+  Zap,
+  Shield,
+  Users,
+} from 'lucide-react';
 
 export function Features() {
   const features = [
     {
-      title: 'Authentication',
-      description: 'Full authentication flow with password and OAuth.',
-      icon: <IconTerminal2 />,
+      title: 'AI Prompt Extraction',
+      description: 'Advanced AI models analyze images and extract the prompts that created them with high accuracy.',
+      icon: <Sparkles className="h-6 w-6" />,
     },
     {
-      title: 'Database',
-      description: 'Access your data in a type-safe way with Drizzle ORM.',
-      icon: <IconEaseInOut />,
+      title: 'Multiple AI Models',
+      description: 'Support for Midjourney, Stable Diffusion, FLUX, DALL-E 3, and more AI generation models.',
+      icon: <Layers className="h-6 w-6" />,
     },
     {
-      title: 'Saas Blog',
-      description: 'Multi-language, MDX-based blog to write about your product.',
-      icon: <IconCurrencyDollar />,
+      title: 'Instant Generation',
+      description: 'Preview and regenerate images instantly with extracted or refined prompts.',
+      icon: <Zap className="h-6 w-6" />,
     },
     {
-      title: 'SaaS Documentation',
-      description:
-        'Multi-language, MDX-based documentation to help your users get started with your product.',
-      icon: <IconCloud />,
+      title: 'Smart Variations',
+      description: 'AI generates multiple prompt variations and negative prompts for better results.',
+      icon: <Wand2 className="h-6 w-6" />,
     },
     {
-      title: 'Payments',
-      description: 'Manage your billing and subscriptions with Stripe',
-      icon: <IconRouteAltLeft />,
+      title: 'Batch Processing',
+      description: 'Upload and extract prompts from multiple images at once for efficient workflows.',
+      icon: <Image className="h-6 w-6" />,
     },
     {
-      title: 'Internationalization',
-      description: 'Reach more customers by making your app multilingual.',
-      icon: <IconHelp />,
+      title: 'Global Style Library',
+      description: 'Save and apply custom style packs across all your prompt generations.',
+      icon: <Globe className="h-6 w-6" />,
     },
     {
-      title: 'Admin Dashboard',
-      description: 'Manage or Disable your user accounts within Admin dashboard.',
-      icon: <IconAdjustmentsBolt />,
+      title: 'Team Collaboration',
+      description: 'Share prompt libraries and collaborate with your team in real-time.',
+      icon: <Users className="h-6 w-6" />,
     },
     {
-      title: 'SEO Friendly',
-      description: 'The Better-SaaS is SEO-Ready out of the box, no extra work required',
-      icon: <IconHeart />,
+      title: 'Enterprise Security',
+      description: 'SOC2 compliant with end-to-end encryption and secure API access.',
+      icon: <Shield className="h-6 w-6" />,
     },
   ];
   return (
-    <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 py-10 md:grid-cols-2 lg:grid-cols-4">
-      {features.map((feature, index) => (
-        <Feature key={feature.title} {...feature} index={index} />
-      ))}
-    </div>
+    <section className="py-24 bg-muted/30">
+      <div className="container">
+        {/* Section header */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-4xl sm:text-5xl font-bold mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            Everything You Need
+          </h2>
+          <p className="text-xl text-muted-foreground animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+            Professional tools to extract, enhance, and regenerate AI prompts at scale
+          </p>
+        </div>
+
+        {/* Features grid - Apple-style cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((feature, index) => (
+            <Feature key={feature.title} {...feature} index={index} />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -76,26 +90,22 @@ const Feature = ({
 }) => {
   return (
     <div
-      className={cn(
-        'group/feature relative flex flex-col py-10 lg:border-r dark:border-neutral-800',
-        (index === 0 || index === 4) && 'lg:border-l dark:border-neutral-800',
-        index < 4 && 'lg:border-b dark:border-neutral-800'
-      )}
+      className="group relative p-6 rounded-2xl bg-background border hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4"
+      style={{
+        animationDelay: `${index * 100}ms`,
+        animationDuration: '700ms',
+      }}
     >
-      {index < 4 && (
-        <div className="pointer-events-none absolute inset-0 h-full w-full bg-gradient-to-t from-neutral-100 to-transparent opacity-0 transition duration-200 group-hover/feature:opacity-100 dark:from-neutral-800" />
-      )}
-      {index >= 4 && (
-        <div className="pointer-events-none absolute inset-0 h-full w-full bg-gradient-to-b from-neutral-100 to-transparent opacity-0 transition duration-200 group-hover/feature:opacity-100 dark:from-neutral-800" />
-      )}
-      <div className="relative z-10 mb-4 px-10 text-neutral-600 dark:text-neutral-400">{icon}</div>
-      <div className="relative z-10 mb-2 px-10 font-bold text-lg">
-        <div className="absolute inset-y-0 left-0 h-6 w-1 origin-center rounded-tr-full rounded-br-full bg-neutral-300 transition-all duration-200 group-hover/feature:h-8 group-hover/feature:bg-blue-500 dark:bg-neutral-700" />
-        <span className="inline-block text-neutral-800 transition duration-200 group-hover/feature:translate-x-2 dark:text-neutral-100">
-          {title}
-        </span>
+      {/* Icon with gradient background */}
+      <div className="mb-4 inline-flex p-3 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 group-hover:from-primary/20 group-hover:to-primary/10 transition-colors">
+        <div className="text-primary">{icon}</div>
       </div>
-      <p className="relative z-10 max-w-xs px-10 text-neutral-600 text-sm dark:text-neutral-300">
+
+      {/* Content */}
+      <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
+        {title}
+      </h3>
+      <p className="text-sm text-muted-foreground leading-relaxed">
         {description}
       </p>
     </div>

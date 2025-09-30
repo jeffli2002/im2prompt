@@ -26,6 +26,12 @@ export {
   SelectValue,
 } from './select';
 export { Switch } from './switch';
+export {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from './tabs';
 
 // 反馈组件
 export { Badge } from './badge';

@@ -140,7 +140,7 @@
     "purchaseText": "购买",
     "purchaseDialog": {
       "title": "测试支付提醒",
-      "description": "better-saas是开源免费的软件，请使用测试卡号5555555555554444进行支付，切勿真实付款。",
+      "description": "im2Prompt目前处于测试阶段，请使用测试卡号5555555555554444进行支付，切勿真实付款。",
       "testCardNumber": "测试卡号：5555555555554444",
       "warning": "⚠️ 此为测试用途，请勿真实付款",
       "continueButton": "继续支付",
@@ -205,7 +205,7 @@
   },
   "navbar": {
     "logo": {
-      "title": "Better SaaS",
+      "title": "im2Prompt",
       "alt": "logo"
     },
     "menu": {
