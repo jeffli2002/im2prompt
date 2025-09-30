@@ -240,6 +240,11 @@ export interface PaymentPlan {
     users?: number;
     projects?: number;
     apiCalls?: number;
+    // im2Prompt specific limits
+    extractions?: number;
+    previews?: number;
+    hdRenders?: number;
+    batchSize?: number;
   };
   // Credits configuration for subscription-based credit system
   credits?: {
