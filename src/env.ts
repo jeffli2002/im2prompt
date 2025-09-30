@@ -10,22 +10,22 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     BETTER_AUTH_SECRET: z.string(),
-    GITHUB_CLIENT_ID: z.string(),
-    GITHUB_CLIENT_SECRET: z.string(),
+    GITHUB_CLIENT_ID: z.string().optional().default(''),
+    GITHUB_CLIENT_SECRET: z.string().optional().default(''),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
-    R2_BUCKET_NAME: z.string(),
-    R2_ACCESS_KEY_ID: z.string(),
-    R2_SECRET_ACCESS_KEY: z.string(),
-    R2_ENDPOINT: z.string(),
-    R2_PUBLIC_URL: z.string(),
+    R2_BUCKET_NAME: z.string().optional().default('dummy'),
+    R2_ACCESS_KEY_ID: z.string().optional().default('dummy'),
+    R2_SECRET_ACCESS_KEY: z.string().optional().default('dummy'),
+    R2_ENDPOINT: z.string().optional().default('https://dummy.r2.cloudflarestorage.com'),
+    R2_PUBLIC_URL: z.string().optional().default('https://dummy.com'),
     // Stripe
-    STRIPE_SECRET_KEY: z.string(),
-    STRIPE_WEBHOOK_SECRET: z.string(),
+    STRIPE_SECRET_KEY: z.string().optional().default('sk_test_dummy'),
+    STRIPE_WEBHOOK_SECRET: z.string().optional().default('whsec_dummy'),
     // Admin Configuration
     ADMIN_EMAILS: z.string().optional().default(''),
     // Cron Security
-    CRON_SECRET: z.string(),
+    CRON_SECRET: z.string().optional().default('dummy'),
   },
 
   /**
