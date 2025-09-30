@@ -245,6 +245,7 @@ export interface PaymentPlan {
     previews?: number;
     hdRenders?: number;
     batchSize?: number;
+    teamMembers?: number;
   };
   // Credits configuration for subscription-based credit system
   credits?: {
