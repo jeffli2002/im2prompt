@@ -209,7 +209,7 @@ export async function POST(req: NextRequest) {
           userId,
           promptText: extractedPrompt,
           negativePrompt: negativePrompt || null,
-          modelStyle,
+          modelStyle: modelStyle as 'general' | 'midjourney' | 'stable-diffusion' | 'flux' | 'sora2' | 'veo3',
           s3KeyOriginal: uploadedImageKey || null,
           creditsSpent: CREDITS_PER_EXTRACTION,
           metadata: JSON.stringify({
