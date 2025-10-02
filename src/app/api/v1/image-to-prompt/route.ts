@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
 import db from '@/server/db';
 import { prompts, creditTransactions, userCredits } from '@/server/db/schema';
-import { eq, desc, count } from 'drizzle-orm';
+import { eq, desc, count, and } from 'drizzle-orm';
 
 // Coze API configuration
 const COZE_API_URL = 'https://api.coze.cn/v3/chat';
@@ -269,19 +269,19 @@ export async function GET(req: NextRequest) {
     const modelStyle = searchParams.get('modelStyle') as string | null;
     const offset = (page - 1) * limit;
 
-    // Build query
-    let query = db
-      .select()
-      .from(prompts)
-      .where(eq(prompts.userId, userId));
-
+    // Build query with conditional filters
+    const conditions = [eq(prompts.userId, userId)];
+    
     // Filter by model style if provided
     if (modelStyle && ['general', 'midjourney', 'stable-diffusion', 'flux', 'sora2', 'veo3'].includes(modelStyle)) {
-      query = query.where(eq(prompts.modelStyle, modelStyle));
+      conditions.push(eq(prompts.modelStyle, modelStyle));
     }
 
     // Add ordering and pagination
-    const userPrompts = await query
+    const userPrompts = await db
+      .select()
+      .from(prompts)
+      .where(and(...conditions))
       .orderBy(desc(prompts.createdAt))
       .limit(limit)
       .offset(offset);
