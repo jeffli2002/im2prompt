@@ -45,12 +45,6 @@ export function ProtectedLayoutClient({ children }: ProtectedLayoutClientProps) 
       defaultOpen: true,
       items: [
         {
-          title: t('imageToPrompt'),
-          href: '/image-to-prompt',
-          icon: Image,
-          badge: 'NEW',
-        },
-        {
           title: t('promptLibrary'),
           href: '/prompt-library',
           icon: Sparkles,
