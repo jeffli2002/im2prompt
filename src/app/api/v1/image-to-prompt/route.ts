@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
     const imageFile = formData.get('image') as File | null;
     const modelStyle = formData.get('modelStyle') as string || 'general';
     const imageUrl = formData.get('imageUrl') as string | null;
+    const language = formData.get('language') as string || 'english';
 
     // Validate input
     if (!imageFile && !imageUrl) {
@@ -46,6 +47,17 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Map frontend model style to Coze API promptStyle format
+    const modelStyleToPromptStyle: Record<string, string> = {
+      'general': 'normal',
+      'midjourney': 'midjourney',
+      'stable-diffusion': 'stableDiffusion',
+      'flux': 'flux',
+      'sora2': 'sora2',
+      'veo3': 'veo3'
+    };
+    const promptStyle = modelStyleToPromptStyle[modelStyle] || 'normal';
 
     // Handle file upload validation
     let imageBase64 = '';
@@ -102,7 +114,7 @@ export async function POST(req: NextRequest) {
 
     const analysisPrompt = stylePrompts[modelStyle as keyof typeof stylePrompts];
 
-    // Call Coze API
+    // Call Coze API with workflow variables
     const cozePayload = {
       bot_id: COZE_BOT_ID,
       stream: false,
@@ -113,7 +125,12 @@ export async function POST(req: NextRequest) {
           content: analysisPrompt,
           content_type: 'text'
         }
-      ]
+      ],
+      // Pass prompt style and language as workflow variables to Coze API
+      bot_variables: {
+        promptStyle: promptStyle,
+        language: language
+      }
     };
 
     // Add image to the message

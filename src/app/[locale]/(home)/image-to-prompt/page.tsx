@@ -43,6 +43,13 @@ const aiModels: AIModel[] = [
     gradient: 'from-pink-500/20 to-pink-600/20'
   },
   {
+    id: 'flux',
+    name: 'Flux',
+    description: 'Photorealistic AI image generation',
+    icon: <Sparkles className="h-5 w-5" />,
+    gradient: 'from-cyan-500/20 to-blue-600/20'
+  },
+  {
     id: 'sora2',
     name: 'Sora 2',
     description: 'Cinematic video prompts with motion and storytelling',
@@ -63,6 +70,7 @@ const aiModels: AIModel[] = [
 export default function ImageToPromptPage() {
   const router = useRouter();
   const [selectedModel, setSelectedModel] = useState<string>('general');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('english');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string>('');
@@ -123,6 +131,7 @@ export default function ImageToPromptPage() {
         formData.append('imageUrl', imageUrl);
       }
       formData.append('modelStyle', selectedModel);
+      formData.append('language', selectedLanguage);
 
       const response = await fetch('/api/v1/image-to-prompt', {
         method: 'POST',
@@ -360,7 +369,7 @@ export default function ImageToPromptPage() {
               <div className="lg:col-span-1 space-y-3">
                 <div>
                   <Label className="text-sm mb-2 block">Prompt Language</Label>
-                  <Select defaultValue="english">
+                  <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
                     <SelectTrigger className="h-10">
                       <SelectValue placeholder="Select language" />
                     </SelectTrigger>
