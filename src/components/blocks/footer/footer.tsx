@@ -53,7 +53,7 @@ const defaultSections = [
     title: 'Resources',
     links: [
       { name: 'Help', href: '#' },
-      { name: 'Github', href: 'https://github.com/justnode/better-saas' },
+      { name: 'Github', href: '#' },
       { name: 'Advertise', href: '#' },
       { name: 'Privacy', href: '#' },
     ],
@@ -61,7 +61,7 @@ const defaultSections = [
 ];
 
 const defaultSocialLinks = [
-  { icon: <IconBrandGithub strokeWidth={1} className="size-5" />, href: 'https://github.com/justnode/better-saas', label: 'Github' },
+  { icon: <IconBrandGithub strokeWidth={1} className="size-5" />, href: '#', label: 'Github' },
   { icon: <IconBrandInstagram strokeWidth={1} className="size-5" />, href: '#', label: 'Instagram' },
   { icon: <IconBrandTwitter strokeWidth={1} className="size-5" />, href: '#', label: 'Twitter' },
   { icon: <IconBrandLinkedin strokeWidth={1} className="size-5" />, href: '#', label: 'LinkedIn' },
@@ -77,12 +77,12 @@ export const Footer = ({
     url: '/',
     src: '/icons/favicon-32x32.png',
     alt: 'logo',
-    title: 'better-saas.org',
+    title: 'im2Prompt',
   },
   sections = defaultSections,
   description = 'A collection of components for your startup business or side project.',
   socialLinks = defaultSocialLinks,
-  copyright = '© 2025 Better-SaaS. All rights reserved.',
+  copyright = '© 2025 im2Prompt. All rights reserved.',
   legalLinks = defaultLegalLinks,
 }: FooterProps) => {
   return (

@@ -294,6 +294,7 @@ export interface SidebarItem {
   title: string;
   href: string;
   icon: React.ComponentType<{ className?: string }> | string;
+  badge?: string;
 }
 
 // Navbar configuration types

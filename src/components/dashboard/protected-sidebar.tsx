@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { ProtectedSidebarProps } from '@/types';
 import { 
@@ -18,7 +19,9 @@ import {
   Shield,
   Home,
   Settings,
-  LayoutDashboard
+  LayoutDashboard,
+  Image,
+  Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -39,6 +42,8 @@ const iconMap = {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Image,
+  Sparkles,
 };
 
 export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: ProtectedSidebarProps) {
@@ -77,10 +82,10 @@ export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: Protect
         {!collapsed && (
           <div className="flex items-center space-x-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="font-bold text-primary-foreground text-sm">BS</span>
+              <span className="font-bold text-primary-foreground text-sm">i2P</span>
             </div>
             <Link href="/">
-              <span className="font-semibold text-lg">Better-SaaS</span>
+              <span className="font-semibold text-lg">im2Prompt</span>
             </Link>
           </div>
         )}
@@ -134,7 +139,16 @@ export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: Protect
                           >
                             <Link href={item.href}>
                               <Icon className={cn('h-4 w-4', !collapsed && 'mr-3')} />
-                              {!collapsed && <span className="text-sm">{item.title}</span>}
+                              {!collapsed && (
+                                <>
+                                  <span className="text-sm flex-1">{item.title}</span>
+                                  {item.badge && (
+                                    <Badge variant="secondary" className="ml-auto text-xs px-1.5 py-0">
+                                      {item.badge}
+                                    </Badge>
+                                  )}
+                                </>
+                              )}
                             </Link>
                           </Button>
                         );

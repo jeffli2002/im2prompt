@@ -3,7 +3,7 @@
 import { ProtectedContainer } from '@/components/dashboard/protected-container';
 import { useIsAdmin } from '@/components/auth/permission-provider';
 import type { SidebarGroup } from '@/types';
-import { Coins, History, CreditCard, Files, Shield, Users, Key } from 'lucide-react';
+import { Coins, History, CreditCard, Files, Shield, Users, Key, Image, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
@@ -38,6 +38,25 @@ export function ProtectedLayoutClient({ children }: ProtectedLayoutClientProps) 
         ],
       });
     }
+
+    // AI Tools menu - available to all users
+    groups.push({
+      title: t('aiTools'),
+      defaultOpen: true,
+      items: [
+        {
+          title: t('imageToPrompt'),
+          href: '/image-to-prompt',
+          icon: Image,
+          badge: 'NEW',
+        },
+        {
+          title: t('promptLibrary'),
+          href: '/prompt-library',
+          icon: Sparkles,
+        },
+      ],
+    });
 
     // all users can see Credits menu
     groups.push({

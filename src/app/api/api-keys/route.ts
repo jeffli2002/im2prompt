@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 生成API Key
-    const keyValue = `bs_${uuidv4().replace(/-/g, '')}`; // bs_ prefix for better-saas
+    const keyValue = `i2p_${uuidv4().replace(/-/g, '')}`; // i2p_ prefix for im2Prompt
     const hashedKey = await bcrypt.hash(keyValue, 10);
 
     // 插入数据库

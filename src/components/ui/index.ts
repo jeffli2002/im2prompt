@@ -6,6 +6,7 @@ export { Button } from './button';
 export { Input } from './input';
 export { Label } from './label';
 export { Separator } from './separator';
+export { Textarea } from './textarea';
 
 // 卡片组件
 export { 
@@ -108,4 +109,17 @@ export {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from './tooltip'; 
+} from './tooltip';
+
+// Toast组件
+export {
+  Toast,
+  ToastAction,
+  ToastClose,
+  ToastDescription,
+  ToastProvider,
+  ToastTitle,
+  ToastViewport,
+} from './toast';
+export { useToast, toast } from './use-toast';
+export { Toaster } from './toaster'; 
