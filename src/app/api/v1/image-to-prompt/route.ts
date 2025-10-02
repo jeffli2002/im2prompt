@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
         content: imageBase64,
         content_type: 'image'
       } as any);
-    } else if (imageUrl) {
+    } else if (imageUrl && cozePayload.additional_messages[0]) {
       cozePayload.additional_messages[0].content = `${analysisPrompt}\n\nImage URL: ${imageUrl}`;
     }
 
