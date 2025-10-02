@@ -15,6 +15,7 @@ const initializeUserCredits = async (userId: string): Promise<void> => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ userId }),
+      credentials: 'include', // Include cookies for authentication
     });
 
     if (!response.ok) {
@@ -382,7 +383,7 @@ export const useAuthStore = create<AuthState>()(
         },
       }),
       {
-        name: 'better-saas-auth',
+        name: 'im2prompt-auth',
         storage: createJSONStorage(() => localStorage),
         // Only persist safe state fields
         partialize: (state) => ({
