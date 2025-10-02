@@ -207,3 +207,28 @@ export const apiKey = pgTable('api_key', {
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+// Prompts table for image-to-prompt feature
+export const prompts = pgTable('prompts', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  promptText: text('prompt_text').notNull(),
+  negativePrompt: text('negative_prompt'),
+  modelStyle: text('model_style', {
+    enum: ['general', 'midjourney', 'stable-diffusion', 'flux', 'sora2', 'veo3']
+  }).notNull(),
+  s3KeyOriginal: text('s3_key_original'), // Original uploaded image
+  s3KeyRender: text('s3_key_render'), // Generated render if any
+  creditsSpent: integer('credits_spent').notNull().default(0),
+  metadata: text('metadata'), // JSON string for additional data
+  tags: text('tags').array(), // Array of tags for search
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+// Force rebuild
