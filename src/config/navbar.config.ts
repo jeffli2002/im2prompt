@@ -33,8 +33,8 @@ export const navbarConfig: NavbarConfig = {
         url: '/docs',
       },
       {
-        title: 'menu.components', // i18n key
-        url: '/blocks',
+        title: 'menu.tools', // i18n key
+        url: '/image-to-prompt',
       },
       {
         title: 'menu.pricing', // i18n key

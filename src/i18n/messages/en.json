@@ -157,23 +157,31 @@
     "description": "Build your SaaS application with the latest technology stack"
   },
   "faq": {
-    "heading": "Frequently asked questions",
-    "description": "Everything you need to know about im2Prompt. Can't find your answer? We're here to help.",
+    "heading": "FAQ (SEO Optimized)",
+    "description": "Everything you need to know about our AI Image/Text ⇄ Prompt ⇄ Image/Video Platform",
     "supportHeading": "Need more support?",
     "supportDescription": "Our dedicated support team is here to help you with any questions or concerns. Get in touch with us for personalized assistance.",
     "supportButtonText": "Contact Support",
     "items": [
       {
-        "question": "How accurate is the prompt extraction?",
-        "answer": "Our AI models achieve 85-95% accuracy in extracting prompts from AI-generated images. The accuracy depends on the complexity of the image and the AI model used to create it. We continuously improve our models based on user feedback."
+        "question": "What is Sora 2?",
+        "answer": "Sora 2 is OpenAI's advanced text-to-video AI model, capable of creating realistic, cinematic videos with detailed motion, scene dynamics, and storytelling elements."
       },
       {
-        "question": "Which AI models do you support?",
-        "answer": "We support all major AI image generation models including Midjourney, Stable Diffusion (SDXL), FLUX, DALL-E 3, and more. We regularly add support for new models as they become available."
+        "question": "How does image-to-prompt work?",
+        "answer": "Upload an image and the system automatically extracts a structured, detailed AI-ready prompt for use in models like Midjourney, Flux, Stable Diffusion, Sora 2, or Veo3."
       },
       {
-        "question": "What's the difference between previews and HD renders?",
-        "answer": "Previews are low-resolution (256px) quick generations perfect for testing prompts. HD renders are full-resolution images (up to 1024px or higher) suitable for production use. Preview generation uses minimal credits while HD renders use more."
+        "question": "Can I generate videos with Veo3?",
+        "answer": "Yes. Veo3 prompts are compatible with Canva's AI video generator, ideal for producing short-form videos and animations."
+      },
+      {
+        "question": "Do you generate negative prompts automatically?",
+        "answer": "Yes. The system auto-creates negative prompts to remove unwanted details and enhance final outputs."
+      },
+      {
+        "question": "Can I refine prompts naturally?",
+        "answer": "Absolutely. You can simply type: \"make this more cinematic,\" \"change lighting to neon,\" or \"add futuristic elements.\""
       },
       {
         "question": "Can I use im2Prompt via API?",
@@ -197,6 +205,9 @@
     "dashboard": "Dashboard",
     "users": "Users",
     "files": "File Management",
+    "aiTools": "AI Tools",
+    "imageToPrompt": "Image to Prompt",
+    "promptLibrary": "Prompt Library",
     "settings": "Settings",
     "profile": "Profile",
     "billing": "Billing",
@@ -208,13 +219,13 @@
   },
   "navbar": {
     "logo": {
-      "title": "Better SaaS",
+      "title": "im2Prompt",
       "alt": "logo"
     },
     "menu": {
       "blog": "Blog",
       "document": "Document",
-      "components": "Components",
+      "tools": "Tools",
       "pricing": "Pricing",
       "resources": "Resources",
       "helpCenter": "Help Center",
