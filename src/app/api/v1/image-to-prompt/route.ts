@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
         // For Stable Diffusion, try to extract negative prompt
         if (modelStyle === 'stable-diffusion' && extractedPrompt.includes('Negative prompt:')) {
           const parts = extractedPrompt.split('Negative prompt:');
-          extractedPrompt = parts[0].replace('Positive prompt:', '').trim();
+          extractedPrompt = parts[0]?.replace('Positive prompt:', '').trim() || '';
           negativePrompt = parts[1]?.trim() || '';
         }
       }
