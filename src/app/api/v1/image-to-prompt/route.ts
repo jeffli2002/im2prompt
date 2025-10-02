@@ -274,7 +274,7 @@ export async function GET(req: NextRequest) {
     
     // Filter by model style if provided
     if (modelStyle && ['general', 'midjourney', 'stable-diffusion', 'flux', 'sora2', 'veo3'].includes(modelStyle)) {
-      conditions.push(eq(prompts.modelStyle, modelStyle));
+      conditions.push(eq(prompts.modelStyle, modelStyle as 'general' | 'midjourney' | 'stable-diffusion' | 'flux' | 'sora2' | 'veo3'));
     }
 
     // Add ordering and pagination
