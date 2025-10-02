@@ -1,26 +1,26 @@
 import { Hero } from '@/components/blocks/hero/hero';
-import { WorkflowDemo } from '@/components/blocks/workflow/workflow-demo';
+import { HowItWorks } from '@/components/blocks/how-it-works/how-it-works';
+import { WhyChoose } from '@/components/blocks/why-choose/why-choose';
+import { WhoIsItFor } from '@/components/blocks/who-is-it-for/who-is-it-for';
 import { Features } from '@/components/blocks/features/features';
-import { TrustedBy } from '@/components/blocks/social-proof/trusted-by';
-import { Testimonials } from '@/components/blocks/social-proof/testimonials';
 import { Pricing } from '@/components/blocks/pricing/pricing';
 import { UseCases } from '@/components/blocks/use-cases/use-cases';
 import { Faq } from '@/components/blocks/faq/faq';
-import { CallToAction } from '@/components/blocks/cta/call-to-action';
+import { FinalCTA } from '@/components/blocks/cta/final-cta';
 import React from 'react';
 
 export default function HomePage() {
   return (
     <>
       <Hero />
-      <TrustedBy />
-      <WorkflowDemo />
+      <HowItWorks />
+      <WhyChoose />
+      <WhoIsItFor />
       <Features />
       <UseCases />
-      <Testimonials />
       <Pricing />
       <Faq />
-      <CallToAction />
+      <FinalCTA />
     </>
   );
 }

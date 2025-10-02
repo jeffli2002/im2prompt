@@ -1,4 +1,4 @@
-import { Star, Upload, Sparkles, ArrowRight, Image, FileText, Wand2 } from 'lucide-react';
+import { Star, Upload, Sparkles, ArrowRight, Image, FileText, Wand2, Video, Zap } from 'lucide-react';
 import React from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -63,12 +63,21 @@ const Hero = ({
     ],
   };
   return (
-    <section className="relative overflow-hidden pt-32 pb-20">
-      {/* Apple-style gradient mesh background */}
+    <section className="relative overflow-hidden pt-20 pb-32">
+      {/* Enhanced Apple-style gradient mesh background */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-background/80" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px]">
-          <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-primary/3 to-transparent blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background/85" />
+        {/* Primary gradient orb */}
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px]">
+          <div className="absolute inset-0 bg-gradient-radial from-primary/8 via-primary/4 to-transparent blur-3xl" />
+        </div>
+        {/* Secondary accent gradient */}
+        <div className="absolute top-40 right-1/4 w-[800px] h-[800px]">
+          <div className="absolute inset-0 bg-gradient-radial from-blue-500/6 via-blue-500/3 to-transparent blur-2xl" />
+        </div>
+        {/* Tertiary accent gradient */}
+        <div className="absolute bottom-20 left-1/4 w-[600px] h-[600px]">
+          <div className="absolute inset-0 bg-gradient-radial from-purple-500/5 via-purple-500/2 to-transparent blur-2xl" />
         </div>
       </div>
 
@@ -76,112 +85,70 @@ const Hero = ({
         {/* Announcement pill - Apple style */}
         <div className="flex justify-center mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
           <div className="inline-flex items-center rounded-full px-6 py-2 text-sm bg-black/5 dark:bg-white/5 backdrop-blur-lg border border-black/10 dark:border-white/10">
-            <Sparkles className="mr-2 h-4 w-4 text-primary" />
-            <span className="font-medium">New: Support for FLUX 1.1 Pro & DALL-E 3</span>
+            <Video className="mr-2 h-4 w-4 text-primary" />
+            <span className="font-medium">New: Sora 2 Video Generation Now Available!</span>
           </div>
         </div>
 
-        <div className="mx-auto max-w-5xl text-center">
-          {/* Main heading - Apple-style typography */}
+        <div className="mx-auto max-w-6xl text-center">
+          {/* Main heading - Enhanced Apple-style typography */}
           <h1 className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-            <span className="block font-bold text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.9]">
-              <span className="bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
-                Extract AI Prompts
+            <span className="block text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.1]">
+              ✨ Turn Your Ideas into
+            </span>
+            <span className="block text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.1] mt-2">
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Cinematic Reality
               </span>
             </span>
-            <span className="block font-bold text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight mt-2">
-              <span className="bg-gradient-to-b from-foreground/70 to-foreground/50 bg-clip-text text-transparent">
-                from Any Image
-              </span>
+            <span className="block text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.1] mt-2">
+              with Sora 2 & AI
             </span>
           </h1>
 
-          {/* Subheading - Clean and refined */}
-          <p className="mt-8 text-xl sm:text-2xl text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-            Upload an image and instantly get the AI prompt that created it. 
-            Refine, enhance, and regenerate stunning visuals with leading AI models.
-          </p>
 
-          {/* Workflow visualization - Minimalist Apple style */}
-          <div className="mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-            <div className="inline-flex items-center gap-3 p-2 rounded-2xl bg-black/5 dark:bg-white/5 backdrop-blur-lg">
-              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-background shadow-sm">
-                <Image className="h-5 w-5 text-primary" />
-                <span className="font-medium text-sm">Image</span>
-              </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground/60" />
-              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-background shadow-sm">
-                <FileText className="h-5 w-5 text-primary" />
-                <span className="font-medium text-sm">Prompt</span>
-              </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground/60" />
-              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-background shadow-sm">
-                <Wand2 className="h-5 w-5 text-primary" />
-                <span className="font-medium text-sm">New Image</span>
-              </div>
+          {/* Key Highlights */}
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20">
+              <Video className="h-5 w-5 text-purple-600" />
+              <span className="text-sm font-medium">Sora 2 Video Generation</span>
+            </div>
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20">
+              <Sparkles className="h-5 w-5 text-blue-600" />
+              <span className="text-sm font-medium">Creative Flexibility</span>
+            </div>
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/20">
+              <ArrowRight className="h-5 w-5 text-green-600" />
+              <span className="text-sm font-medium">Seamless Workflow</span>
             </div>
           </div>
 
-          {/* CTAs - Apple-style buttons */}
-          <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
+
+          {/* Enhanced CTAs - Premium Apple-style buttons */}
+          <div className="mt-12 flex flex-col sm:flex-row gap-6 justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
             <Button 
               asChild 
               size="lg" 
-              className="px-8 py-6 text-base font-medium bg-foreground text-background hover:bg-foreground/90 transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="px-10 py-6 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 transition-all duration-300 shadow-xl hover:shadow-2xl rounded-2xl border-0"
             >
               <a href="/signup">
-                Start Free Trial
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <Zap className="mr-2 h-5 w-5" />
+                Start Creating Free
               </a>
             </Button>
             <Button 
               asChild 
               size="lg" 
               variant="outline" 
-              className="px-8 py-6 text-base font-medium border-muted-foreground/20 hover:bg-muted/50 transition-all duration-200"
+              className="px-10 py-6 text-lg font-semibold border-2 border-muted-foreground/30 hover:bg-muted/50 hover:border-muted-foreground/50 transition-all duration-300 rounded-2xl backdrop-blur-sm"
             >
-              <a href="#demo">
-                Watch Demo
+              <a href="/image-to-prompt">
+                <Video className="mr-2 h-5 w-5" />
+                Try Image to Prompt Generator
               </a>
             </Button>
           </div>
 
-          {/* Social proof - Clean and minimal */}
-          <div className="mt-16 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
-              <div className="flex items-center gap-4">
-                <span className="-space-x-2 flex">
-                  {finalReviews.avatars.slice(0, 4).map((avatar) => (
-                    <Avatar key={avatar.src} className="size-10 border-2 border-background shadow-sm">
-                      <AvatarImage src={avatar.src} alt={avatar.alt} />
-                    </Avatar>
-                  ))}
-                </span>
-                <div className="text-left">
-                  <div className="flex items-center gap-0.5">
-                    {[...Array(5)].map((_, index) => (
-                      <Star key={index} className="size-4 fill-primary text-primary" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-0.5">
-                    Loved by {finalReviews.count}+ creators
-                  </p>
-                </div>
-              </div>
-              
-              <div className="hidden sm:flex items-center gap-8 text-sm">
-                <div className="text-center">
-                  <p className="text-2xl font-semibold text-foreground">50K+</p>
-                  <p className="text-muted-foreground mt-1">Prompts extracted</p>
-                </div>
-                <div className="w-px h-12 bg-border" />
-                <div className="text-center">
-                  <p className="text-2xl font-semibold text-foreground">99.9%</p>
-                  <p className="text-muted-foreground mt-1">Uptime SLA</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>

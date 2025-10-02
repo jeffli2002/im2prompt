@@ -158,85 +158,134 @@ const Pricing = ({
   };
 
   return (
-    <section id="pricing" className="py-16">
-      <div className="container">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 text-center">
-          <h2 className="text-pretty font-bold text-4xl lg:text-6xl">{finalHeading}</h2>
-          <p className="text-muted-foreground lg:text-xl">{finalDescription}</p>
-          <div className="flex items-center gap-3 text-lg">
-            {t('monthly')}
-            <Switch checked={isYearly} onCheckedChange={() => setIsYearly(!isYearly)} />
-            {t('yearly')}
+    <section id="pricing" className="py-32 relative">
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/98 to-muted/20" />
+      
+      <div className="container relative">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 text-center">
+          <h2 className="text-pretty font-bold text-5xl sm:text-6xl lg:text-7xl">
+            <span className="bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
+              {finalHeading}
+            </span>
+          </h2>
+          <p className="text-xl sm:text-2xl text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed">
+            {finalDescription}
+          </p>
+          
+          {/* Enhanced toggle switch */}
+          <div className="flex items-center gap-4 text-lg bg-muted/30 p-2 rounded-2xl">
+            <span className={`px-4 py-2 rounded-xl transition-all duration-300 ${!isYearly ? 'bg-background shadow-sm font-semibold' : 'text-muted-foreground'}`}>
+              {t('monthly')}
+            </span>
+            <Switch 
+              checked={isYearly} 
+              onCheckedChange={() => setIsYearly(!isYearly)}
+              className="data-[state=checked]:bg-primary"
+            />
+            <span className={`px-4 py-2 rounded-xl transition-all duration-300 ${isYearly ? 'bg-background shadow-sm font-semibold' : 'text-muted-foreground'}`}>
+              {t('yearly')}
+            </span>
+            {isYearly && (
+              <span className="text-sm bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-3 py-1 rounded-full font-medium">
+                Save 20%
+              </span>
+            )}
           </div>
-          <div className="flex flex-col items-stretch gap-6 md:flex-row">
-            {pricingPlans.map((plan: PricingPlan) => (
-              <Card key={plan.id} className="flex w-80 flex-col justify-between text-left">
-                <CardHeader>
-                  <CardTitle>
+          <div className="flex flex-col items-stretch gap-8 md:flex-row justify-center">
+            {pricingPlans.map((plan: PricingPlan, index: number) => (
+              <Card 
+                key={plan.id} 
+                className={`flex w-80 flex-col justify-between text-left relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
+                  plan.id === 'pro' ? 'border-primary shadow-xl shadow-primary/20 scale-105' : 'border-border/50 hover:border-primary/50'
+                }`}
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                }}
+              >
+                {/* Popular badge */}
+                {plan.id === 'pro' && (
+                  <div className="absolute top-4 right-4">
+                    <Badge className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                      Most Popular
+                    </Badge>
+                  </div>
+                )}
+                
+                <CardHeader className="p-8">
+                  <CardTitle className="text-2xl font-bold mb-2">
                     <p>{plan.name}</p>
                   </CardTitle>
-                  <p className="text-muted-foreground text-sm">{plan.description}</p>
+                  <p className="text-muted-foreground text-base mb-6">{plan.description}</p>
                   
-                  {/* Credits Badge */}
+                  {/* Enhanced Credits Badge */}
                   {plan.credits && (
-                    <div className="flex flex-wrap gap-2 mb-3">
+                    <div className="flex flex-wrap gap-2 mb-6">
                       {plan.credits.monthly && (
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-2 rounded-xl font-semibold">
                           💎 {isYearly ? plan.credits.yearly || plan.credits.monthly * 12 : plan.credits.monthly} Credits
                           {isYearly ? '/year' : '/month'}
                         </Badge>
                       )}
                       {plan.credits.onSubscribe && (
-                        <Badge variant="outline" className="border-green-200 text-green-700 dark:border-green-800 dark:text-green-300">
+                        <Badge variant="outline" className="border-green-200 text-green-700 dark:border-green-800 dark:text-green-300 px-3 py-2 rounded-xl">
                           🎁 +{plan.credits.onSubscribe} Bonus
                         </Badge>
                       )}
                       {plan.credits.onSignup && (
-                        <Badge variant="outline" className="border-purple-200 text-purple-700 dark:border-purple-800 dark:text-purple-300">
+                        <Badge variant="outline" className="border-purple-200 text-purple-700 dark:border-purple-800 dark:text-purple-300 px-3 py-2 rounded-xl">
                           ✨ {plan.credits.onSignup} Free Credits
                         </Badge>
                       )}
                     </div>
                   )}
                   
-                  <span className="font-bold text-4xl">
-                    {isYearly ? plan.yearlyPrice : plan.monthlyPrice}
-                  </span>
-                  <p className="text-muted-foreground">
-                    {plan.monthlyPrice === 'Free' ? (
-                      'Forever free'
-                    ) : (
-                      <>
-                        Billed{' '}
-                        {isYearly
-                          ? `$${plan.yearlyTotal} annually`
-                          : `$${Number(plan.monthlyPrice.slice(1))} monthly`}
-                      </>
-                    )}
-                  </p>
+                  <div className="mb-4">
+                    <span className="font-bold text-5xl bg-gradient-to-b from-foreground to-foreground/80 bg-clip-text text-transparent">
+                      {isYearly ? plan.yearlyPrice : plan.monthlyPrice}
+                    </span>
+                    <p className="text-muted-foreground text-sm mt-2">
+                      {plan.monthlyPrice === 'Free' ? (
+                        'Forever free'
+                      ) : (
+                        <>
+                          Billed{' '}
+                          {isYearly
+                            ? `$${plan.yearlyTotal} annually`
+                            : `$${Number(plan.monthlyPrice.slice(1))} monthly`}
+                        </>
+                      )}
+                    </p>
+                  </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-8 pb-6">
                   <Separator className="mb-6" />
                   {plan.id === 'pro' && (
-                    <p className="mb-3 font-semibold">Everything in Plus, and:</p>
+                    <p className="mb-4 font-semibold text-primary">Everything in Plus, and:</p>
                   )}
-                  <ul className="space-y-4">
+                  <ul className="space-y-3">
                     {plan.features.map((feature: PricingFeature, index: number) => (
-                      <li key={`${plan.id}-feature-${index}`} className="flex items-center gap-2">
-                        <CircleCheck className="size-4" />
-                        <span>{feature.text}</span>
+                      <li key={`${plan.id}-feature-${index}`} className="flex items-start gap-3">
+                        <div className="p-1 rounded-full bg-green-100 dark:bg-green-900 mt-0.5">
+                          <CircleCheck className="size-3 text-green-600 dark:text-green-400" />
+                        </div>
+                        <span className="text-sm leading-relaxed">{feature.text}</span>
                       </li>
                     ))}
                   </ul>
                 </CardContent>
-                <CardFooter className="mt-auto">
+                <CardFooter className="mt-auto p-8 pt-0">
                   <Button 
-                    className="w-full" 
+                    className={`w-full py-6 text-lg font-semibold rounded-2xl transition-all duration-300 ${
+                      plan.id === 'pro' 
+                        ? 'bg-primary hover:bg-primary/90 shadow-xl hover:shadow-2xl' 
+                        : 'hover:shadow-xl'
+                    }`}
                     onClick={() => handlePurchaseClick(plan)}
                     disabled={isPending}
                   >
                     {isPending ? t('processingText') : plan.button.text}
-                    <ArrowRight className="ml-2 size-4" />
+                    <ArrowRight className="ml-2 size-5" />
                   </Button>
                 </CardFooter>
               </Card>
