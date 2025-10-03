@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { PromptPreview } from '@/components/prompt-preview';
 
 interface AIModel {
   id: string;
@@ -405,47 +406,16 @@ export default function ImageToPromptPage() {
 
               {/* Generated Prompt Output */}
               <div className="lg:col-span-2">
-                <div className="flex justify-between items-center mb-3">
-                  <Label className="text-sm">Generated Prompt</Label>
-                  {generatedPrompt && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(generatedPrompt)}
-                      className="h-8 px-2 text-xs"
-                    >
-                      <Check className="h-3 w-3 mr-1" />
-                      Copy
-                    </Button>
-                  )}
-                </div>
-                <Textarea
-                  value={generatedPrompt}
-                  onChange={(e) => setGeneratedPrompt(e.target.value)}
-                  className="min-h-[120px] text-sm"
-                  placeholder={isLoading ? "Generating your prompt..." : "Your generated prompt will appear here..."}
-                  readOnly={isLoading}
-                />
-                
-                {negativePrompt && selectedModel === 'stable-diffusion' && (
-                  <div className="mt-3">
-                    <div className="flex justify-between items-center mb-2">
-                      <Label className="text-sm">Negative Prompt</Label>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(negativePrompt)}
-                        className="h-8 px-2 text-xs"
-                      >
-                        <Check className="h-3 w-3 mr-1" />
-                        Copy
-                      </Button>
-                    </div>
-                    <Textarea
-                      value={negativePrompt}
-                      onChange={(e) => setNegativePrompt(e.target.value)}
-                      className="min-h-[80px] text-sm"
-                    />
+                <Label className="text-sm mb-3 block">Generated Prompt</Label>
+                {generatedPrompt ? (
+                  <PromptPreview 
+                    prompt={generatedPrompt} 
+                    negativePrompt={negativePrompt}
+                    modelStyle={selectedModel}
+                  />
+                ) : (
+                  <div className="min-h-[300px] border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground text-sm">
+                    {isLoading ? "Generating your prompt..." : "Your generated prompt will appear here..."}
                   </div>
                 )}
               </div>
