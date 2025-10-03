@@ -34,28 +34,23 @@ const defaultSections = [
   {
     title: 'Product',
     links: [
-      { name: 'Overview', href: '#' },
-      { name: 'Pricing', href: '#' },
-      { name: 'Marketplace', href: '#' },
-      { name: 'Features', href: '#' },
+      { name: 'Image to Prompt', href: '/image-to-prompt' },
+      { name: 'Blog', href: '/blog' },
+      { name: 'Pricing', href: '#pricing' },
     ],
   },
   {
-    title: 'Company',
+    title: 'Support',
     links: [
-      { name: 'About', href: '#' },
-      { name: 'Team', href: '#' },
-      { name: 'Blog', href: '#' },
-      { name: 'Careers', href: '#' },
+      { name: 'Contact Us', href: 'mailto:support@im2prompt.com' },
+      { name: 'Status', href: '#' },
     ],
   },
   {
-    title: 'Resources',
+    title: 'Legal',
     links: [
-      { name: 'Help', href: '#' },
-      { name: 'Github', href: '#' },
-      { name: 'Advertise', href: '#' },
-      { name: 'Privacy', href: '#' },
+      { name: 'Terms of Service', href: '/terms' },
+      { name: 'Privacy Policy', href: '/privacy' },
     ],
   },
 ];
@@ -68,8 +63,8 @@ const defaultSocialLinks = [
 ];
 
 const defaultLegalLinks = [
-  { name: 'Terms and Conditions', href: '#' },
-  { name: 'Privacy Policy', href: '#' },
+  { name: 'Terms of Service', href: '/terms' },
+  { name: 'Privacy Policy', href: '/privacy' },
 ];
 
 export const Footer = ({
@@ -80,7 +75,7 @@ export const Footer = ({
     title: 'im2Prompt',
   },
   sections = defaultSections,
-  description = 'A collection of components for your startup business or side project.',
+  description = 'Transform images into AI prompts and generate stunning visuals with our powerful AI platform. Support for Sora2, Veo3, Stable Diffusion, Flux, and more.',
   socialLinks = defaultSocialLinks,
   copyright = '© 2025 im2Prompt. All rights reserved.',
   legalLinks = defaultLegalLinks,

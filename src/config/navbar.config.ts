@@ -25,51 +25,17 @@ export const navbarConfig: NavbarConfig = {
   menu: {
     items: [
       {
-        title: 'menu.blog', // i18n key
-        url: '/blog' // Will be prefixed with locale in hook
-      },
-      {
-        title: 'menu.document', // i18n key
-        url: '/docs',
-      },
-      {
         title: 'menu.tools', // i18n key
         url: '/image-to-prompt',
+      },
+      {
+        title: 'menu.blog', // i18n key
+        url: '/blog' // Will be prefixed with locale in hook
       },
       {
         title: 'menu.pricing', // i18n key
         url: '#pricing',
         onClick: 'handlePricingClick', // Special handler
-      },
-      {
-        title: 'menu.resources', // i18n key
-        url: '#',
-        items: [
-          {
-            title: 'menu.helpCenter', // i18n key
-            description: 'menu.helpCenterDescription', // i18n key
-            url: '#',
-            icon: 'Zap',
-          },
-          {
-            title: 'menu.contactUs', // i18n key
-            description: 'menu.contactUsDescription', // i18n key
-            url: '#',
-            icon: 'Sunset',
-          },
-          {
-            title: 'menu.status', // i18n key
-            description: 'menu.statusDescription', // i18n key
-            url: '#',
-            icon: 'Trees',
-          },
-          {
-            title: 'menu.termsOfService', // i18n key
-            description: 'menu.termsOfServiceDescription', // i18n key
-            url: '#',
-            icon: 'Book',
-          },
-        ],
       },
     ],
   },

@@ -51,9 +51,9 @@ const WhoIsItFor = () => {
       icon: <Code2 className="h-6 w-6" strokeWidth={1.5} />,
       title: "Developers & Startups",
       emoji: "💻",
-      description: "Embed prompt-to-image/video APIs into your apps.",
+      description: "Build AI-powered applications with our advanced tools.",
       features: [
-        "Access powerful API endpoints",
+        "Custom integrations",
         "Scale with usage-based pricing",
         "Build AI-powered features"
       ],

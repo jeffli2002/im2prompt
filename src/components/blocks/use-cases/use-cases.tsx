@@ -44,12 +44,12 @@ export function UseCases() {
     {
       icon: Code,
       title: 'Developers',
-      description: 'Integrate prompt extraction into your apps with our powerful API.',
+      description: 'Build amazing applications with our AI-powered prompt generation tools.',
       features: [
-        'RESTful API',
+        'Custom integrations',
         'Batch processing',
-        'Webhooks support',
-        'SDK libraries',
+        'Advanced workflows',
+        'Developer tools',
       ],
       gradient: 'from-green-500 to-emerald-500',
     },

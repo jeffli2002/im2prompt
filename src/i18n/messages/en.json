@@ -157,7 +157,7 @@
     "description": "Build your SaaS application with the latest technology stack"
   },
   "faq": {
-    "heading": "FAQ (SEO Optimized)",
+    "heading": "Frequently Asked Questions",
     "description": "Everything you need to know about our AI Image/Text ⇄ Prompt ⇄ Image/Video Platform",
     "supportHeading": "Need more support?",
     "supportDescription": "Our dedicated support team is here to help you with any questions or concerns. Get in touch with us for personalized assistance.",
@@ -182,10 +182,6 @@
       {
         "question": "Can I refine prompts naturally?",
         "answer": "Absolutely. You can simply type: \"make this more cinematic,\" \"change lighting to neon,\" or \"add futuristic elements.\""
-      },
-      {
-        "question": "Can I use im2Prompt via API?",
-        "answer": "Yes! Pro and Team plans include API access. Our RESTful API supports batch processing, webhooks, and comes with SDKs for popular programming languages. Check our documentation for integration guides."
       },
       {
         "question": "How do credits work?",
@@ -214,8 +210,7 @@
     "security": "Security",
     "credits": "Credits",
     "balance": "Balance",
-    "history": "History",
-    "apiKeys": "API Keys"
+    "history": "History"
   },
   "navbar": {
     "logo": {
@@ -269,10 +264,6 @@
     "billing": {
       "title": "Billing",
       "description": "Manage your subscription and payments"
-    },
-    "apiKeys": {
-      "title": "API Keys",
-      "description": "Manage your API keys and access permissions"
     }
   },
   "profile": {

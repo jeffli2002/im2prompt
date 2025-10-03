@@ -64,7 +64,6 @@ export const paymentConfig: PaymentConfig = {
         'Custom style packs',
         'Batch processing (up to 10)',
         'Priority support',
-        'API access',
       ],
       popular: true,
       limits: {

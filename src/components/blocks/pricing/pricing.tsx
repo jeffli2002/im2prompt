@@ -212,6 +212,15 @@ const Pricing = ({
                   </div>
                 )}
                 
+                {/* Coming Soon badge for paid plans */}
+                {plan.id !== 'free' && (
+                  <div className="absolute top-4 left-4">
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 px-3 py-1 rounded-full text-xs font-semibold">
+                      Coming Soon
+                    </Badge>
+                  </div>
+                )}
+                
                 <CardHeader className="p-8">
                   <CardTitle className="text-2xl font-bold mb-2">
                     <p>{plan.name}</p>
@@ -275,18 +284,23 @@ const Pricing = ({
                   </ul>
                 </CardContent>
                 <CardFooter className="mt-auto p-8 pt-0">
-                  <Button 
-                    className={`w-full py-6 text-lg font-semibold rounded-2xl transition-all duration-300 ${
-                      plan.id === 'pro' 
-                        ? 'bg-primary hover:bg-primary/90 shadow-xl hover:shadow-2xl' 
-                        : 'hover:shadow-xl'
-                    }`}
-                    onClick={() => handlePurchaseClick(plan)}
-                    disabled={isPending}
-                  >
-                    {isPending ? t('processingText') : plan.button.text}
-                    <ArrowRight className="ml-2 size-5" />
-                  </Button>
+                  {plan.id === 'free' ? (
+                    <Button 
+                      className="w-full py-6 text-lg font-semibold rounded-2xl transition-all duration-300 hover:shadow-xl"
+                      onClick={() => handlePurchaseClick(plan)}
+                      disabled={isPending}
+                    >
+                      {isPending ? t('processingText') : plan.button.text}
+                      <ArrowRight className="ml-2 size-5" />
+                    </Button>
+                  ) : (
+                    <Button 
+                      className="w-full py-6 text-lg font-semibold rounded-2xl transition-all duration-300 bg-muted text-muted-foreground cursor-not-allowed"
+                      disabled={true}
+                    >
+                      Coming Soon
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             ))}

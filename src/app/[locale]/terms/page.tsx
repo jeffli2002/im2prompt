@@ -85,18 +85,18 @@ function TermsPageContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-10">
+    <div className="min-h-screen bg-background">
+      {/* Enhanced header with better contrast */}
+      <div className="bg-background/95 backdrop-blur-lg border-b border-border/50 sticky top-0 z-10">
         <div className="container mx-auto max-w-6xl px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/">
-              <Button variant="ghost" size="sm" className="gap-2">
+              <Button variant="ghost" size="sm" className="gap-2 text-foreground hover:bg-muted/50">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Home
               </Button>
             </Link>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground">
               Legal Document
             </Badge>
           </div>
@@ -104,12 +104,12 @@ function TermsPageContent() {
       </div>
 
       <div className="container mx-auto max-w-4xl px-4 py-12">
-        {/* Hero Section */}
+        {/* Hero Section - Consistent with homepage style */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-6">
-            <FileText className="h-8 w-8 text-blue-600" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-6">
+            <FileText className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent mb-4">
             Terms of Service
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
@@ -129,16 +129,16 @@ function TermsPageContent() {
           {sectionsWithIcons.map((section, index) => {
             const Icon = section.icon;
             return (
-              <div key={index} className="group hover:shadow-lg transition-all duration-300 border-0 shadow-md bg-white/70 backdrop-blur-sm rounded-xl p-6">
+              <div key={index} className="group hover:shadow-lg transition-all duration-300 border border-border/50 shadow-md bg-card/80 backdrop-blur-sm rounded-xl p-6">
                 <div className="flex items-start gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
-                    <Icon className="h-6 w-6 text-white" />
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                    <Icon className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                    <h2 className="text-xl font-semibold text-foreground mb-3">
                       {section.title}
                     </h2>
-                    <p className="text-gray-700 leading-relaxed text-base whitespace-pre-wrap">
+                    <p className="text-muted-foreground leading-relaxed text-base whitespace-pre-wrap">
                       {section.content}
                     </p>
                   </div>
@@ -150,12 +150,12 @@ function TermsPageContent() {
 
         {/* Footer */}
         <div className="mt-16 text-center">
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 shadow-md border-0">
+          <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-8 shadow-md border border-border/50">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Mail className="h-5 w-5 text-blue-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Need Help?</h3>
+              <Mail className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold text-foreground">Need Help?</h3>
             </div>
-            <p className="text-gray-600 mb-6">
+            <p className="text-muted-foreground mb-6">
               If you have any questions about these terms, please don't hesitate to contact us.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

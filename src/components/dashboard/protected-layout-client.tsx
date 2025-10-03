@@ -67,11 +67,6 @@ export function ProtectedLayoutClient({ children }: ProtectedLayoutClientProps) 
           href: '/credits/history',
           icon: History,
         },
-        {
-          title: t('apiKeys'),
-          href: '/credits/api-keys',
-          icon: Key,
-        },
       ],
     });
 

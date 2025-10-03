@@ -49,7 +49,7 @@ export function Features() {
     },
     {
       title: 'Enterprise Security',
-      description: 'SOC2 compliant with end-to-end encryption and secure API access.',
+      description: 'SOC2 compliant with end-to-end encryption and secure data handling.',
       icon: <Shield className="h-6 w-6" />,
     },
   ];
