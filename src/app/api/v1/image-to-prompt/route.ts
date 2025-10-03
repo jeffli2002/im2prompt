@@ -327,7 +327,7 @@ export async function POST(req: NextRequest) {
       };
 
       extractedPrompt = mockPrompts[modelStyle as keyof typeof mockPrompts] || mockPrompts.general;
-      negativePrompt = modelStyle === 'stable-diffusion' ? 'blurry, low quality, distorted, ugly, bad anatomy, bad proportions, deformed, low resolution' : undefined;
+      negativePrompt = modelStyle === 'stable-diffusion' ? 'blurry, low quality, distorted, ugly, bad anatomy, bad proportions, deformed, low resolution' : '';
       
       console.log('Generated mock prompt:', extractedPrompt);
     }
