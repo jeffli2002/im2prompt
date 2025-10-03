@@ -41,8 +41,8 @@ export function PromptPreview({ prompt, negativePrompt, modelStyle }: PromptPrev
     let match;
     
     while ((match = sectionRegex.exec(realText)) !== null) {
-      const title = match[1].trim();
-      const rawContent = match[2].trim();
+      const title = match[1]?.trim();
+      const rawContent = match[2]?.trim();
       
       const bracketMatch = rawContent.match(/^\[(.*?)\]$/s);
       
