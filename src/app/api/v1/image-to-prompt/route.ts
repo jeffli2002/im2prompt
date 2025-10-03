@@ -335,7 +335,7 @@ export async function POST(req: NextRequest) {
     const transactionId = `tx_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const isFallbackResponse = extractedPrompt.includes('mountain landscape'); // Check if it's a mock response
     
-    if (isAuthenticated) {
+    if (isAuthenticated && userCreditRecord) {
       try {
         await db.transaction(async (tx) => {
           // Deduct credits

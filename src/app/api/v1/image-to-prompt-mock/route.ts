@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     const promptId = `prompt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const transactionId = `tx_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     
-    if (isAuthenticated) {
+    if (isAuthenticated && userCreditRecord) {
       try {
         await db.transaction(async (tx) => {
           // Deduct credits
