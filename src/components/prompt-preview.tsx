@@ -44,7 +44,7 @@ export function PromptPreview({ prompt, negativePrompt, modelStyle }: PromptPrev
       const title = match[1]?.trim();
       const rawContent = match[2]?.trim();
       
-      const bracketMatch = rawContent.match(/^\[(.*?)\]$/s);
+      const bracketMatch = rawContent?.match(/^\[(.*?)\]$/s);
       
       if (bracketMatch) {
         const tags = bracketMatch[1]
