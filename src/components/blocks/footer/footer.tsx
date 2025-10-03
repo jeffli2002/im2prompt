@@ -35,6 +35,8 @@ const defaultSections = [
     title: 'Product',
     links: [
       { name: 'Image to Prompt', href: '/image-to-prompt' },
+      { name: 'Text to Prompt', href: '/text-to-prompt' },
+      { name: 'Text to Image', href: '/text-to-image' },
       { name: 'Blog', href: '/blog' },
       { name: 'Pricing', href: '#pricing' },
     ],

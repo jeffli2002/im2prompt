@@ -26,7 +26,23 @@ export const navbarConfig: NavbarConfig = {
     items: [
       {
         title: 'menu.tools', // i18n key
-        url: '/image-to-prompt',
+        items: [
+          {
+            title: 'menu.imageToPrompt',
+            url: '/image-to-prompt',
+            description: 'menu.imageToPromptDescription',
+          },
+          {
+            title: 'menu.textToPrompt',
+            url: '/text-to-prompt',
+            description: 'menu.textToPromptDescription',
+          },
+          {
+            title: 'menu.textToImage',
+            url: '/text-to-image',
+            description: 'menu.textToImageDescription',
+          },
+        ],
       },
       {
         title: 'menu.blog', // i18n key
