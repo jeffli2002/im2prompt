@@ -281,7 +281,9 @@ export async function POST(req: NextRequest) {
           const sections = [];
           let match;
           while ((match = sectionPattern.exec(extractedPrompt)) !== null) {
-            sections.push(match[1].trim());
+            if (match[1]) {
+              sections.push(match[1].trim());
+            }
           }
           if (sections.length > 0) {
             // Combine all sections into one prompt, removing extra line breaks
