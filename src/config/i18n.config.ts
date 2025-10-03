@@ -1,8 +1,8 @@
 import type { I18nConfig } from "@/types";
 
 export const i18nConfig: I18nConfig = {
-  // Supported languages
-  locales: ['en', 'zh'] as const,
+  // Supported languages - temporarily commented out Chinese
+  locales: ['en'] as const, // 'zh' temporarily commented out
   
   // Default language
   defaultLocale: 'en',
@@ -19,13 +19,14 @@ export const i18nConfig: I18nConfig = {
       dir: 'ltr',
       enabled: true,
     },
-    zh: {
-      name: 'Chinese',
-      nativeName: '中文',
-      flag: '🇨🇳',
-      dir: 'ltr',
-      enabled: true,
-    },
+    // Temporarily commented out Chinese language configuration
+    // zh: {
+    //   name: 'Chinese',
+    //   nativeName: '中文',
+    //   flag: '🇨🇳',
+    //   dir: 'ltr',
+    //   enabled: true,
+    // },
   },
 
   // Routing configuration
@@ -83,29 +84,30 @@ export const i18nConfig: I18nConfig = {
         timeZoneName: 'short',
       },
     },
-    zh: {
-      short: {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      },
-      medium: {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-      },
-      long: {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric',
-        timeZoneName: 'short',
-      },
-    },
+    // Temporarily commented out Chinese date/time formats
+    // zh: {
+    //   short: {
+    //     year: 'numeric',
+    //     month: 'short',
+    //     day: 'numeric',
+    //   },
+    //   medium: {
+    //     year: 'numeric',
+    //     month: 'short',
+    //     day: 'numeric',
+    //     hour: 'numeric',
+    //     minute: 'numeric',
+    //   },
+    //   long: {
+    //     year: 'numeric',
+    //     month: 'long',
+    //     day: 'numeric',
+    //     hour: 'numeric',
+    //     minute: 'numeric',
+    //     second: 'numeric',
+    //     timeZoneName: 'short',
+    //   },
+    // },
   },
 
   // Number formats for each locale
@@ -127,22 +129,23 @@ export const i18nConfig: I18nConfig = {
         maximumFractionDigits: 1,
       },
     },
-    zh: {
-      currency: {
-        style: 'currency',
-        currency: 'CNY',
-        minimumFractionDigits: 2,
-      },
-      decimal: {
-        style: 'decimal',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      },
-      percent: {
-        style: 'percent',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 1,
-      },
-    },
+    // Temporarily commented out Chinese number formats
+    // zh: {
+    //   currency: {
+    //     style: 'currency',
+    //     currency: 'CNY',
+    //     minimumFractionDigits: 2,
+    //   },
+    //   decimal: {
+    //     style: 'decimal',
+    //     minimumFractionDigits: 0,
+    //     maximumFractionDigits: 2,
+    //   },
+    //   percent: {
+    //     style: 'percent',
+    //     minimumFractionDigits: 0,
+    //     maximumFractionDigits: 1,
+    //   },
+    // },
   },
 }; 
