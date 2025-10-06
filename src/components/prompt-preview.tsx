@@ -60,7 +60,7 @@ export function PromptPreview({ prompt, negativePrompt, modelStyle }: PromptPrev
       } else {
         sections.push({
           title,
-          content: rawContent
+          content: rawContent || ''
         });
       }
     }
