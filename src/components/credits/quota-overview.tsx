@@ -9,7 +9,7 @@ import { getQuotaUsage } from '@/server/actions/credit-actions';
 import { toast } from 'sonner';
 
 interface QuotaUsageData {
-  apiCalls: {
+  apiCalls?: {
     used: number;
     limit: number;
     isUnlimited: boolean;
@@ -105,44 +105,46 @@ export function QuotaOverview() {
         <CardDescription>Current month usage statistics and limits</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* API Calls Usage */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4 text-blue-500" />
-              <span className="font-medium">API Calls</span>
+        {/* API Calls Usage - Not currently supported */}
+        {quotaData.apiCalls && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-blue-500" />
+                <span className="font-medium">API Calls</span>
+              </div>
+              {quotaData.apiCalls.isUnlimited ? (
+                <Badge variant="secondary">Unlimited</Badge>
+              ) : (
+                <span className="text-muted-foreground text-sm">
+                  {quotaData.apiCalls.used.toLocaleString()} /{' '}
+                  {quotaData.apiCalls.limit.toLocaleString()}
+                </span>
+              )}
             </div>
-            {quotaData.apiCalls.isUnlimited ? (
-              <Badge variant="secondary">Unlimited</Badge>
-            ) : (
-              <span className="text-muted-foreground text-sm">
-                {quotaData.apiCalls.used.toLocaleString()} /{' '}
-                {quotaData.apiCalls.limit.toLocaleString()}
-              </span>
+
+            {!quotaData.apiCalls.isUnlimited && (
+              <>
+                <Progress
+                  value={(quotaData.apiCalls.used / quotaData.apiCalls.limit) * 100}
+                  className="h-2"
+                />
+                <div className="flex items-center justify-between text-xs">
+                  <span
+                    className={getUsageColor(
+                      (quotaData.apiCalls.used / quotaData.apiCalls.limit) * 100
+                    )}
+                  >
+                    {Math.round((quotaData.apiCalls.used / quotaData.apiCalls.limit) * 100)}% used
+                  </span>
+                  <span className="text-muted-foreground">
+                    {(quotaData.apiCalls.limit - quotaData.apiCalls.used).toLocaleString()} remaining
+                  </span>
+                </div>
+              </>
             )}
           </div>
-
-          {!quotaData.apiCalls.isUnlimited && (
-            <>
-              <Progress
-                value={(quotaData.apiCalls.used / quotaData.apiCalls.limit) * 100}
-                className="h-2"
-              />
-              <div className="flex items-center justify-between text-xs">
-                <span
-                  className={getUsageColor(
-                    (quotaData.apiCalls.used / quotaData.apiCalls.limit) * 100
-                  )}
-                >
-                  {Math.round((quotaData.apiCalls.used / quotaData.apiCalls.limit) * 100)}% used
-                </span>
-                <span className="text-muted-foreground">
-                  {(quotaData.apiCalls.limit - quotaData.apiCalls.used).toLocaleString()} remaining
-                </span>
-              </div>
-            </>
-          )}
-        </div>
+        )}
 
         {/* Storage Usage */}
         <div className="space-y-2">
