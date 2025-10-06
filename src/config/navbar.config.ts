@@ -4,7 +4,7 @@ export const navbarConfig: NavbarConfig = {
   // Logo configuration
   logo: {
     url: '/',
-    src: '/icons/apple-touch-icon.png',
+    src: '/logo.svg',
     alt: 'logo.alt', // i18n key (navbar. prefix will be added by useTranslations)
     title: 'logo.title', // i18n key
   },

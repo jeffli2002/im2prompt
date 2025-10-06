@@ -75,9 +75,9 @@ const defaultLegalLinks = [
 export const Footer = ({
   logo = {
     url: '/',
-    src: '/icons/favicon-32x32.png',
-    alt: 'logo',
-    title: 'im2Prompt',
+    src: '/logo.svg',
+    alt: 'im2prompt logo',
+    title: 'im2prompt',
   },
   sections = defaultSections,
   description = 'Transform images into AI prompts and generate stunning visuals with our powerful AI platform. Support for Sora2, Veo3, Stable Diffusion, Flux, and more.',
