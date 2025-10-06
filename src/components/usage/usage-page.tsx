@@ -167,29 +167,31 @@ export function UsagePage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ImageIcon className="h-5 w-5" />
-              Image-to-Text Usage
-            </CardTitle>
-            <CardDescription>Monthly extraction quota</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Used</span>
-              <span className="text-sm font-medium">
-                {quotaUsage?.apiCalls.used || 0} / {quotaUsage?.apiCalls.isUnlimited ? '∞' : quotaUsage?.apiCalls.limit || 0}
-              </span>
-            </div>
-            {!quotaUsage?.apiCalls.isUnlimited && (
-              <Progress 
-                value={((quotaUsage?.apiCalls.used || 0) / (quotaUsage?.apiCalls.limit || 1)) * 100} 
-                className="h-2"
-              />
-            )}
-          </CardContent>
-        </Card>
+        {quotaUsage?.apiCalls && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ImageIcon className="h-5 w-5" />
+                Image-to-Text Usage
+              </CardTitle>
+              <CardDescription>Monthly extraction quota</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Used</span>
+                <span className="text-sm font-medium">
+                  {quotaUsage.apiCalls.used || 0} / {quotaUsage.apiCalls.isUnlimited ? '∞' : quotaUsage.apiCalls.limit || 0}
+                </span>
+              </div>
+              {!quotaUsage.apiCalls.isUnlimited && (
+                <Progress 
+                  value={((quotaUsage.apiCalls.used || 0) / (quotaUsage.apiCalls.limit || 1)) * 100} 
+                  className="h-2"
+                />
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader>
