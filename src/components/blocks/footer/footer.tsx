@@ -3,6 +3,7 @@ import {
   Instagram as IconBrandInstagram,
   Linkedin as IconBrandLinkedin,
   Twitter as IconBrandTwitter,
+  Mail as IconMail,
 } from '@/lib/icons';
 import type React from 'react';
 
@@ -59,9 +60,10 @@ const defaultSections = [
 ];
 
 const defaultSocialLinks = [
+  { icon: <IconBrandTwitter strokeWidth={1} className="size-5" />, href: 'https://x.com/jeffli2002', label: 'Twitter' },
+  { icon: <IconMail strokeWidth={1} className="size-5" />, href: 'mailto:jefflee2002@gmail.com', label: 'Email' },
   { icon: <IconBrandGithub strokeWidth={1} className="size-5" />, href: '#', label: 'Github' },
   { icon: <IconBrandInstagram strokeWidth={1} className="size-5" />, href: '#', label: 'Instagram' },
-  { icon: <IconBrandTwitter strokeWidth={1} className="size-5" />, href: '#', label: 'Twitter' },
   { icon: <IconBrandLinkedin strokeWidth={1} className="size-5" />, href: '#', label: 'LinkedIn' },
 ];
 
