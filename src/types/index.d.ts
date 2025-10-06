@@ -322,11 +322,13 @@ export interface NavbarConfig {
 
 export interface NavbarMenuItem {
   title: string;
-  url: string;
+  url?: string;
   description?: string;
-  icon?: string; // Icon name for config, will be resolved to JSX.Element in component
+  icon?: string;
   items?: NavbarMenuItem[];
-  onClick?: string; // Function name for special handlers like 'handlePricingClick'
+  onClick?: string;
+  badge?: string;
+  highlight?: boolean;
 }
 
 export interface SidebarGroup {
