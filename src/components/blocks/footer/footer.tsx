@@ -39,15 +39,14 @@ const defaultSections = [
       { name: 'Text to Image', href: '/text-to-image' },
       { name: '🎥 Text to Video (Sora 2)', href: '/text-to-video', highlight: true },
       { name: '🎬 Image to Video (Sora 2)', href: '/text-to-video?mode=image', highlight: true },
-      { name: 'Blog', href: '/blog' },
-      { name: 'Pricing', href: '#pricing' },
     ],
   },
   {
-    title: 'Support',
+    title: 'Resources',
     links: [
+      { name: 'Blog', href: '/blog' },
+      { name: 'Pricing', href: '#pricing' },
       { name: 'Contact Us', href: 'mailto:support@im2prompt.com' },
-      { name: 'Status', href: '#' },
     ],
   },
   {
