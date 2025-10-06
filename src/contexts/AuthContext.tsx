@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, ReactNode } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 import { authClient } from '@/lib/auth/auth-client'
 
 interface AuthContextType {
