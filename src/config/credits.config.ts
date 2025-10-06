@@ -4,10 +4,11 @@ export interface CreditsConfig {
   
   // Credit consumption rules
   consumption: {
-    apiCall: {
-      costPerCall: number;        // Credits consumed per API call
-      freeQuotaCalls: number;     // Free quota for paid users (0 = all use credits)
-    };
+    // API calls not supported at this moment
+    // apiCall: {
+    //   costPerCall: number;        // Credits consumed per API call
+    //   freeQuotaCalls: number;     // Free quota for paid users (0 = all use credits)
+    // };
     imageGeneration: {
       nanoBanana: number;         // Credits per image with Nano Banana model
     };
@@ -47,10 +48,11 @@ export const creditsConfig: CreditsConfig = {
   
   // Consumption rules
   consumption: {
-    apiCall: {
-      costPerCall: 1,        // Each API call costs 1 credit
-      freeQuotaCalls: 0,     // Paid users have no free quota, all use credits
-    },
+    // API calls not supported at this moment
+    // apiCall: {
+    //   costPerCall: 1,        // Each API call costs 1 credit
+    //   freeQuotaCalls: 0,     // Paid users have no free quota, all use credits
+    // },
     imageGeneration: {
       nanoBanana: 5,         // Nano Banana model: 5 credits per image
     },
@@ -75,9 +77,10 @@ export const creditsConfig: CreditsConfig = {
       dailyCredits: 20,      // 20 credits/day (1 image + 1 video = 20 credits)
       monthlyCredits: 125,   // 125 credits/month (10 images + 5 videos = 125 credits)
     },
-    apiCall: {
-      freeQuotaCalls: 100,   // Free users get 100 API calls per month
-    },
+    // API calls not supported at this moment
+    // apiCall: {
+    //   freeQuotaCalls: 100,   // Free users get 100 API calls per month
+    // },
     storage: {
       freeQuotaGB: 1,        // Free users get 1GB free storage
     },
