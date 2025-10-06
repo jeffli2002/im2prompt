@@ -50,7 +50,7 @@ function TermsPageContent() {
     {
       title: '6. Credits & Payments',
       icon: CreditCard,
-      content: 'The Service uses a credit-based system to meter usage (e.g., prompt extractions, previews, video renders). Credits and subscriptions are managed via Stripe. Payments are non-refundable except as required by law.'
+      content: 'The Service uses a credit-based system to meter usage (e.g., image generation, video generation, prompt extractions). Credits and subscriptions are managed via Creem payment service. Payments are non-refundable except as required by law. Free plan includes daily rate limits (3 images + 1 video per day), while paid plans (Pro $16.99, Pro+ $29.99) offer higher monthly allocations without daily restrictions.'
     },
     {
       title: '7. Third-Party Services',

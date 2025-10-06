@@ -27,9 +27,9 @@ function PrivacyPageContent() {
       icon: Database,
       content: `Account Information: Name, email, authentication details.
 
-Usage Data: Uploaded images, text inputs, generated prompts, and outputs.
+Usage Data: Uploaded images, text inputs, generated prompts, AI-generated images and videos (Sora 2, Veo3, Nano Banana).
 
-Payment Data: Managed by third-party providers (e.g., Stripe). We do not store credit card numbers.
+Payment Data: Managed by Creem payment service. We do not store credit card numbers.
 
 Technical Data: IP address, device/browser type, cookies, and analytics.`
     },
@@ -49,8 +49,8 @@ Technical Data: IP address, device/browser type, cookies, and analytics.`
       icon: Share2,
       content: `We may share limited data with:
 
-• AI providers (e.g., OpenAI Sora 2, Google Veo3, Stable Diffusion, Flux) for processing prompts and outputs
-• Payment processors (e.g., Stripe) for billing
+• AI providers (e.g., OpenAI Sora 2, Google Veo3, Stable Diffusion, Flux, Nano Banana via KIE.AI) for processing prompts and outputs
+• Payment processors (Creem payment service) for billing
 • Analytics & monitoring tools (e.g., PostHog, Sentry) for platform performance
 
 We do not sell personal information to third parties.`

@@ -164,36 +164,52 @@
     "supportButtonText": "Contact Support",
     "items": [
       {
-        "question": "What is Sora 2?",
-        "answer": "Sora 2 is OpenAI's advanced text-to-video AI model, capable of creating realistic, cinematic videos with detailed motion, scene dynamics, and storytelling elements."
+        "question": "What is Sora 2 and how does it work?",
+        "answer": "Sora 2 is OpenAI's cutting-edge text-to-video and image-to-video AI model. It creates realistic, cinematic 10-second videos with detailed motion, scene dynamics, and storytelling elements. Simply provide a text prompt or upload an image, and Sora 2 generates professional-quality videos with natural movement and coherent narratives."
+      },
+      {
+        "question": "What's the difference between text-to-video and image-to-video?",
+        "answer": "Text-to-video generates videos entirely from text descriptions, perfect for creating new scenes from scratch. Image-to-video takes your existing image as the first frame and animates it based on your text prompt, ideal for bringing static images to life with motion and storytelling."
+      },
+      {
+        "question": "What are the monthly generation limits for each plan?",
+        "answer": "Each plan has specific monthly and daily limits for image and video generation. Free plan includes daily rate limits, while paid plans offer higher monthly allocations without daily restrictions. Check the pricing section for detailed limits for each tier. All plans include both Nano Banana image generation and Sora 2 video generation."
+      },
+      {
+        "question": "What quality options are available for videos?",
+        "answer": "We offer two quality tiers: Standard (good for previews and social media) and HD (1080p, perfect for professional content). Starter plan includes HD 720p, while Pro and Pro+ plans unlock full 1080p HD quality. You can also choose between Landscape and Portrait aspect ratios."
       },
       {
         "question": "How does image-to-prompt work?",
-        "answer": "Upload an image and the system automatically extracts a structured, detailed AI-ready prompt for use in models like Midjourney, Flux, Stable Diffusion, Sora 2, or Veo3."
+        "answer": "Upload any image and our AI instantly analyzes it to generate detailed, structured prompts compatible with Midjourney, Flux, Stable Diffusion, Sora 2, and Veo3. It extracts style, composition, lighting, colors, and artistic elements into a ready-to-use prompt you can refine or use immediately."
       },
       {
-        "question": "Can I generate videos with Veo3?",
-        "answer": "Yes. Veo3 prompts are compatible with Canva's AI video generator, ideal for producing short-form videos and animations."
+        "question": "Can I use generated content commercially?",
+        "answer": "Free plan is for personal use only. Pro and Pro+ plans include commercial usage rights for all generated images and videos. Pro+ plan adds white-label options, API access, and advanced analytics, perfect for agencies and businesses."
+      },
+      {
+        "question": "What happens if I run out of credits before the month ends?",
+        "answer": "You can upgrade to a higher tier anytime to get more credits immediately. Alternatively, you can wait until your monthly credits reset. We'll notify you when you're running low so you can plan accordingly."
       },
       {
         "question": "Do you generate negative prompts automatically?",
-        "answer": "Yes. The system auto-creates negative prompts to remove unwanted details and enhance final outputs."
+        "answer": "Yes. Our AI automatically creates negative prompts for image generation to remove unwanted elements, artifacts, and quality issues. This ensures cleaner, more accurate results aligned with your creative vision."
       },
       {
-        "question": "Can I refine prompts naturally?",
-        "answer": "Absolutely. You can simply type: \"make this more cinematic,\" \"change lighting to neon,\" or \"add futuristic elements.\""
+        "question": "How long does video generation take?",
+        "answer": "Video generation typically takes 2-5 minutes depending on complexity and quality settings. You can monitor progress in real-time with our status tracker. Pro users get priority queue access for faster generation during peak times."
       },
       {
-        "question": "How do credits work?",
-        "answer": "Credits are used for different operations: 1 credit for prompt extraction, 0.5 credits for preview generation, and 5 credits for HD renders. Free users get 20 credits/month, Pro users get unlimited extractions plus generation credits."
+        "question": "Can I download videos without watermarks?",
+        "answer": "Yes! All paid plans (Starter, Pro, and Pro+) include watermark-free downloads for both images and videos. Free plan videos include a small watermark in the corner."
       },
       {
-        "question": "Is my data secure?",
-        "answer": "Absolutely. We're SOC2 compliant and use 256-bit encryption for all data. Images are processed in isolated environments and automatically deleted after 30 days. We never use your images for training without explicit permission."
+        "question": "Is my data secure and private?",
+        "answer": "Absolutely. We're SOC2 compliant and use 256-bit encryption for all data. Images and videos are processed in isolated environments and automatically deleted after 30 days. We never use your content for AI training without explicit permission."
       },
       {
         "question": "Can I cancel my subscription anytime?",
-        "answer": "Yes, you can cancel your subscription at any time. You'll continue to have access to paid features until the end of your billing period. No questions asked, and you can resubscribe whenever you want."
+        "answer": "Yes, cancel anytime with no questions asked. You'll keep access to paid features until the end of your billing period, and you can resubscribe whenever you want. Annual plans save 20% and can also be cancelled anytime."
       }
     ]
   },
@@ -206,6 +222,7 @@
     "promptLibrary": "Prompt Library",
     "settings": "Settings",
     "profile": "Profile",
+    "usage": "Usage & Credits",
     "billing": "Billing",
     "security": "Security",
     "credits": "Credits",
@@ -228,7 +245,13 @@
       "textToPrompt": "Text to Prompt",
       "textToPromptDescription": "Enhance text and generate images",
       "textToImage": "Text to Image",
-      "textToImageDescription": "Generate images from text prompts",
+      "textToImageDescription": "Generate images from text with Nano Banana AI",
+      "imageToImage": "Image to Image",
+      "imageToImageDescription": "Transform images with Nano Banana AI",
+      "textToVideo": "Text to Video",
+      "textToVideoDescription": "Generate videos from text prompts with Sora 2 AI",
+      "imageToVideo": "Image to Video",
+      "imageToVideoDescription": "Transform images into videos with Sora 2 AI",
       "helpCenter": "Help Center",
       "helpCenterDescription": "Get help and support",
       "contactUs": "Contact Us",

@@ -1,20 +1,17 @@
 import type { PaymentConfig } from '@/types';
+// Note: Credit costs (5 credits/image, 15 credits/video) are defined in credits.config.ts
 
 export const paymentConfig: PaymentConfig = {
-  // Payment provider
   provider: 'stripe',
   
-  // Base currency
   currency: 'usd',
   
-  // Stripe configuration
   stripe: {
     secretKey: process.env.STRIPE_SECRET_KEY || '',
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
     apiVersion: '2025-06-30.basil',
   },
 
-  // Subscription plans
   plans: [
     {
       id: 'free',
@@ -23,115 +20,110 @@ export const paymentConfig: PaymentConfig = {
       price: 0,
       interval: null,
       credits: {
-        monthly: 20,    // 20 extractions
-        onSignup: 20,   // Start immediately
+        monthly: 125,
+        onSignup: 0,
       },
       features: [
-        '20 prompt extractions/month',
-        '10 preview generations',
-        '2 HD image renders',
-        'Basic prompt variations',
-        'Community support',
+        '5 Image-to-Text per day',
+        'Unlimited Text-to-Prompt',
+        '20 credits/day (125/month) - 1 image = 5 credits, 1 video = 15 credits',
+        'No watermark for images',
+        'Personal use',
       ],
       popular: false,
       limits: {
-        extractions: 20,
-        previews: 10,
-        hdRenders: 2,
+        extractions: 5,
+        images: 10,
+        videos: 5,
+        dailyImages: 1,
+        dailyVideos: 1,
         batchSize: 1,
+        quality: 'standard',
       },
     },
     {
       id: 'pro',
       name: 'Pro',
-      description: 'For professional creators',
-      price: 15,
-      yearlyPrice: 150, // $15 * 10 months (2 months free)
+      description: 'Great for individual creators',
+      price: 14.9,
+      yearlyPrice: 143.04,
       interval: 'month',
       stripePriceIds: {
         monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY || 'price_pro_monthly',
         yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY || 'price_pro_yearly',
       },
       credits: {
-        monthly: 999999,     // Unlimited extractions
-        onSubscribe: 300,    // 300 preview generations
+        monthly: 500,
+        onSubscribe: 0,
       },
       features: [
-        'Unlimited prompt extractions',
-        '300 preview generations/month',
-        '50 HD image renders/month',
-        'Advanced prompt variations',
-        'Custom style packs',
-        'Batch processing (up to 10)',
-        'Priority support',
+        '300 Image-to-Text per month',
+        '500 credits/month (100 images or 33 videos)',
+        'No watermark for images',
+        'No Ads',
+        'Commercial license',
       ],
       popular: true,
       limits: {
-        extractions: -1, // unlimited
-        previews: 300,
-        hdRenders: 50,
-        batchSize: 10,
+        extractions: 300,
+        dailyImages: -1,
+        dailyVideos: -1,
+        batchSize: 5,
+        quality: 'hd',
       },
     },
     {
-      id: 'team',
-      name: 'Team',
-      description: 'For teams and agencies',
-      price: 49,
-      yearlyPrice: 490, // $49 * 10 months (2 months free)
+      id: 'proplus',
+      name: 'Pro+',
+      description: 'For professional creators and businesses',
+      price: 24.9,
+      yearlyPrice: 239.04,
       interval: 'month',
       stripePriceIds: {
-        monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_TEAM_MONTHLY || 'price_team_monthly',
-        yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_TEAM_YEARLY || 'price_team_yearly',
+        monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PROPLUS_MONTHLY || 'price_proplus_monthly',
+        yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PROPLUS_YEARLY || 'price_proplus_yearly',
       },
       credits: {
-        monthly: 999999,     // Unlimited
-        onSubscribe: 1000,   // 1000 preview generations
+        monthly: 900,
+        onSubscribe: 0,
       },
       features: [
-        'Everything in Pro',
-        '1000 preview generations/month',
-        '200 HD image renders/month',
-        'Shared prompt libraries',
-        'Team collaboration tools',
-        'Brand style packs',
-        'Advanced analytics',
-        'Dedicated support',
-        'SSO authentication',
+        '600 Image-to-Text per month',
+        '900 credits/month (180 images or 60 videos)',
+        'No watermark for images',
+        'No Ads',
+        'Commercial License',
       ],
       popular: false,
       limits: {
-        extractions: -1, // unlimited
-        previews: 1000,
-        hdRenders: 200,
-        batchSize: 50,
-        teamMembers: 10,
+        extractions: 600,
+        dailyImages: -1,
+        dailyVideos: -1,
+        batchSize: 10,
+        quality: 'fullhd',
+        apiCalls: 10000,
       },
     },
   ],
 
-  // Trial configuration
   trial: {
     enabled: true,
     days: 14,
-    plans: ['pro', 'enterprise'], // Only these plans support trial
+    plans: ['pro', 'proplus'],
   },
 
-  // Invoice configuration
   invoice: {
     footer: 'Thank you for your business! If you have any questions, please contact our support team.',
     logo: '/logo.png',
     supportEmail: 'support@im2prompt.com',
   },
 
-  // Billing configuration
   billing: {
     collectTaxId: true,
     allowPromotionCodes: true,
     automaticTax: true,
   },
 
-  // Feature flags
   features: {
     subscriptions: true,
     oneTimePayments: true,
@@ -139,4 +131,4 @@ export const paymentConfig: PaymentConfig = {
     customerPortal: true,
     webhooks: true,
   },
-}; 
+};

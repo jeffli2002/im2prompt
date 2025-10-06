@@ -15,7 +15,7 @@ interface FooterProps {
   };
   sections?: Array<{
     title: string;
-    links: Array<{ name: string; href: string }>;
+    links: Array<{ name: string; href: string; highlight?: boolean }>;
   }>;
   description?: string;
   socialLinks?: Array<{
@@ -37,6 +37,8 @@ const defaultSections = [
       { name: 'Image to Prompt', href: '/image-to-prompt' },
       { name: 'Text to Prompt', href: '/text-to-prompt' },
       { name: 'Text to Image', href: '/text-to-image' },
+      { name: '🎥 Text to Video (Sora 2)', href: '/text-to-video', highlight: true },
+      { name: '🎬 Image to Video (Sora 2)', href: '/text-to-video?mode=image', highlight: true },
       { name: 'Blog', href: '/blog' },
       { name: 'Pricing', href: '#pricing' },
     ],
@@ -111,8 +113,19 @@ export const Footer = ({
                 <h3 className="mb-4 font-bold">{section.title}</h3>
                 <ul className="space-y-3 text-muted-foreground text-sm">
                   {section.links.map((link, linkIdx) => (
-                    <li key={link.name} className="font-medium hover:text-primary">
-                      <a href={link.href}>{link.name}</a>
+                    <li key={link.name} className={`font-medium hover:text-primary ${link.highlight ? 'relative' : ''}`}>
+                      <a 
+                        href={link.href}
+                        className={link.highlight ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent font-bold' : ''}
+                      >
+                        {link.name}
+                      </a>
+                      {link.highlight && (
+                        <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                          <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>

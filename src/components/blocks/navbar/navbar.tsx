@@ -19,7 +19,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { LanguageSwitcher } from '@/components/widget/language-switcher';
 import { ThemeToggle } from '@/components/widget/theme-toggle';
 import { UserAvatarMenu } from '@/components/widget/user-avatar-menu';
-import { Book, Menu, Sunset, Trees, Zap } from 'lucide-react';
+import { Book, Menu, Sunset, Trees, Zap, Sparkles } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import type { JSX } from 'react';
 import type { NavbarProps, MenuItem } from '@/types/navbar';
@@ -133,19 +134,34 @@ const Navbar = ({
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
               {item.items.map((subItem) => (
-                <li key={subItem.title}>
+                <li key={subItem.title} className="relative">
                   <NavigationMenuLink asChild>
                     <Link
                       href={subItem.url}
-                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                      className={`block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground ${
+                        subItem.highlight ? 'border-2 border-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-gradient-to-r from-red-500/5 via-orange-500/5 to-yellow-500/5' : ''
+                      }`}
                     >
                       <div className="flex items-center gap-2 font-medium text-sm leading-none">
                         {subItem.icon}
-                        {subItem.title}
+                        <span className={subItem.highlight ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent' : ''}>
+                          {subItem.title}
+                        </span>
+                        {subItem.badge && (
+                          <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 h-4 bg-gradient-to-r from-red-500 to-orange-500 text-white border-0">
+                            {subItem.badge}
+                          </Badge>
+                        )}
                       </div>
                       <p className="line-clamp-2 text-muted-foreground text-sm leading-snug">
                         {subItem.description}
                       </p>
+                      {subItem.highlight && (
+                        <div className="absolute -top-1 -right-1 flex h-3 w-3">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                          <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
+                        </div>
+                      )}
                     </Link>
                   </NavigationMenuLink>
                 </li>
@@ -191,15 +207,32 @@ const Navbar = ({
                 <Link
                   key={subItem.title}
                   href={subItem.url}
-                  className="flex items-start gap-2 rounded-md p-2 hover:bg-accent"
+                  className={`flex items-start gap-2 rounded-md p-2 hover:bg-accent relative ${
+                    subItem.highlight ? 'bg-gradient-to-r from-red-500/5 via-orange-500/5 to-yellow-500/5 border border-orange-500/30' : ''
+                  }`}
                 >
                   {subItem.icon}
-                  <div>
-                    <div className="font-medium text-sm">{subItem.title}</div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 font-medium text-sm">
+                      <span className={subItem.highlight ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent' : ''}>
+                        {subItem.title}
+                      </span>
+                      {subItem.badge && (
+                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-gradient-to-r from-red-500 to-orange-500 text-white border-0">
+                          {subItem.badge}
+                        </Badge>
+                      )}
+                    </div>
                     {subItem.description && (
                       <div className="text-muted-foreground text-xs">{subItem.description}</div>
                     )}
                   </div>
+                  {subItem.highlight && (
+                    <div className="absolute -top-1 -right-1 flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+                    </div>
+                  )}
                 </Link>
               ))}
             </div>

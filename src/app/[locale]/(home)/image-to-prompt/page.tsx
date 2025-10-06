@@ -11,6 +11,9 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { PromptPreview } from '@/components/prompt-preview';
+import UpgradePrompt from '@/components/auth/UpgradePrompt';
+import { useQuota } from '@/hooks/useQuota';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AIModel {
   id: string;
@@ -70,6 +73,8 @@ const aiModels: AIModel[] = [
 
 export default function ImageToPromptPage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const { usage, canUseImageToText, trackImageToText } = useQuota();
   const [selectedModel, setSelectedModel] = useState<string>('general');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('english');
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -79,6 +84,7 @@ export default function ImageToPromptPage() {
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [negativePrompt, setNegativePrompt] = useState<string>('');
   const [promptHistory, setPromptHistory] = useState<Array<{prompt: string, model: string, timestamp: Date}>>([]);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
   const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -120,6 +126,11 @@ export default function ImageToPromptPage() {
       return;
     }
 
+    if (!canUseImageToText()) {
+      setShowUpgradePrompt(true);
+      return;
+    }
+
     setIsLoading(true);
     setGeneratedPrompt('');
     setNegativePrompt('');
@@ -137,11 +148,16 @@ export default function ImageToPromptPage() {
       const response = await fetch('/api/v1/image-to-prompt', {
         method: 'POST',
         body: formData,
-        credentials: 'include', // Include cookies for authentication
+        credentials: 'include',
       });
 
       if (!response.ok) {
-        throw new Error(await response.text());
+        const errorText = await response.text();
+        if (response.status === 429) {
+          setShowUpgradePrompt(true);
+          return;
+        }
+        throw new Error(errorText);
       }
 
       const data = await response.json();
@@ -150,12 +166,13 @@ export default function ImageToPromptPage() {
         setGeneratedPrompt(data.data.prompt);
         setNegativePrompt(data.data.negativePrompt || '');
         
-        // Add to history
+        await trackImageToText();
+        
         setPromptHistory(prev => [{
           prompt: data.data.prompt,
           model: selectedModel,
           timestamp: new Date()
-        }, ...prev.slice(0, 4)]); // Keep last 5
+        }, ...prev.slice(0, 4)]);
 
         toast.success("Prompt generated successfully!", {
           description: `Credits used: ${data.data.creditsUsed}. Remaining: ${data.data.remainingCredits}`,
@@ -180,6 +197,17 @@ export default function ImageToPromptPage() {
 
   return (
     <div className="container max-w-7xl py-8">
+      {showUpgradePrompt && (
+        <UpgradePrompt
+          onClose={() => setShowUpgradePrompt(false)}
+          creditsUsed={usage.imageToText.daily}
+          creditsLimit={usage.imageToText.dailyLimit}
+          type="imageToText"
+          isAuthenticated={!!user}
+          limitType="daily"
+        />
+      )}
+
       {/* Header */}
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold mb-4">Free Image to Prompt Generator</h1>

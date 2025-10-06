@@ -3,11 +3,13 @@ import type { JSX } from 'react';
 // 菜单项类型
 export interface MenuItem {
   title: string;
-  url: string;
+  url?: string;
   description?: string;
   icon?: JSX.Element;
   items?: MenuItem[];
   onClick?: () => void;
+  badge?: string;
+  highlight?: boolean;
 }
 
 // Logo配置类型

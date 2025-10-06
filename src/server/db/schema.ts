@@ -231,4 +231,28 @@ export const prompts = pgTable('prompts', {
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+// Usage tracking for free tier limits (credit-based)
+export const usageTracking = pgTable('usage_tracking', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  date: text('date').notNull(), // Format: YYYY-MM-DD
+  imageToTextCount: integer('image_to_text_count').notNull().default(0),
+  creditsUsedDaily: integer('credits_used_daily').notNull().default(0), // Credits used today
+  creditsUsedMonthly: integer('credits_used_monthly').notNull().default(0), // Credits used this month (cumulative)
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+}, (table) => ({
+  userDateIdx: {
+    name: 'usage_user_date_idx',
+    columns: [table.userId, table.date],
+    unique: true,
+  },
+}));
 // Force rebuild

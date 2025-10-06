@@ -31,13 +31,17 @@ const getIconComponent = (iconName?: string): JSX.Element | undefined => {
 
 // Translation helper function
 const translateMenuItem = (item: NavbarMenuItem, t: (key: string) => string, locale: string): MenuItem => {
+  const url = item.url ? (item.url.startsWith('#') ? item.url : `/${locale}${item.url}`) : undefined;
+  
   return {
     title: t(item.title),
-    url: item.url.startsWith('#') ? item.url : `/${locale}${item.url}`,
+    url,
     description: item.description ? t(item.description) : undefined,
     icon: getIconComponent(item.icon),
     items: item.items?.map(subItem => translateMenuItem(subItem, t, locale)),
-    onClick: item.onClick ? () => {} : undefined, // Will be handled in component
+    onClick: item.onClick ? () => {} : undefined,
+    badge: item.badge,
+    highlight: item.highlight,
   };
 };
 

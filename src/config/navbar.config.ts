@@ -42,6 +42,25 @@ export const navbarConfig: NavbarConfig = {
             url: '/text-to-image',
             description: 'menu.textToImageDescription',
           },
+          {
+            title: 'menu.imageToImage',
+            url: '/text-to-image?mode=image-to-image',
+            description: 'menu.imageToImageDescription',
+          },
+          {
+            title: 'menu.textToVideo',
+            url: '/text-to-video',
+            description: 'menu.textToVideoDescription',
+            badge: 'NEW',
+            highlight: true,
+          },
+          {
+            title: 'menu.imageToVideo',
+            url: '/text-to-video?mode=image-to-video',
+            description: 'menu.imageToVideoDescription',
+            badge: 'NEW',
+            highlight: true,
+          },
         ],
       },
       {

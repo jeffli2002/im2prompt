@@ -91,18 +91,16 @@ const Hero = ({
         </div>
 
         <div className="mx-auto max-w-6xl text-center">
-          {/* Main heading - Enhanced Apple-style typography */}
           <h1 className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-            <span className="block text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.1]">
-              ✨ Turn Your Ideas into
-            </span>
-            <span className="block text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.1] mt-2">
+            <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
+              ✨ Turn Your Ideas into{' '}
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Cinematic Reality
               </span>
-            </span>
-            <span className="block text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.1] mt-2">
-              with Sora 2 & AI
+              {' '}with{' '}
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Sora 2 Video & Nano Banana Image
+              </span>
             </span>
           </h1>
 
@@ -125,7 +123,18 @@ const Hero = ({
 
 
           {/* Enhanced CTAs - Premium Apple-style buttons */}
-          <div className="mt-12 flex flex-col sm:flex-row gap-6 justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
+          <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
+            <Button 
+              asChild 
+              size="lg" 
+              className="px-10 py-6 text-lg font-semibold bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 text-white hover:from-red-600 hover:via-orange-600 hover:to-yellow-600 transition-all duration-300 shadow-xl hover:shadow-2xl rounded-2xl border-0 relative overflow-hidden group"
+            >
+              <a href="/text-to-video">
+                <Video className="mr-2 h-5 w-5" />
+                Start Sora 2 Video
+                <span className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+              </a>
+            </Button>
             <Button 
               asChild 
               size="lg" 
@@ -143,8 +152,8 @@ const Hero = ({
               className="px-10 py-6 text-lg font-semibold border-2 border-muted-foreground/30 hover:bg-muted/50 hover:border-muted-foreground/50 transition-all duration-300 rounded-2xl backdrop-blur-sm"
             >
               <a href="/image-to-prompt">
-                <Video className="mr-2 h-5 w-5" />
-                Try Image to Prompt Generator
+                <Sparkles className="mr-2 h-5 w-5" />
+                Try Image to Prompt
               </a>
             </Button>
           </div>
