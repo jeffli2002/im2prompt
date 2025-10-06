@@ -246,6 +246,12 @@ export interface PaymentPlan {
     hdRenders?: number;
     batchSize?: number;
     teamMembers?: number;
+    // Credit-based generation limits
+    images?: number;          // Monthly image generation limit
+    videos?: number;          // Monthly video generation limit
+    dailyImages?: number;     // Daily image generation limit (-1 = unlimited)
+    dailyVideos?: number;     // Daily video generation limit (-1 = unlimited)
+    quality?: string;         // Quality tier: 'standard', 'hd', 'fullhd'
   };
   // Credits configuration for subscription-based credit system
   credits?: {
