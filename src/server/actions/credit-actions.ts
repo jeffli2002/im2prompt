@@ -140,16 +140,18 @@ export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageRespons
     ));
 
     // Extract usage data
-    const apiCallUsage = usageRecords.find(record => record.service === 'api_call')?.usedAmount || 0;
+    // API calls not supported at this moment
+    // const apiCallUsage = usageRecords.find(record => record.service === 'api_call')?.usedAmount || 0;
     const storageUsage = usageRecords.find(record => record.service === 'storage')?.usedAmount || 0;
     
     // Determine limits based on subscription
-    const baseApiCallLimit = creditsConfig.freeUser.apiCall.freeQuotaCalls;
+    // API calls not supported at this moment
+    // const baseApiCallLimit = creditsConfig.freeUser.apiCall.freeQuotaCalls;
     const baseStorageLimit = creditsConfig.freeUser.storage.freeQuotaGB * 1024 * 1024 * 1024; // Convert GB to bytes
     
-    let apiCallLimit = baseApiCallLimit;
+    // let apiCallLimit = baseApiCallLimit;
     let storageLimit = baseStorageLimit;
-    const isApiUnlimited = false;
+    // const isApiUnlimited = false;
     let isStorageUnlimited = false;
 
     if (subscription) {
@@ -157,12 +159,12 @@ export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageRespons
       switch (subscription.priceId) {
         case process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY:
         case process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY:
-          apiCallLimit = 10000;
+          // apiCallLimit = 10000;
           storageLimit = 10 * 1024 * 1024 * 1024; // 10GB
           break;
         case process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE_MONTHLY:
         case process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE_YEARLY:
-          apiCallLimit = 100000;
+          // apiCallLimit = 100000;
           isStorageUnlimited = true;
           break;
       }
@@ -171,11 +173,12 @@ export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageRespons
     return {
       success: true,
       data: {
-        apiCalls: {
-          used: apiCallUsage,
-          limit: apiCallLimit,
-          isUnlimited: isApiUnlimited,
-        },
+        // API calls not supported at this moment
+        // apiCalls: {
+        //   used: apiCallUsage,
+        //   limit: apiCallLimit,
+        //   isUnlimited: isApiUnlimited,
+        // },
         storage: {
           used: storageUsage,
           limit: storageLimit,
