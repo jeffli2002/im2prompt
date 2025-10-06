@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import NanoBananaImageGenerator from '@/components/nano-banana-image-generator'
 
 export default function TextToImagePage() {
@@ -12,7 +13,9 @@ export default function TextToImagePage() {
         </p>
       </div>
 
-      <NanoBananaImageGenerator />
+      <Suspense fallback={<div className="flex justify-center py-12">Loading...</div>}>
+        <NanoBananaImageGenerator />
+      </Suspense>
     </div>
   )
 }
