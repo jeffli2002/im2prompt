@@ -29,7 +29,7 @@ interface CreditBalanceData {
 }
 
 interface QuotaUsageData {
-  apiCalls: {
+  apiCalls?: {
     used: number;
     limit: number;
     isUnlimited: boolean;
