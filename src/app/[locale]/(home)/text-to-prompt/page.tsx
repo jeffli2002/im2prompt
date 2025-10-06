@@ -149,7 +149,7 @@ export default function TextToPromptPage() {
 
   const handleSizeChange = (value: string) => {
     const [width, height] = value.split('x').map(Number);
-    setImageSize({ width, height });
+    setImageSize({ width: width || 1024, height: height || 1024 });
   };
 
   const isUltraModel = selectedModel === 'flux-1.1-ultra';
