@@ -22,7 +22,7 @@ export interface GetCreditHistoryParams {
 }
 
 export interface GetQuotaUsageResponse {
-  apiCalls: {
+  apiCalls?: {
     used: number;
     limit: number;
     isUnlimited: boolean;
