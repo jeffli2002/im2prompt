@@ -137,7 +137,7 @@ const Navbar = ({
                 <li key={subItem.title} className="relative">
                   <NavigationMenuLink asChild>
                     <Link
-                      href={subItem.url}
+                      href={subItem.url || '#'}
                       className={`block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground ${
                         subItem.highlight ? 'border-2 border-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-gradient-to-r from-red-500/5 via-orange-500/5 to-yellow-500/5' : ''
                       }`}
