@@ -99,9 +99,9 @@ const Pricing = ({
       return;
     }
 
-    // Free plan redirects directly to dashboard
+    // Free plan redirects to image-to-prompt page
     if (plan.id === 'free') {
-      router.push('/dashboard');
+      router.push('/image-to-prompt');
       return;
     }
 

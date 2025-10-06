@@ -1,4 +1,4 @@
-import { Star, Upload, Sparkles, ArrowRight, Image, FileText, Wand2, Video, Zap } from 'lucide-react';
+import { Star, Upload, Sparkles, ArrowRight, Image, FileText, Wand2, Video } from 'lucide-react';
 import React from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -133,16 +133,6 @@ const Hero = ({
                 <Video className="mr-2 h-5 w-5" />
                 Start Sora 2 Video
                 <span className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-              </a>
-            </Button>
-            <Button 
-              asChild 
-              size="lg" 
-              className="px-10 py-6 text-lg font-semibold bg-foreground text-background hover:bg-foreground/90 transition-all duration-300 shadow-xl hover:shadow-2xl rounded-2xl border-0"
-            >
-              <a href="/signup">
-                <Zap className="mr-2 h-5 w-5" />
-                Start Creating Free
               </a>
             </Button>
             <Button 
