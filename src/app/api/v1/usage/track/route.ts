@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid usage type' }, { status: 400 })
     }
 
-    const today = new Date().toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0] as string
 
     // Get credit cost based on type
     let creditCost = 0
