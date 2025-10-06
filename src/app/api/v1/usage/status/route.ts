@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = session.user.id
-    const today = new Date().toISOString().split('T')[0]
-    const month = new Date().toISOString().slice(0, 7)
+    const today = new Date().toISOString().split('T')[0] as string
+    const month = new Date().toISOString().slice(0, 7) as string
 
     const [dailyUsage] = await db
       .select()
