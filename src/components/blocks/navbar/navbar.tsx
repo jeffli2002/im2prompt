@@ -176,7 +176,7 @@ const Navbar = ({
       <NavigationMenuItem key={item.title}>
         <NavigationMenuLink asChild>
           <Link
-            href={item.url}
+            href={item.url || '#'}
             onClick={(e) => {
               if (item.onClick) {
                 e.preventDefault();
@@ -206,7 +206,7 @@ const Navbar = ({
               {item.items.map((subItem) => (
                 <Link
                   key={subItem.title}
-                  href={subItem.url}
+                  href={subItem.url || '#'}
                   className={`flex items-start gap-2 rounded-md p-2 hover:bg-accent relative ${
                     subItem.highlight ? 'bg-gradient-to-r from-red-500/5 via-orange-500/5 to-yellow-500/5 border border-orange-500/30' : ''
                   }`}
@@ -244,7 +244,7 @@ const Navbar = ({
     return (
       <div key={item.title}>
         <Link
-          href={item.url}
+          href={item.url || '#'}
           onClick={(e) => {
             if (item.onClick) {
               e.preventDefault();
