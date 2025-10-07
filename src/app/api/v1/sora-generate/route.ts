@@ -19,11 +19,18 @@ export async function POST(request: NextRequest) {
     
     const userId = session.user.id;
     
-    const { prompt, aspect_ratio = 'landscape', quality = 'standard' } = await request.json();
+    const { mode, prompt, image_url, aspect_ratio = 'landscape', quality = 'standard' } = await request.json();
 
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json(
         { error: 'Prompt is required and must be a string' },
+        { status: 400 }
+      );
+    }
+    
+    if (mode === 'image-to-video' && !image_url) {
+      return NextResponse.json(
+        { error: 'Image URL is required for image-to-video mode' },
         { status: 400 }
       );
     }
@@ -67,6 +74,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (mode === 'image-to-video') {
+      const imageResponse = await fetch(image_url);
+      const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+      
+      const { checkForPeopleAndFaces } = await import('@/lib/google-vision');
+      const visionCheck = await checkForPeopleAndFaces(imageBuffer);
+      
+      if (!visionCheck.success) {
+        return NextResponse.json(
+          { error: visionCheck.error || 'Failed to analyze image' },
+          { status: 500 }
+        );
+      }
+      
+      if (visionCheck.blocked) {
+        return NextResponse.json(
+          { 
+            error: visionCheck.reason,
+            details: visionCheck.details,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     const response = await fetch('https://api.kie.ai/api/v1/jobs/createTask', {
       method: 'POST',
       headers: {
@@ -74,12 +106,19 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'sora-2-text-to-video',
-        input: {
-          prompt,
-          aspect_ratio,
-          quality,
-        },
+        model: mode === 'image-to-video' ? 'sora-2-image-to-video' : 'sora-2-text-to-video',
+        input: mode === 'image-to-video' 
+          ? {
+              prompt,
+              image_urls: [image_url],
+              aspect_ratio,
+              quality,
+            }
+          : {
+              prompt,
+              aspect_ratio,
+              quality,
+            },
       }),
     });
 

@@ -177,6 +177,11 @@ export default function SoraVideoGenerator() {
           throw new Error(createData.error || 'Video generation limit reached')
         }
         
+        if (createData.error && (createData.error.includes('face') || createData.error.includes('people') || createData.error.includes('person'))) {
+          alert(`❌ ${createData.error}\n\n💡 Please upload an image without people or faces (landscapes, objects, scenes, etc.)`)
+          throw new Error(createData.error)
+        }
+        
         throw new Error(createData.error || 'Failed to create task')
       }
 
@@ -352,6 +357,18 @@ export default function SoraVideoGenerator() {
             </TabsContent>
 
             <TabsContent value="image-to-video" className="mt-0 space-y-6">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                <div className="flex gap-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-amber-900">Sora 2 Image Requirements</p>
+                    <p className="text-xs text-amber-700 leading-relaxed">
+                      Sora 2 has strict requirements for uploaded images. <strong>Images containing people or faces are not supported</strong> and will be automatically rejected. Please use images with landscapes, objects, or scenes without any people.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <label className="text-sm font-light text-gray-700">Source Image</label>
                 
@@ -366,6 +383,9 @@ export default function SoraVideoGenerator() {
                     </p>
                     <p className="text-xs font-light text-gray-400">
                       JPEG, PNG, or WebP (max 10MB)
+                    </p>
+                    <p className="text-xs font-light text-amber-600 mt-2">
+                      ⚠️ No people or faces allowed
                     </p>
                   </div>
                 ) : (

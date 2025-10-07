@@ -333,24 +333,71 @@ export async function POST(req: NextRequest) {
 
     if (!extractedPrompt) {
       console.error('No prompt extracted from Coze response:', cozeData);
+      console.log('Falling back to Google Vision API');
       
-      // If Coze API fails, fall back to mock response
-      console.log('Falling back to mock response due to Coze API failure');
-      
-      // Generate mock prompt based on model style
-      const mockPrompts = {
-        general: 'A beautiful landscape with mountains in the background, a serene lake in the foreground, golden hour lighting, photorealistic style, high quality, detailed',
-        midjourney: 'A stunning mountain landscape at sunset, crystal clear lake reflection, dramatic clouds, golden hour lighting, photorealistic, highly detailed, 8k resolution --ar 16:9 --v 6',
-        'stable-diffusion': 'A majestic mountain landscape during golden hour, pristine lake with perfect reflections, dramatic sky with clouds, photorealistic, highly detailed, 8k, masterpiece, best quality',
-        flux: 'A breathtaking mountain landscape at sunset, crystal clear alpine lake, dramatic cloud formations, golden hour lighting, photorealistic, ultra detailed, 8k resolution, professional photography',
-        sora2: 'A cinematic shot of a serene mountain landscape at sunset, camera slowly panning across a crystal clear lake reflecting the golden sky, dramatic clouds moving overhead, golden hour lighting, photorealistic, 4k video quality',
-        veo3: 'A peaceful mountain landscape at golden hour, camera gently moving across a pristine lake with perfect reflections, dramatic clouds drifting in the sky, warm lighting, cinematic quality, photorealistic'
-      };
+      try {
+        const { generatePromptFromImage } = await import('@/lib/google-vision');
+        
+        let imageBuffer: Buffer;
+        if (imageFile) {
+          const arrayBuffer = await imageFile.arrayBuffer();
+          imageBuffer = Buffer.from(arrayBuffer);
+        } else if (imageUrl) {
+          const imageResponse = await fetch(imageUrl);
+          const arrayBuffer = await imageResponse.arrayBuffer();
+          imageBuffer = Buffer.from(arrayBuffer);
+        } else {
+          throw new Error('No image available for Vision API fallback');
+        }
+        
+        const languageMap: Record<string, 'en' | 'zh' | 'fr' | 'ja' | 'es'> = {
+          'english': 'en',
+          'chinese': 'zh',
+          'french': 'fr',
+          'japanese': 'ja',
+          'spanish': 'es'
+        };
+        
+        const visionLang = languageMap[language.toLowerCase()] || 'en';
+        const visionResult = await generatePromptFromImage(imageBuffer, visionLang, modelStyle);
+        
+        if (visionResult.success && visionResult.prompt) {
+          extractedPrompt = visionResult.prompt;
+          console.log('Generated prompt from Google Vision API:', extractedPrompt);
+        } else {
+          throw new Error('Vision API failed to generate prompt');
+        }
+      } catch (visionError) {
+        console.error('Google Vision API fallback failed:', visionError);
+        
+        const mockPrompts = {
+          general: language === 'chinese' 
+            ? '一个美丽的风景，背景是山脉，前景是宁静的湖泊，黄金时段光线，照片写实风格，高质量，细节丰富'
+            : 'A beautiful landscape with mountains in the background, a serene lake in the foreground, golden hour lighting, photorealistic style, high quality, detailed',
+          midjourney: language === 'chinese'
+            ? '日落时分壮观的山地景观，清澈的湖面倒影，戏剧性云层，黄金时段光线，照片写实，高度细节，8k分辨率'
+            : 'A stunning mountain landscape at sunset, crystal clear lake reflection, dramatic clouds, golden hour lighting, photorealistic, highly detailed, 8k resolution',
+          'stable-diffusion': language === 'chinese'
+            ? '黄金时段雄伟的山地景观，原始湖泊完美倒影，戏剧性天空云层，照片写实，高度细节，8k，杰作，最佳质量'
+            : 'A majestic mountain landscape during golden hour, pristine lake with perfect reflections, dramatic sky with clouds, photorealistic, highly detailed, 8k, masterpiece, best quality',
+          flux: language === 'chinese'
+            ? '日落时分令人惊叹的山地景观，清澈的高山湖泊，戏剧性云层，黄金时段光线，照片写实，超高细节，8k分辨率，专业摄影'
+            : 'A breathtaking mountain landscape at sunset, crystal clear alpine lake, dramatic cloud formations, golden hour lighting, photorealistic, ultra detailed, 8k resolution, professional photography',
+          sora2: language === 'chinese'
+            ? '日落时分宁静山地景观的电影镜头，相机缓慢平移穿过清澈的湖泊倒映金色天空，戏剧性云层移动，黄金时段光线，照片写实，4k视频质量'
+            : 'A cinematic shot of a serene mountain landscape at sunset, camera slowly panning across a crystal clear lake reflecting the golden sky, dramatic clouds moving overhead, golden hour lighting, photorealistic, 4k video quality',
+          veo3: language === 'chinese'
+            ? '黄金时段平静的山地景观，相机轻柔移动穿过原始湖泊完美倒影，戏剧性云层飘动，温暖光线，电影质量，照片写实'
+            : 'A peaceful mountain landscape at golden hour, camera gently moving across a pristine lake with perfect reflections, dramatic clouds drifting in the sky, warm lighting, cinematic quality, photorealistic'
+        };
 
-      extractedPrompt = mockPrompts[modelStyle as keyof typeof mockPrompts] || mockPrompts.general;
-      negativePrompt = modelStyle === 'stable-diffusion' ? 'blurry, low quality, distorted, ugly, bad anatomy, bad proportions, deformed, low resolution' : '';
-      
-      console.log('Generated mock prompt:', extractedPrompt);
+        extractedPrompt = mockPrompts[modelStyle as keyof typeof mockPrompts] || mockPrompts.general;
+        negativePrompt = modelStyle === 'stable-diffusion' 
+          ? (language === 'chinese' ? '模糊，低质量，扭曲，丑陋，解剖错误，比例失调，变形，低分辨率' : 'blurry, low quality, distorted, ugly, bad anatomy, bad proportions, deformed, low resolution')
+          : '';
+        
+        console.log('Using final fallback mock prompt:', extractedPrompt);
+      }
     }
 
     const promptId = `prompt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;

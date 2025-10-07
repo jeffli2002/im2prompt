@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { checkForPeopleAndFaces } from '@/lib/google-vision';
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,8 +26,30 @@ export async function POST(request: NextRequest) {
     }
 
     let imageUrls: string[] = [];
+    let imageBuffer: Buffer | null = null;
 
     if (imageFile) {
+      const arrayBuffer = await imageFile.arrayBuffer();
+      imageBuffer = Buffer.from(arrayBuffer);
+      
+      const visionCheck = await checkForPeopleAndFaces(imageBuffer);
+      
+      if (!visionCheck.success) {
+        return NextResponse.json(
+          { error: visionCheck.error || 'Failed to analyze image' },
+          { status: 500 }
+        );
+      }
+      
+      if (visionCheck.blocked) {
+        return NextResponse.json(
+          { 
+            error: visionCheck.reason,
+            details: visionCheck.details,
+          },
+          { status: 400 }
+        );
+      }
       const fileFormData = new FormData();
       fileFormData.append('file', imageFile);
 
