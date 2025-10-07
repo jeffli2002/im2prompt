@@ -60,12 +60,12 @@ export const creditsConfig: CreditsConfig = {
   // Consumption rules
   consumption: {
     imageToPrompt: {
-      general: 1,
+      general: 2,
       midjourney: 2,
       'stable-diffusion': 2,
       flux: 2,
-      sora2: 3,
-      veo3: 3,
+      sora2: 2,
+      veo3: 2,
     },
     imageGeneration: {
       'nano-banana': 5,
@@ -90,19 +90,20 @@ export const creditsConfig: CreditsConfig = {
   // Free user quotas
   freeUser: {
     imageToText: {
-      freeQuotaPerDay: 5,    // Free users get 5 Image-to-Text calls per day
+      freeQuotaPerDay: 3,      // Free users get 3 Image-to-Prompt calls per day
+      freeQuotaPerMonth: 10,   // Free users get 10 Image-to-Prompt calls per month
     },
     textToPrompt: {
-      unlimited: true,       // Free users get unlimited Text-to-Prompt generation
+      unlimited: true,         // Free users get unlimited Text-to-Prompt generation
     },
-    credits: {
-      dailyCredits: 30,
-      monthlyCredits: 150,
+    imageGeneration: {
+      freeQuotaPerDay: 1,      // Free users get 1 image generation per day
+      freeQuotaPerMonth: 3,    // Free users get 3 image generations per month
     },
-    // API calls not supported at this moment
-    // apiCall: {
-    //   freeQuotaCalls: 100,   // Free users get 100 API calls per month
-    // },
+    videoGeneration: {
+      freeQuotaPerDay: 1,      // Free users get 1 video generation per day
+      freeQuotaPerMonth: 3,    // Free users get 3 video generations per month
+    },
     storage: {
       freeQuotaGB: 1,
     },

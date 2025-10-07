@@ -3,15 +3,14 @@ import { auth } from '@/lib/auth/auth';
 import db from '@/server/db';
 import { prompts, creditTransactions, userCredits } from '@/server/db/schema';
 import { eq, desc, count, and } from 'drizzle-orm';
+import { getModelCost } from '@/config/credits.config';
+import { quotaService } from '@/lib/usage/quota-service';
+import { creditService } from '@/lib/credits/credit-service';
 
-// Coze API configuration
 const COZE_WORKFLOW_API_URL = 'https://api.coze.cn/v1/workflow/run';
 const COZE_FILE_UPLOAD_URL = 'https://api.coze.cn/v1/files/upload';
 const COZE_WORKFLOW_ID = process.env.COZE_WORKFLOW_ID || '7550263539588399142';
 const COZE_API_KEY = process.env.COZE_API_KEY;
-
-// Credit costs for image-to-prompt
-const CREDITS_PER_EXTRACTION = 1;
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,7 +23,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Try to get session, but don't require it for first 3 attempts
     const session = await auth.api.getSession({
       headers: req.headers,
     });
@@ -33,9 +31,10 @@ export async function POST(req: NextRequest) {
     let isAuthenticated = !!userId;
     let isFreeTrial = false;
 
-    // If no session, use a temporary user ID for free trial
     if (!userId) {
-      userId = `guest_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      const ipAddress = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+      const userAgent = req.headers.get('user-agent') || 'unknown';
+      userId = await quotaService.getOrCreateGuestUserId(ipAddress, userAgent);
       isFreeTrial = true;
     }
 
@@ -54,7 +53,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate model style
     const validStyles = ['general', 'midjourney', 'stable-diffusion', 'flux', 'sora2', 'veo3'];
     if (!validStyles.includes(modelStyle)) {
       return NextResponse.json(
@@ -62,6 +60,8 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    
+    const creditsPerExtraction = getModelCost('imageToPrompt', modelStyle);
 
     // Map frontend model style to Coze API promptStyle format
     const modelStyleToPromptStyle: Record<string, string> = {
@@ -136,27 +136,48 @@ export async function POST(req: NextRequest) {
       // uploadedImageKey = await uploadToS3(buffer, imageFile.type);
     }
 
-    // Check user credits (skip for free trial users)
+    const quotaCheck = await quotaService.checkImageToPromptQuota(userId);
+    let shouldChargeCredits = quotaCheck.shouldChargeCredits;
     let userCreditRecord = null;
-    let canProceed = true;
     let remainingCredits = 0;
 
     if (isAuthenticated) {
-      userCreditRecord = await db.query.userCredits.findFirst({
-        where: (credits, { eq }) => eq(credits.userId, userId),
-      });
+      if (shouldChargeCredits) {
+        userCreditRecord = await db.query.userCredits.findFirst({
+          where: (credits, { eq }) => eq(credits.userId, userId),
+        });
 
-      if (!userCreditRecord || userCreditRecord.balance < CREDITS_PER_EXTRACTION) {
+        if (!userCreditRecord || userCreditRecord.balance < creditsPerExtraction) {
+          const limitType = quotaCheck.quotaRemaining === 0 ? 'daily' : 'monthly';
+          return NextResponse.json(
+            { error: `Insufficient credits. You have used your ${limitType} free quota (3/day, 10/month).` },
+            { status: 402 }
+          );
+        }
+        remainingCredits = userCreditRecord.balance - creditsPerExtraction;
+      } else {
+        userCreditRecord = await db.query.userCredits.findFirst({
+          where: (credits, { eq }) => eq(credits.userId, userId),
+        });
+        remainingCredits = userCreditRecord?.balance || 0;
+      }
+    } else {
+      if (quotaCheck.quotaRemaining === 0 && quotaCheck.monthlyQuotaRemaining === 0) {
         return NextResponse.json(
-          { error: 'Insufficient credits' },
-          { status: 402 }
+          { error: 'Daily and monthly quota exceeded. Please sign in to continue.' },
+          { status: 429 }
+        );
+      } else if (quotaCheck.quotaRemaining === 0) {
+        return NextResponse.json(
+          { error: 'Daily quota exceeded (3/day). Please try again tomorrow or sign in.' },
+          { status: 429 }
+        );
+      } else if (quotaCheck.monthlyQuotaRemaining === 0) {
+        return NextResponse.json(
+          { error: 'Monthly quota exceeded (10/month). Please sign in to continue.' },
+          { status: 429 }
         );
       }
-      remainingCredits = userCreditRecord.balance - CREDITS_PER_EXTRACTION;
-    } else {
-      // For free trial, check if this is within the first 3 attempts
-      // We'll track this in the response metadata
-      remainingCredits = 3; // Start with 3 free attempts
     }
 
     // Prepare the prompt for Coze API based on model style
@@ -332,42 +353,42 @@ export async function POST(req: NextRequest) {
       console.log('Generated mock prompt:', extractedPrompt);
     }
 
-    // Start a database transaction (only for authenticated users)
     const promptId = `prompt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const transactionId = `tx_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    const isFallbackResponse = extractedPrompt.includes('mountain landscape'); // Check if it's a mock response
+    const isFallbackResponse = extractedPrompt.includes('mountain landscape');
     
-    if (isAuthenticated && userCreditRecord) {
+    await quotaService.incrementImageToPromptUsage(userId);
+    
+    if (isAuthenticated) {
       let savedToDb = false;
       try {
         await db.transaction(async (tx) => {
-          // Deduct credits
-          await tx
-            .update(userCredits)
-            .set({
-              balance: userCreditRecord.balance - CREDITS_PER_EXTRACTION,
-              totalSpent: userCreditRecord.totalSpent + CREDITS_PER_EXTRACTION,
-              updatedAt: new Date(),
-            })
-            .where(eq(userCredits.userId, userId));
+          if (shouldChargeCredits && userCreditRecord) {
+            await tx
+              .update(userCredits)
+              .set({
+                balance: userCreditRecord.balance - creditsPerExtraction,
+                totalSpent: userCreditRecord.totalSpent + creditsPerExtraction,
+                updatedAt: new Date(),
+              })
+              .where(eq(userCredits.userId, userId));
 
-          // Record credit transaction
-          await tx.insert(creditTransactions).values({
-            id: transactionId,
-            userId,
-            type: 'spend',
-            amount: CREDITS_PER_EXTRACTION,
-            balanceAfter: userCreditRecord.balance - CREDITS_PER_EXTRACTION,
-            source: 'api_call',
-            description: `Image to ${modelStyle} prompt extraction`,
-            referenceId: promptId,
-            metadata: JSON.stringify({
-              feature: 'image-to-prompt',
-              modelStyle,
-            }),
-          });
+            await tx.insert(creditTransactions).values({
+              id: transactionId,
+              userId,
+              type: 'spend',
+              amount: creditsPerExtraction,
+              balanceAfter: userCreditRecord.balance - creditsPerExtraction,
+              source: 'api_call',
+              description: `Image to ${modelStyle} prompt extraction`,
+              referenceId: promptId,
+              metadata: JSON.stringify({
+                feature: 'image-to-prompt',
+                modelStyle,
+              }),
+            });
+          }
 
-          // Save the prompt
           await tx.insert(prompts).values({
             id: promptId,
             userId,
@@ -375,10 +396,11 @@ export async function POST(req: NextRequest) {
             negativePrompt: negativePrompt || null,
             modelStyle: modelStyle as 'general' | 'midjourney' | 'stable-diffusion' | 'flux' | 'sora2' | 'veo3',
             s3KeyOriginal: uploadedImageKey || null,
-            creditsSpent: CREDITS_PER_EXTRACTION,
+            creditsSpent: shouldChargeCredits ? creditsPerExtraction : 0,
             metadata: JSON.stringify({
               cozeConversationId: cozeData.conversation_id,
               imageSource: imageFile ? 'upload' : 'url',
+              usedFreeQuota: !shouldChargeCredits,
             }),
             tags: [modelStyle, 'extracted'],
           });
@@ -386,13 +408,10 @@ export async function POST(req: NextRequest) {
         savedToDb = true;
       } catch (dbError) {
         console.error('Database transaction error:', dbError);
-        // Do not fail the whole request; continue to return the generated prompt
       }
-      // Optionally attach flag for client awareness
       (globalThis as any).__lastPromptSaved = savedToDb;
     }
 
-    // Return the extracted prompt
     return NextResponse.json({
       success: true,
       data: {
@@ -400,13 +419,19 @@ export async function POST(req: NextRequest) {
         prompt: extractedPrompt,
         negativePrompt: negativePrompt || undefined,
         modelStyle,
-        creditsUsed: isAuthenticated ? CREDITS_PER_EXTRACTION : 0,
+        creditsUsed: shouldChargeCredits ? creditsPerExtraction : 0,
         remainingCredits: remainingCredits,
+        quotaRemaining: quotaCheck.quotaRemaining - 1,
+        quotaUsed: quotaCheck.quotaUsed + 1,
         isFreeTrial: isFreeTrial,
         isAuthenticated: isAuthenticated,
-        fallbackResponse: isFallbackResponse, // Mark if this was a fallback response
+        fallbackResponse: isFallbackResponse,
         saved: (globalThis as any).__lastPromptSaved ?? false,
-        message: isFreeTrial ? 'This is a free trial. Sign up to save your prompts and get more credits!' : undefined,
+        message: shouldChargeCredits 
+          ? `Used ${creditsPerExtraction} credits (daily quota exhausted)`
+          : isFreeTrial 
+            ? `Free trial (${quotaCheck.quotaRemaining - 1} remaining today). Sign up to save your prompts!`
+            : `Free quota (${quotaCheck.quotaRemaining - 1} remaining today)`,
       },
     });
 

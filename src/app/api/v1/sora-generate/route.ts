@@ -1,13 +1,61 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth/auth';
+import { creditService } from '@/lib/credits/credit-service';
+import { getModelCost } from '@/config/credits.config';
+import { quotaService } from '@/lib/usage/quota-service';
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+    
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    
+    const userId = session.user.id;
+    
     const { prompt, aspect_ratio = 'landscape', quality = 'standard' } = await request.json();
 
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json(
         { error: 'Prompt is required and must be a string' },
         { status: 400 }
+      );
+    }
+    
+    const creditCost = getModelCost('videoGeneration', 'sora-2');
+    
+    const quotaCheck = await quotaService.checkVideoGenerationQuota(userId);
+    let shouldChargeCredits = quotaCheck.shouldChargeCredits;
+    
+    if (shouldChargeCredits) {
+      const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
+      if (!hasCredits) {
+        const limitType = quotaCheck.quotaRemaining === 0 ? 'daily' : 'monthly';
+        return NextResponse.json(
+          { error: `Insufficient credits. You have used your ${limitType} free quota (1/day, 3/month).` },
+          { status: 402 }
+        );
+      }
+    } else if (quotaCheck.quotaRemaining === 0 && quotaCheck.monthlyQuotaRemaining === 0) {
+      return NextResponse.json(
+        { error: 'Daily and monthly quota exceeded. Please use credits.' },
+        { status: 429 }
+      );
+    } else if (quotaCheck.quotaRemaining === 0) {
+      return NextResponse.json(
+        { error: 'Daily quota exceeded (1/day). Try again tomorrow or use credits.' },
+        { status: 429 }
+      );
+    } else if (quotaCheck.monthlyQuotaRemaining === 0) {
+      return NextResponse.json(
+        { error: 'Monthly quota exceeded (3/month). Please use credits.' },
+        { status: 429 }
       );
     }
 
@@ -52,10 +100,25 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    
+    await quotaService.incrementVideoGenerationUsage(userId);
+    
+    if (shouldChargeCredits) {
+      await creditService.spendCredits({
+        userId,
+        amount: creditCost,
+        source: 'api_call',
+        description: 'Video generation with Sora 2',
+        metadata: { feature: 'video-generation', model: 'sora-2', prompt: prompt.substring(0, 100), taskId: data.data.taskId, usedFreeQuota: !shouldChargeCredits },
+      });
+    }
 
     return NextResponse.json({
       taskId: data.data.taskId,
       message: 'Video generation task created successfully',
+      creditsUsed: shouldChargeCredits ? creditCost : 0,
+      quotaRemaining: quotaCheck.quotaRemaining - 1,
+      usedFreeQuota: !shouldChargeCredits,
     });
   } catch (error) {
     console.error('Error creating video generation task:', error);

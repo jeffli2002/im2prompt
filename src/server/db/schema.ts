@@ -232,7 +232,7 @@ export const prompts = pgTable('prompts', {
     .notNull(),
 });
 
-// Usage tracking for free tier limits (credit-based)
+// Usage tracking for free tier limits (daily tracking)
 export const usageTracking = pgTable('usage_tracking', {
   id: text('id').primaryKey(),
   userId: text('user_id')
@@ -240,6 +240,8 @@ export const usageTracking = pgTable('usage_tracking', {
     .references(() => user.id, { onDelete: 'cascade' }),
   date: text('date').notNull(), // Format: YYYY-MM-DD
   imageToTextCount: integer('image_to_text_count').notNull().default(0),
+  imageGenerationCount: integer('image_generation_count').notNull().default(0),
+  videoGenerationCount: integer('video_generation_count').notNull().default(0),
   creditsUsedDaily: integer('credits_used_daily').notNull().default(0), // Credits used today
   creditsUsedMonthly: integer('credits_used_monthly').notNull().default(0), // Credits used this month (cumulative)
   createdAt: timestamp('created_at')
@@ -252,6 +254,30 @@ export const usageTracking = pgTable('usage_tracking', {
   userDateIdx: {
     name: 'usage_user_date_idx',
     columns: [table.userId, table.date],
+    unique: true,
+  },
+}));
+
+// Monthly usage tracking for free tier limits
+export const monthlyUsageTracking = pgTable('monthly_usage_tracking', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  month: text('month').notNull(), // Format: YYYY-MM
+  imageToTextCount: integer('image_to_text_count').notNull().default(0),
+  imageGenerationCount: integer('image_generation_count').notNull().default(0),
+  videoGenerationCount: integer('video_generation_count').notNull().default(0),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+}, (table) => ({
+  userMonthIdx: {
+    name: 'monthly_usage_user_month_idx',
+    columns: [table.userId, table.month],
     unique: true,
   },
 }));

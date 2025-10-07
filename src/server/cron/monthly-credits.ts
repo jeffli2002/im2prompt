@@ -33,11 +33,22 @@ export async function grantMonthlyFreeCredits() {
     console.log(`Found ${freeUsers.length} free users`);
 
     const freePlan = paymentConfig.plans.find(p => p.id === 'free');
-    const freeCredits = freePlan?.credits?.monthly || 100;
+    const freeCredits = freePlan?.credits?.monthly || 0;
     
     if (!freeCredits || freeCredits <= 0) {
-      console.log('❌ No monthly credits configured for free plan');
-      return { success: false, message: 'No monthly credits configured' };
+      console.log('ℹ️ No monthly credits configured for free plan (free users get one-time signup bonus only)');
+      console.log('✅ Monthly credits distribution completed (0 free users to process)');
+      return { 
+        success: true, 
+        totalUsers: 0,
+        successCount: 0,
+        errorCount: 0,
+        creditsPerUser: 0,
+        totalCreditsDistributed: 0,
+        quotaUpdateSuccessCount: 0,
+        quotaUpdateErrorCount: 0,
+        message: 'Free users do not receive monthly credits'
+      };
     }
 
     let successCount = 0;

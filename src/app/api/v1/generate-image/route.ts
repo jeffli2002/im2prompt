@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits/credit-service';
 import { getModelCost } from '@/config/credits.config';
+import { quotaService } from '@/lib/usage/quota-service';
 
 const MODEL_ENDPOINTS: Record<string, string> = {
   'flux-1.1': 'https://api.bfl.ai/v1/flux-pro-1.1',
@@ -66,12 +67,33 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    const quotaCheck = await quotaService.checkImageGenerationQuota(userId);
+    let shouldChargeCredits = quotaCheck.shouldChargeCredits;
+    
     if (!isTestMode) {
-      const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
-      if (!hasCredits) {
+      if (shouldChargeCredits) {
+        const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
+        if (!hasCredits) {
+          const limitType = quotaCheck.quotaRemaining === 0 ? 'daily' : 'monthly';
+          return NextResponse.json(
+            { error: `Insufficient credits. You have used your ${limitType} free quota (1/day, 3/month).` },
+            { status: 402 }
+          );
+        }
+      } else if (quotaCheck.quotaRemaining === 0 && quotaCheck.monthlyQuotaRemaining === 0) {
         return NextResponse.json(
-          { error: 'Insufficient credits' },
-          { status: 402 }
+          { error: 'Daily and monthly quota exceeded. Please use credits.' },
+          { status: 429 }
+        );
+      } else if (quotaCheck.quotaRemaining === 0) {
+        return NextResponse.json(
+          { error: 'Daily quota exceeded (1/day). Try again tomorrow or use credits.' },
+          { status: 429 }
+        );
+      } else if (quotaCheck.monthlyQuotaRemaining === 0) {
+        return NextResponse.json(
+          { error: 'Monthly quota exceeded (3/month). Please use credits.' },
+          { status: 429 }
         );
       }
     }
@@ -158,13 +180,15 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      if (!isTestMode) {
+      await quotaService.incrementImageGenerationUsage(userId);
+      
+      if (!isTestMode && shouldChargeCredits) {
         await creditService.spendCredits({
           userId,
           amount: creditCost,
           source: 'api_call',
           description: `Image generation with ${model}`,
-          metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100) },
+          metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100), usedFreeQuota: !shouldChargeCredits },
         });
       }
 
@@ -174,7 +198,9 @@ export async function POST(request: NextRequest) {
         prompt,
         width,
         height,
-        creditsUsed: creditCost,
+        creditsUsed: shouldChargeCredits ? creditCost : 0,
+        quotaRemaining: quotaCheck.quotaRemaining - 1,
+        usedFreeQuota: !shouldChargeCredits,
       });
     }
 
@@ -217,13 +243,15 @@ export async function POST(request: NextRequest) {
       const base64Image = Buffer.from(imageBuffer).toString('base64');
       const imageUrl = `data:image/${output_format || 'jpeg'};base64,${base64Image}`;
       
-      if (!isTestMode) {
+      await quotaService.incrementImageGenerationUsage(userId);
+      
+      if (!isTestMode && shouldChargeCredits) {
         await creditService.spendCredits({
           userId,
           amount: creditCost,
           source: 'api_call',
           description: `Image generation with ${model}`,
-          metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100) },
+          metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100), usedFreeQuota: !shouldChargeCredits },
         });
       }
 
@@ -233,7 +261,9 @@ export async function POST(request: NextRequest) {
         prompt,
         width,
         height,
-        creditsUsed: creditCost,
+        creditsUsed: shouldChargeCredits ? creditCost : 0,
+        quotaRemaining: quotaCheck.quotaRemaining - 1,
+        usedFreeQuota: !shouldChargeCredits,
       });
     }
 
@@ -339,13 +369,15 @@ export async function POST(request: NextRequest) {
           );
         }
         
-        if (!isTestMode) {
+        await quotaService.incrementImageGenerationUsage(userId);
+        
+        if (!isTestMode && shouldChargeCredits) {
           await creditService.spendCredits({
             userId,
             amount: creditCost,
             source: 'api_call',
             description: `Image generation with ${model}`,
-            metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100) },
+            metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100), usedFreeQuota: !shouldChargeCredits },
           });
         }
 
@@ -356,7 +388,9 @@ export async function POST(request: NextRequest) {
           width,
           height,
           requestId,
-          creditsUsed: creditCost,
+          creditsUsed: shouldChargeCredits ? creditCost : 0,
+          quotaRemaining: quotaCheck.quotaRemaining - 1,
+          usedFreeQuota: !shouldChargeCredits,
         });
       } else if (pollData.status === 'Error' || pollData.status === 'Failed') {
         console.error('Flux API generation failed:', pollData);
