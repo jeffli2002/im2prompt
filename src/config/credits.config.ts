@@ -35,20 +35,22 @@ export interface CreditsConfig {
   // Free user quotas (credit-based)
   freeUser: {
     imageToText: {
-      freeQuotaPerDay: number;    // Free Image-to-Text calls per day for free users
+      freeQuotaPerDay: number;
+      freeQuotaPerMonth: number;
     };
     textToPrompt: {
-      unlimited: boolean;         // Unlimited Text-to-Prompt generation
+      unlimited: boolean;
     };
-    credits: {
-      dailyCredits: number;       // Daily free credits for image/video generation
-      monthlyCredits: number;     // Monthly free credits for image/video generation
+    imageGeneration: {
+      freeQuotaPerDay: number;
+      freeQuotaPerMonth: number;
     };
-    // apiCall: {
-    //   freeQuotaCalls: number;     // Free API calls per month for free users
-    // };
+    videoGeneration: {
+      freeQuotaPerDay: number;
+      freeQuotaPerMonth: number;
+    };
     storage: {
-      freeQuotaGB: number;        // Free storage for free users
+      freeQuotaGB: number;
     };
   };
 }
