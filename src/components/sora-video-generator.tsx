@@ -169,7 +169,12 @@ export default function SoraVideoGenerator() {
         body: JSON.stringify(requestBody)
       })
 
-      const createData = await createResponse.json()
+      let createData
+      try {
+        createData = await createResponse.json()
+      } catch (jsonError) {
+        throw new Error('Failed to process server response. Please try again.')
+      }
 
       if (!createResponse.ok) {
         if (createResponse.status === 429 || createResponse.status === 402) {
@@ -193,7 +198,13 @@ export default function SoraVideoGenerator() {
       const pollInterval = setInterval(async () => {
         try {
           const statusResponse = await fetch(`/api/v1/sora-task-status?taskId=${taskId}`)
-          const statusData = await statusResponse.json()
+          
+          let statusData
+          try {
+            statusData = await statusResponse.json()
+          } catch (jsonError) {
+            throw new Error('Failed to check generation status. Please refresh the page.')
+          }
 
           if (!statusResponse.ok) {
             throw new Error(statusData.error || 'Failed to query task')

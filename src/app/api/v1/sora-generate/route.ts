@@ -78,24 +78,23 @@ export async function POST(request: NextRequest) {
       const imageResponse = await fetch(image_url);
       const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
       
-      const { checkForPeopleAndFaces } = await import('@/lib/google-vision');
-      const visionCheck = await checkForPeopleAndFaces(imageBuffer);
-      
-      if (!visionCheck.success) {
-        return NextResponse.json(
-          { error: visionCheck.error || 'Failed to analyze image' },
-          { status: 500 }
-        );
-      }
-      
-      if (visionCheck.blocked) {
-        return NextResponse.json(
-          { 
-            error: visionCheck.reason,
-            details: visionCheck.details,
-          },
-          { status: 400 }
-        );
+      try {
+        const { checkForPeopleAndFaces } = await import('@/lib/google-vision');
+        const visionCheck = await checkForPeopleAndFaces(imageBuffer);
+        
+        if (!visionCheck.success) {
+          console.warn('Vision API check failed, proceeding without face detection:', visionCheck.error);
+        } else if (visionCheck.blocked) {
+          return NextResponse.json(
+            { 
+              error: visionCheck.reason || 'Image contains people or faces. Please use an image without people (landscapes, objects, scenes, etc.)',
+              details: visionCheck.details,
+            },
+            { status: 400 }
+          );
+        }
+      } catch (visionError) {
+        console.warn('Vision API error, proceeding without face detection:', visionError);
       }
     }
 
@@ -161,8 +160,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error creating video generation task:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred while creating the video generation task. Please try again.';
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
