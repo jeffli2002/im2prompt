@@ -1,6 +1,6 @@
 import vision from '@google-cloud/vision';
 
-let client: vision.ImageAnnotatorClient;
+let client: InstanceType<typeof vision.ImageAnnotatorClient>;
 
 if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
   const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
