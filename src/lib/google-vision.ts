@@ -1,19 +1,30 @@
 import vision from '@google-cloud/vision';
 
-let client: InstanceType<typeof vision.ImageAnnotatorClient>;
+let client: InstanceType<typeof vision.ImageAnnotatorClient> | null = null;
 
-if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-  const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-  client = new vision.ImageAnnotatorClient({
-    credentials,
-  });
-} else {
-  client = new vision.ImageAnnotatorClient();
+function getClient() {
+  if (!client) {
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      try {
+        const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+        client = new vision.ImageAnnotatorClient({
+          credentials,
+        });
+      } catch (error) {
+        console.error('Failed to initialize Google Vision client with credentials:', error);
+        throw new Error('Google Vision API not properly configured');
+      }
+    } else {
+      throw new Error('Google Vision API credentials not found. Please configure GOOGLE_APPLICATION_CREDENTIALS.');
+    }
+  }
+  return client;
 }
 
 export async function analyzeImage(imageBuffer: Buffer) {
   try {
-    const [result] = await client.labelDetection(imageBuffer);
+    const visionClient = getClient();
+    const [result] = await visionClient.labelDetection(imageBuffer);
     const labels = result.labelAnnotations || [];
     
     return {
@@ -34,7 +45,8 @@ export async function analyzeImage(imageBuffer: Buffer) {
 
 export async function detectText(imageBuffer: Buffer) {
   try {
-    const [result] = await client.textDetection(imageBuffer);
+    const visionClient = getClient();
+    const [result] = await visionClient.textDetection(imageBuffer);
     const detections = result.textAnnotations || [];
     
     return {
@@ -56,7 +68,8 @@ export async function detectText(imageBuffer: Buffer) {
 
 export async function detectFaces(imageBuffer: Buffer) {
   try {
-    const [result] = await client.faceDetection(imageBuffer);
+    const visionClient = getClient();
+    const [result] = await visionClient.faceDetection(imageBuffer);
     const faces = result.faceAnnotations || [];
     
     return {
@@ -80,7 +93,8 @@ export async function detectFaces(imageBuffer: Buffer) {
 
 export async function checkForPeopleAndFaces(imageBuffer: Buffer) {
   try {
-    const [result] = await client.annotateImage({
+    const visionClient = getClient();
+    const [result] = await visionClient.annotateImage({
       image: { content: imageBuffer },
       features: [
         { type: 'FACE_DETECTION' },
@@ -148,7 +162,8 @@ export async function checkForPeopleAndFaces(imageBuffer: Buffer) {
 
 export async function analyzeImageFull(imageBuffer: Buffer) {
   try {
-    const [result] = await client.annotateImage({
+    const visionClient = getClient();
+    const [result] = await visionClient.annotateImage({
       image: { content: imageBuffer },
       features: [
         { type: 'LABEL_DETECTION' },
@@ -176,7 +191,8 @@ type SupportedLanguage = 'en' | 'zh' | 'fr' | 'ja' | 'es';
 
 export async function generatePromptFromImage(imageBuffer: Buffer, language: SupportedLanguage = 'en', modelStyle: string = 'general') {
   try {
-    const [result] = await client.annotateImage({
+    const visionClient = getClient();
+    const [result] = await visionClient.annotateImage({
       image: { content: imageBuffer },
       features: [
         { type: 'LABEL_DETECTION', maxResults: 20 },

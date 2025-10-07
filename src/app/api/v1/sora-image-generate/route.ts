@@ -105,8 +105,15 @@ export async function POST(request: NextRequest) {
       }),
     });
 
+    const responseText = await response.text();
+    
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      let errorData: any = {};
+      try {
+        errorData = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Failed to parse error response:', responseText);
+      }
       console.error('KIE API error:', errorData);
       return NextResponse.json(
         { error: errorData.msg || 'Failed to create image-to-video generation task' },
@@ -114,7 +121,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const data = await response.json();
+    let data: any;
+    try {
+      data = JSON.parse(responseText);
+    } catch (error) {
+      console.error('Failed to parse response:', responseText);
+      return NextResponse.json(
+        { error: 'Invalid response from video generation service' },
+        { status: 500 }
+      );
+    }
 
     if (data.code !== 200) {
       return NextResponse.json(
