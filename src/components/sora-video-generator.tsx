@@ -442,7 +442,7 @@ export default function SoraVideoGenerator() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
               <p className="text-blue-800">
                 <strong>Credits:</strong> {videoCreditCost} credits per video | 
-                Available: {usage.credits.dailyLimit - usage.credits.dailyUsed}/day, {usage.credits.monthlyLimit - usage.credits.monthlyUsed}/month
+                Free quota: {usage.videoGeneration.dailyLimit}/day, {usage.videoGeneration.monthlyLimit}/month
               </p>
             </div>
 
@@ -541,8 +541,8 @@ export default function SoraVideoGenerator() {
       {showUpgradeModal && (
         <UpgradePrompt 
           onClose={() => setShowUpgradeModal(false)}
-          creditsUsed={usage.credits.dailyUsed}
-          creditsLimit={usage.credits.dailyLimit}
+          creditsUsed={0}
+          creditsLimit={0}
           type="credits"
           isAuthenticated={!!user}
           limitType="daily"
