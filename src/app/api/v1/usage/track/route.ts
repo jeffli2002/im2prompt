@@ -28,9 +28,9 @@ export async function POST(request: NextRequest) {
     // Get credit cost based on type
     let creditCost = 0
     if (type === 'imageGeneration') {
-      creditCost = credits || creditsConfig.consumption.imageGeneration.nanoBanana
+      creditCost = credits || creditsConfig.consumption.imageGeneration['nano-banana']
     } else if (type === 'videoGeneration') {
-      creditCost = credits || creditsConfig.consumption.videoGeneration.sora2
+      creditCost = credits || creditsConfig.consumption.videoGeneration['sora-2']
     }
 
     const [existing] = await db

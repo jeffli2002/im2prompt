@@ -41,8 +41,8 @@ export function useQuota() {
       monthlyLimit: creditsConfig.freeUser.credits.monthlyCredits,
     },
     consumption: {
-      imageGeneration: creditsConfig.consumption.imageGeneration.nanoBanana,
-      videoGeneration: creditsConfig.consumption.videoGeneration.sora2,
+      imageGeneration: creditsConfig.consumption.imageGeneration['nano-banana'],
+      videoGeneration: creditsConfig.consumption.videoGeneration['sora-2'],
     },
   })
   const [isLoading, setIsLoading] = useState(true)
@@ -193,8 +193,8 @@ export function useQuota() {
         monthlyLimit: creditsConfig.freeUser.credits.monthlyCredits,
       },
       consumption: {
-        imageGeneration: creditsConfig.consumption.imageGeneration.nanoBanana,
-        videoGeneration: creditsConfig.consumption.videoGeneration.sora2,
+        imageGeneration: creditsConfig.consumption.imageGeneration['nano-banana'],
+        videoGeneration: creditsConfig.consumption.videoGeneration['sora-2'],
       },
     }
   }
