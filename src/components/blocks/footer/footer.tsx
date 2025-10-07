@@ -72,7 +72,7 @@ const defaultLegalLinks = [
 export const Footer = ({
   logo = {
     url: '/',
-    src: '/logo.svg',
+    src: '/logo-icon.svg',
     alt: 'im2prompt logo',
     title: 'im2prompt',
   },
@@ -89,10 +89,10 @@ export const Footer = ({
           <div className="flex w-full flex-col justify-between gap-6 lg:items-start">
             {/* Logo */}
             <div className="flex items-center gap-2 lg:justify-start">
-              <a href={logo.url}>
-                <img src={logo.src} alt={logo.alt} title={logo.title} className="h-8" />
+              <a href={logo.url} className="flex items-center gap-2">
+                <img src={logo.src} alt={logo.alt} title={logo.title} className="h-8 invert-0 dark:invert" />
+                <h2 className="font-semibold text-xl">{logo.title}</h2>
               </a>
-              <h2 className="font-semibold text-xl">{logo.title}</h2>
             </div>
             <p className="max-w-[70%] text-muted-foreground text-sm">{description}</p>
             <ul className="flex items-center space-x-6 text-muted-foreground">

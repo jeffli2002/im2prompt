@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
@@ -11,6 +11,7 @@ import UpgradePrompt from '@/components/auth/UpgradePrompt'
 import { useAuth } from '@/contexts/AuthContext'
 import { useQuota } from '@/hooks/useQuota'
 import { creditsConfig } from '@/config/credits.config'
+import { useVideoStore } from '@/store/video-store'
 
 interface GenerationResult {
   taskId: string
@@ -24,6 +25,7 @@ type GenerationMode = 'text-to-video' | 'image-to-video'
 export default function SoraVideoGenerator() {
   const { user } = useAuth()
   const { usage, canGenerateVideo, trackVideoGeneration } = useQuota()
+  const { setVideo, getLatestVideo } = useVideoStore()
   const [mode, setMode] = useState<GenerationMode>('text-to-video')
   const [prompt, setPrompt] = useState('')
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -35,6 +37,13 @@ export default function SoraVideoGenerator() {
   const [result, setResult] = useState<GenerationResult | null>(null)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const latestVideo = getLatestVideo()
+    if (latestVideo) {
+      setResult(latestVideo)
+    }
+  }, [])
 
   const maxPromptLength = 5000
   const videoCreditCost = creditsConfig.consumption.videoGeneration.sora2
@@ -172,7 +181,9 @@ export default function SoraVideoGenerator() {
       }
 
       const taskId = createData.taskId
-      setResult({ taskId, status: 'generating' })
+      const generatingResult = { taskId, status: 'generating' as const }
+      setResult(generatingResult)
+      setVideo(taskId, generatingResult)
 
       const pollInterval = setInterval(async () => {
         try {
@@ -186,11 +197,13 @@ export default function SoraVideoGenerator() {
           if (statusData.state === 'success') {
             clearInterval(pollInterval)
             const resultUrls = JSON.parse(statusData.resultJson).resultUrls
-            setResult({
+            const successResult = {
               taskId,
               videoUrl: resultUrls[0],
-              status: 'success'
-            })
+              status: 'success' as const
+            }
+            setResult(successResult)
+            setVideo(taskId, successResult)
             setIsGenerating(false)
             await trackVideoGeneration()
           } else if (statusData.state === 'fail') {
@@ -205,20 +218,24 @@ export default function SoraVideoGenerator() {
             
             alert(errorMessage)
             
-            setResult({
+            const failedResult = {
               taskId,
-              status: 'failed',
+              status: 'failed' as const,
               error: errorMessage
-            })
+            }
+            setResult(failedResult)
+            setVideo(taskId, failedResult)
             setIsGenerating(false)
           }
         } catch (error) {
           clearInterval(pollInterval)
-          setResult({
+          const errorResult = {
             taskId,
-            status: 'failed',
+            status: 'failed' as const,
             error: error instanceof Error ? error.message : 'Unknown error'
-          })
+          }
+          setResult(errorResult)
+          setVideo(taskId, errorResult)
           setIsGenerating(false)
         }
       }, 5000)
@@ -226,21 +243,27 @@ export default function SoraVideoGenerator() {
       setTimeout(() => {
         if (isGenerating) {
           clearInterval(pollInterval)
-          setResult({
+          const timeoutResult = {
             taskId,
-            status: 'failed',
+            status: 'failed' as const,
             error: 'Generation timeout (5 minutes)'
-          })
+          }
+          setResult(timeoutResult)
+          setVideo(taskId, timeoutResult)
           setIsGenerating(false)
         }
       }, 300000)
 
     } catch (error) {
-      setResult({
+      const catchErrorResult = {
         taskId: '',
-        status: 'failed',
+        status: 'failed' as const,
         error: error instanceof Error ? error.message : 'Unknown error'
-      })
+      }
+      setResult(catchErrorResult)
+      if (catchErrorResult.taskId) {
+        setVideo(catchErrorResult.taskId, catchErrorResult)
+      }
       setIsGenerating(false)
       setIsUploading(false)
     }

@@ -338,6 +338,7 @@ export async function POST(req: NextRequest) {
     const isFallbackResponse = extractedPrompt.includes('mountain landscape'); // Check if it's a mock response
     
     if (isAuthenticated && userCreditRecord) {
+      let savedToDb = false;
       try {
         await db.transaction(async (tx) => {
           // Deduct credits
@@ -382,13 +383,13 @@ export async function POST(req: NextRequest) {
             tags: [modelStyle, 'extracted'],
           });
         });
+        savedToDb = true;
       } catch (dbError) {
         console.error('Database transaction error:', dbError);
-        return NextResponse.json(
-          { error: 'Failed to save prompt' },
-          { status: 500 }
-        );
+        // Do not fail the whole request; continue to return the generated prompt
       }
+      // Optionally attach flag for client awareness
+      (globalThis as any).__lastPromptSaved = savedToDb;
     }
 
     // Return the extracted prompt
@@ -404,6 +405,7 @@ export async function POST(req: NextRequest) {
         isFreeTrial: isFreeTrial,
         isAuthenticated: isAuthenticated,
         fallbackResponse: isFallbackResponse, // Mark if this was a fallback response
+        saved: (globalThis as any).__lastPromptSaved ?? false,
         message: isFreeTrial ? 'This is a free trial. Sign up to save your prompts and get more credits!' : undefined,
       },
     });
