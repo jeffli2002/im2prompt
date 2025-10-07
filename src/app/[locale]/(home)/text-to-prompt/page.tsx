@@ -15,6 +15,7 @@ import { Camera, Copy, Download, Image as ImageIcon, Loader2, Sparkles, Wand2 } 
 import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { creditsConfig } from '@/config/credits.config';
 
 export default function TextToPromptPage() {
   const [inputText, setInputText] = useState<string>('');
@@ -231,13 +232,10 @@ export default function TextToPromptPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="flux-1.1">Flux 1.1</SelectItem>
-                      <SelectItem value="flux-1.1-pro">Flux 1.1 Pro</SelectItem>
-                      <SelectItem value="flux-1.1-ultra">Flux 1.1 Ultra (4MP)</SelectItem>
-                      <SelectItem value="flux-kontext-pro">Flux Kontext Pro (Fast, $0.04)</SelectItem>
-                      <SelectItem value="flux-kontext-dev">Flux Kontext Dev (Editing Only, Free)</SelectItem>
-                      <SelectItem value="stable-diffusion">Stable Diffusion</SelectItem>
-                      <SelectItem value="nano-banana">Nano Banana</SelectItem>
+                      <SelectItem value="flux-1.1-pro">Flux 1.1 Pro - {creditsConfig.consumption.imageGeneration['flux-1.1-pro']} credits</SelectItem>
+                      <SelectItem value="flux-1.1-ultra">Flux 1.1 Ultra - {creditsConfig.consumption.imageGeneration['flux-1.1-ultra']} credits</SelectItem>
+                      <SelectItem value="stable-diffusion">Stable Diffusion - {creditsConfig.consumption.imageGeneration['stable-diffusion']} credits</SelectItem>
+                      <SelectItem value="nano-banana">Nano Banana - {creditsConfig.consumption.imageGeneration['nano-banana']} credits</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

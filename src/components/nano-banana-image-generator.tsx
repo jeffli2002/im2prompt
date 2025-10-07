@@ -301,10 +301,10 @@ export default function NanoBananaImageGenerator() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="nano-banana">Nano Banana (Gemini 2.5 Flash)</SelectItem>
-                    <SelectItem value="flux-1.1-pro">Flux 1.1 Pro</SelectItem>
-                    <SelectItem value="flux-1.1-ultra">Flux 1.1 Ultra</SelectItem>
-                    <SelectItem value="stable-diffusion">Stable Diffusion 3</SelectItem>
+                    <SelectItem value="nano-banana">Nano Banana (Gemini 2.5 Flash) - {creditsConfig.consumption.imageGeneration['nano-banana']} credits</SelectItem>
+                    <SelectItem value="flux-1.1-pro">Flux 1.1 Pro - {creditsConfig.consumption.imageGeneration['flux-1.1-pro']} credits</SelectItem>
+                    <SelectItem value="flux-1.1-ultra">Flux 1.1 Ultra - {creditsConfig.consumption.imageGeneration['flux-1.1-ultra']} credits</SelectItem>
+                    <SelectItem value="stable-diffusion">Stable Diffusion 3 - {creditsConfig.consumption.imageGeneration['stable-diffusion']} credits</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
