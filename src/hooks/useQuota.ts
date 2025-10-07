@@ -8,15 +8,22 @@ interface QuotaUsage {
   imageToText: {
     daily: number
     dailyLimit: number
+    monthlyLimit: number
   }
   textToPrompt: {
     unlimited: boolean
   }
+  imageGeneration: {
+    dailyLimit: number
+    monthlyLimit: number
+  }
+  videoGeneration: {
+    dailyLimit: number
+    monthlyLimit: number
+  }
   credits: {
     dailyUsed: number
-    dailyLimit: number
     monthlyUsed: number
-    monthlyLimit: number
   }
   consumption: {
     imageGeneration: number
@@ -30,15 +37,22 @@ export function useQuota() {
     imageToText: {
       daily: 0,
       dailyLimit: creditsConfig.freeUser.imageToText.freeQuotaPerDay,
+      monthlyLimit: creditsConfig.freeUser.imageToText.freeQuotaPerMonth,
     },
     textToPrompt: {
       unlimited: creditsConfig.freeUser.textToPrompt.unlimited,
     },
+    imageGeneration: {
+      dailyLimit: creditsConfig.freeUser.imageGeneration.freeQuotaPerDay,
+      monthlyLimit: creditsConfig.freeUser.imageGeneration.freeQuotaPerMonth,
+    },
+    videoGeneration: {
+      dailyLimit: creditsConfig.freeUser.videoGeneration.freeQuotaPerDay,
+      monthlyLimit: creditsConfig.freeUser.videoGeneration.freeQuotaPerMonth,
+    },
     credits: {
       dailyUsed: 0,
-      dailyLimit: creditsConfig.freeUser.credits.dailyCredits,
       monthlyUsed: 0,
-      monthlyLimit: creditsConfig.freeUser.credits.monthlyCredits,
     },
     consumption: {
       imageGeneration: creditsConfig.consumption.imageGeneration['nano-banana'],
@@ -80,19 +94,11 @@ export function useQuota() {
   }
 
   const canGenerateImage = () => {
-    const creditsNeeded = usage.consumption.imageGeneration
-    return (
-      usage.credits.dailyUsed + creditsNeeded <= usage.credits.dailyLimit &&
-      usage.credits.monthlyUsed + creditsNeeded <= usage.credits.monthlyLimit
-    )
+    return true
   }
 
   const canGenerateVideo = () => {
-    const creditsNeeded = usage.consumption.videoGeneration
-    return (
-      usage.credits.dailyUsed + creditsNeeded <= usage.credits.dailyLimit &&
-      usage.credits.monthlyUsed + creditsNeeded <= usage.credits.monthlyLimit
-    )
+    return true
   }
 
   const trackImageToText = async () => {
@@ -182,15 +188,22 @@ export function useQuota() {
       imageToText: {
         daily: parsed.imageToText?.date === today ? parsed.imageToText?.count || 0 : 0,
         dailyLimit: creditsConfig.freeUser.imageToText.freeQuotaPerDay,
+        monthlyLimit: creditsConfig.freeUser.imageToText.freeQuotaPerMonth,
       },
       textToPrompt: {
         unlimited: creditsConfig.freeUser.textToPrompt.unlimited,
       },
+      imageGeneration: {
+        dailyLimit: creditsConfig.freeUser.imageGeneration.freeQuotaPerDay,
+        monthlyLimit: creditsConfig.freeUser.imageGeneration.freeQuotaPerMonth,
+      },
+      videoGeneration: {
+        dailyLimit: creditsConfig.freeUser.videoGeneration.freeQuotaPerDay,
+        monthlyLimit: creditsConfig.freeUser.videoGeneration.freeQuotaPerMonth,
+      },
       credits: {
         dailyUsed: parsed.credits?.date === today ? parsed.credits?.dailyUsed || 0 : 0,
-        dailyLimit: creditsConfig.freeUser.credits.dailyCredits,
         monthlyUsed: parsed.credits?.month === month ? parsed.credits?.monthlyUsed || 0 : 0,
-        monthlyLimit: creditsConfig.freeUser.credits.monthlyCredits,
       },
       consumption: {
         imageGeneration: creditsConfig.consumption.imageGeneration['nano-banana'],
