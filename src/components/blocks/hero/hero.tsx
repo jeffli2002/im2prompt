@@ -93,16 +93,18 @@ const Hero = ({
         <div className="mx-auto max-w-6xl text-center">
           <h1 className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
             <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
-              ✨ Turn Your Ideas into{' '}
+              Your All-in-One AI Creation Flow — From{' '}
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Cinematic Reality
-              </span>
-              {' '}with{' '}
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Sora 2 Video & Nano Banana Image
+                Text & Image to Prompt, Image, and Video
               </span>
             </span>
           </h1>
+
+          <p className="mt-8 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+            Seamlessly powered by{' '}
+            <span className="font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">Nano Banana</span> for images and{' '}
+            <span className="font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Sora 2</span> for videos.
+          </p>
 
 
           {/* Key Highlights */}
