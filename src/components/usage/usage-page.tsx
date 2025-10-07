@@ -112,8 +112,8 @@ export function UsagePage() {
     return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
   };
 
-  const imageCredits = creditsConfig.consumption.imageGeneration.nanoBanana;
-  const videoCredits = creditsConfig.consumption.videoGeneration.sora2;
+  const imageCredits = creditsConfig.consumption.imageGeneration['nano-banana'];
+  const videoCredits = creditsConfig.consumption.videoGeneration['sora-2'];
 
   if (loading) {
     return <div>Loading...</div>;

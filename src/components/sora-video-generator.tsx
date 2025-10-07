@@ -46,7 +46,7 @@ export default function SoraVideoGenerator() {
   }, [])
 
   const maxPromptLength = 5000
-  const videoCreditCost = creditsConfig.consumption.videoGeneration.sora2
+  const videoCreditCost = creditsConfig.consumption.videoGeneration['sora-2']
   const textDefaultPrompt = 'A professor stands at the front of a lively classroom, enthusiastically giving a lecture. On the blackboard behind him are colorful chalk diagrams. With an animated gesture, he declares to the students: "Sora 2 is now available on im2Prompt, making it easier than ever to create stunning videos." The students listen attentively, some smiling and taking notes.'
   const imageDefaultPrompt = 'Camera slowly zooms in, cinematic lighting, smooth motion'
 
@@ -172,7 +172,7 @@ export default function SoraVideoGenerator() {
       const createData = await createResponse.json()
 
       if (!createResponse.ok) {
-        if (createResponse.status === 429) {
+        if (createResponse.status === 429 || createResponse.status === 402) {
           setShowUpgradeModal(true)
           throw new Error(createData.error || 'Video generation limit reached')
         }

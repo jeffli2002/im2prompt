@@ -14,6 +14,7 @@ import { PromptPreview } from '@/components/prompt-preview';
 import UpgradePrompt from '@/components/auth/UpgradePrompt';
 import { useQuota } from '@/hooks/useQuota';
 import { useAuth } from '@/contexts/AuthContext';
+import { creditsConfig } from '@/config/credits.config';
 
 interface AIModel {
   id: string;
@@ -28,35 +29,35 @@ const aiModels: AIModel[] = [
   {
     id: 'general',
     name: 'General Image Prompt',
-    description: 'Natural language description of the image',
+    description: `Natural language description (${creditsConfig.consumption.imageToPrompt.general} credits)`,
     icon: <FileText className="h-5 w-5" />,
     gradient: 'from-blue-500/20 to-blue-600/20'
   },
   {
     id: 'midjourney',
     name: 'Midjourney',
-    description: 'Tailored for Midjourney generation with parameters',
+    description: `Midjourney prompts with parameters (${creditsConfig.consumption.imageToPrompt.midjourney} credits)`,
     icon: <Palette className="h-5 w-5" />,
     gradient: 'from-purple-500/20 to-purple-600/20'
   },
   {
     id: 'stable-diffusion',
     name: 'Stable Diffusion',
-    description: 'Formatted for Stable Diffusion models',
+    description: `Stable Diffusion format (${creditsConfig.consumption.imageToPrompt['stable-diffusion']} credits)`,
     icon: <Wand2 className="h-5 w-5" />,
     gradient: 'from-pink-500/20 to-pink-600/20'
   },
   {
     id: 'flux',
     name: 'Flux',
-    description: 'Photorealistic AI image generation',
+    description: `Photorealistic prompts (${creditsConfig.consumption.imageToPrompt.flux} credits)`,
     icon: <Sparkles className="h-5 w-5" />,
     gradient: 'from-cyan-500/20 to-blue-600/20'
   },
   {
     id: 'sora2',
     name: 'Sora 2',
-    description: 'Cinematic video prompts with motion and storytelling',
+    description: `Cinematic video prompts (${creditsConfig.consumption.imageToPrompt['sora2']} credits)`,
     icon: <Video className="h-5 w-5" />,
     badge: 'NEW',
     gradient: 'from-red-500/20 to-orange-600/20'
@@ -64,7 +65,7 @@ const aiModels: AIModel[] = [
   {
     id: 'veo3',
     name: 'Veo3',
-    description: 'Short-form video prompts for Canva integration',
+    description: `Short-form video prompts (${creditsConfig.consumption.imageToPrompt.veo3} credits)`,
     icon: <Video className="h-5 w-5" />,
     badge: 'HOT',
     gradient: 'from-green-500/20 to-emerald-600/20'
@@ -152,12 +153,12 @@ export default function ImageToPromptPage() {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        if (response.status === 429) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        if (response.status === 429 || response.status === 402) {
           setShowUpgradePrompt(true);
           return;
         }
-        throw new Error(errorText);
+        throw new Error(errorData.error || 'Failed to generate prompt');
       }
 
       const data = await response.json();

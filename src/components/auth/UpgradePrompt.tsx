@@ -6,6 +6,9 @@ import { Badge } from '@/components/ui/badge'
 import { Sparkles, Zap, Shield, Check } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { creditsConfig } from '@/config/credits.config'
+import { useEffect, useState } from 'react'
+import { getUserSubscription } from '@/server/actions/payment/get-billing-info'
+import { paymentConfig } from '@/config/payment.config'
 
 interface UpgradePromptProps {
   onClose?: () => void
@@ -26,10 +29,34 @@ export default function UpgradePrompt({
 }: UpgradePromptProps) {
   const pathname = usePathname()
   const locale = pathname.split('/')[1] || 'en'
+  const [userPlanId, setUserPlanId] = useState<string>('free')
+  
+  useEffect(() => {
+    if (isAuthenticated) {
+      getUserSubscription().then((result) => {
+        if (result.success && result.data) {
+          const priceId = result.data.priceId
+          const plan = paymentConfig.plans.find(p => 
+            p.stripePriceIds?.monthly === priceId || 
+            p.stripePriceIds?.yearly === priceId
+          )
+          if (plan) {
+            setUserPlanId(plan.id)
+          }
+        }
+      })
+    }
+  }, [isAuthenticated])
   
   // Get configured credit costs
-  const imageCreditCost = creditsConfig.consumption.imageGeneration.nanoBanana
-  const videoCreditCost = creditsConfig.consumption.videoGeneration.sora2
+  const imageCreditCost = creditsConfig.consumption.imageGeneration['nano-banana']
+  const videoCreditCost = creditsConfig.consumption.videoGeneration['sora-2']
+  
+  // Determine which plan to recommend
+  const targetPlan = userPlanId === 'pro' ? 'proplus' : 'pro'
+  const targetPlanConfig = paymentConfig.plans.find(p => p.id === targetPlan)
+  const targetPlanName = targetPlan === 'proplus' ? 'Pro+' : 'Pro'
+  const targetPlanPrice = targetPlanConfig?.price || 14.9
   
   const getContentType = () => {
     switch (type) {
@@ -46,7 +73,10 @@ export default function UpgradePrompt({
 
   const contentType = getContentType()
   
-  const features = [
+  const features = targetPlanConfig?.features.map((text, index) => ({
+    icon: [Zap, Sparkles, Shield, Check, Check, Check][index] || Check,
+    text
+  })) || [
     { icon: Zap, text: '300 Image-to-Text per month' },
     { icon: Sparkles, text: '500 credits/month (100 images or 33 videos)' },
     { icon: Shield, text: 'No Ads' },
@@ -95,10 +125,10 @@ export default function UpgradePrompt({
         <CardContent className="space-y-6">
           <div className="text-center py-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              Upgrade to Pro
+              Upgrade to {targetPlanName}
             </h3>
             <div className="flex items-center justify-center gap-2">
-              <span className="text-3xl font-bold text-purple-600">$14.9/mo</span>
+              <span className="text-3xl font-bold text-purple-600">${targetPlanPrice}/mo</span>
             </div>
             <Badge className="mt-2 bg-purple-500">Save 20% with yearly</Badge>
           </div>
@@ -141,7 +171,7 @@ export default function UpgradePrompt({
                   className="w-full bg-purple-600 hover:bg-purple-700"
                   onClick={() => window.location.href = `/${locale}/pricing`}
                 >
-                  Upgrade to Pro
+                  Upgrade to {targetPlanName}
                 </Button>
                 
                 <Button 
