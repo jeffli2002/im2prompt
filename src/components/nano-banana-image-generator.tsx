@@ -329,7 +329,7 @@ export default function NanoBananaImageGenerator() {
             <div className="bg-muted/50 border border-border rounded-lg p-3 text-sm">
               <p className="text-foreground">
                 <strong>Credits:</strong> {imageCreditCost} credits per image | 
-                Available: {usage.credits.dailyLimit - usage.credits.dailyUsed}/day, {usage.credits.monthlyLimit - usage.credits.monthlyUsed}/month
+                Free quota: {usage.imageGeneration.dailyLimit}/day, {usage.imageGeneration.monthlyLimit}/month
               </p>
             </div>
 
