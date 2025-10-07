@@ -1,11 +1,15 @@
 import vision from '@google-cloud/vision';
-import path from 'path';
 
-const credentialsPath = path.join(process.cwd(), 'config', 'google-vision-key.json');
+let client: vision.ImageAnnotatorClient;
 
-const client = new vision.ImageAnnotatorClient({
-  keyFilename: credentialsPath,
-});
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+  client = new vision.ImageAnnotatorClient({
+    credentials,
+  });
+} else {
+  client = new vision.ImageAnnotatorClient();
+}
 
 export async function analyzeImage(imageBuffer: Buffer) {
   try {
