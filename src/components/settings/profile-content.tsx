@@ -164,23 +164,9 @@ export function ProfileContent({
             <CardDescription>{t('email.description')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  placeholder={t('email.placeholder')}
-                  disabled
-                />
-              </div>
-              <Button onClick={handleSaveEmail} variant="outline" disabled>
-                {t('save')}
-              </Button>
+            <div className="text-sm">
+              {formData.email}
             </div>
-            <p className="mt-2 text-muted-foreground text-sm">
-              邮箱更改需要验证，此功能正在开发中
-            </p>
           </CardContent>
         </Card>
       </div>
