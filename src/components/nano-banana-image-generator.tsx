@@ -40,7 +40,7 @@ export default function NanoBananaImageGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const maxPromptLength = 2000
-  const imageCreditCost = creditsConfig.consumption.imageGeneration.nanoBanana
+  const imageCreditCost = creditsConfig.consumption.imageGeneration['nano-banana']
   const textDefaultPrompt = 'A serene Japanese garden with cherry blossoms in full bloom, koi fish swimming in a crystal-clear pond, traditional wooden bridge, soft morning light filtering through maple trees, ultra-realistic, high detail'
   const imageDefaultPrompt = 'Transform this image into a watercolor painting style, soft pastel colors, artistic brush strokes'
 
@@ -131,7 +131,7 @@ export default function NanoBananaImageGenerator() {
       const data = await response.json()
 
       if (!response.ok) {
-        if (response.status === 429) {
+        if (response.status === 429 || response.status === 402) {
           setShowUpgradeModal(true)
           throw new Error(data.error || 'Image generation limit reached')
         }
