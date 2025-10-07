@@ -12,10 +12,13 @@ import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
 import { syncSingleSubscription } from '@/server/actions/payment/sync-subscription-periods';
+import { useTranslations, useLocale } from 'next-intl';
 
 const billingErrorLogger = new ErrorLogger('billing-page');
 
 export function BillingPage() {
+  const t = useTranslations('billing');
+  const locale = useLocale();
   const [billingInfo, setBillingInfo] = useState<BillingInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -30,10 +33,10 @@ export function BillingPage() {
       if (result.success && result.data) {
         setBillingInfo(result.data);
       } else {
-        setError(result.error || '获取账单信息失败');
+        setError(result.error || t('toast.getBillingInfoFailed'));
       }
     } catch (err) {
-      setError('获取账单信息失败');
+      setError(t('toast.getBillingInfoFailed'));
       billingErrorLogger.logError(err as Error, {
         operation: 'loadBillingInfo',
       });
@@ -44,7 +47,7 @@ export function BillingPage() {
 
   const handleSyncSubscription = useCallback(async () => {
     if (!billingInfo?.activeSubscription?.subscriptionId) {
-      toast.error('没有找到订阅信息');
+      toast.error(t('toast.noSubscriptionFound'));
       return;
     }
 
@@ -52,13 +55,13 @@ export function BillingPage() {
       setSyncing(true);
       const result = await syncSingleSubscription(billingInfo.activeSubscription.subscriptionId);
       if (result.success) {
-        toast.success(result.message || '订阅信息同步成功');
-        await loadBillingInfo(); // Reload billing info after sync
+        toast.success(result.message || t('toast.syncSuccess'));
+        await loadBillingInfo();
       } else {
-        toast.error(result.error || '同步订阅信息失败');
+        toast.error(result.error || t('toast.syncFailed'));
       }
     } catch (err) {
-      toast.error('同步订阅信息失败');
+      toast.error(t('toast.syncFailed'));
       billingErrorLogger.logError(err as Error, {
         operation: 'syncSubscription',
         subscriptionId: billingInfo.activeSubscription.subscriptionId,
@@ -78,13 +81,12 @@ export function BillingPage() {
     const canceled = searchParams.get('canceled');
 
     if (success === 'true') {
-      toast.success('支付成功！您的订阅已激活。', {
+      toast.success(t('toast.paymentSuccess'), {
         duration: 5000,
       });
-      // Clean up URL parameters
       window.history.replaceState({}, '', window.location.pathname);
     } else if (canceled === 'true') {
-      toast.info('支付已取消。您可以随时重新订阅。', {
+      toast.info(t('toast.paymentCanceled'), {
         duration: 5000,
       });
       // Clean up URL parameters
@@ -93,25 +95,19 @@ export function BillingPage() {
   }, [searchParams]);
 
   const formatDate = (date: Date | null | undefined) => {
-    if (!date) return '未知';
-    return new Date(date).toLocaleDateString('zh-CN');
+    if (!date) return t('unknown');
+    return new Date(date).toLocaleDateString(locale);
   };
 
   const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active':
-        return '活跃';
-      case 'trialing':
-        return '试用中';
-      case 'past_due':
-        return '逾期';
-      case 'canceled':
-        return '已取消';
-      case 'incomplete':
-        return '未完成';
-      default:
-        return status;
-    }
+    const statusMap: Record<string, string> = {
+      active: t('status.active'),
+      trialing: t('status.trialing'),
+      past_due: t('status.past_due'),
+      canceled: t('status.canceled'),
+      incomplete: t('status.incomplete'),
+    };
+    return statusMap[status] || status;
   };
 
   const getStatusColor = (status: string) => {
@@ -203,8 +199,8 @@ export function BillingPage() {
     <div className="container mx-auto space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-bold text-3xl">账单管理</h1>
-          <p className="text-muted-foreground">管理您的订阅和查看支付历史</p>
+          <h1 className="font-bold text-3xl">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('description')}</p>
         </div>
         {billingInfo?.activeSubscription && (
           <div className="flex items-center gap-2">
@@ -216,7 +212,7 @@ export function BillingPage() {
               className="flex items-center gap-2"
             >
               <RefreshCw className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
-              {syncing ? '同步中...' : '同步订阅信息'}
+              {syncing ? t('syncing') : t('syncButton')}
             </Button>
           </div>
         )}
@@ -231,11 +227,11 @@ export function BillingPage() {
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle>当前订阅</CardTitle>
-            <CardDescription>您目前没有活跃的订阅</CardDescription>
+            <CardTitle>{t('currentSubscription')}</CardTitle>
+            <CardDescription>{t('noActiveSubscription')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">您可以在定价页面选择适合的订阅计划</p>
+            <p className="text-muted-foreground">{t('noSubscriptionDescription')}</p>
           </CardContent>
         </Card>
       )}
@@ -245,9 +241,9 @@ export function BillingPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
-            支付历史
+            {t('paymentHistory')}
           </CardTitle>
-          <CardDescription>您的所有支付记录</CardDescription>
+          <CardDescription>{t('allPaymentRecords')}</CardDescription>
         </CardHeader>
         <CardContent>
           {billingInfo?.paymentHistory && billingInfo.paymentHistory.length > 0 ? (
@@ -260,7 +256,7 @@ export function BillingPage() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">
-                        {payment.type === 'subscription' ? '订阅' : '一次性支付'}
+                        {payment.type === 'subscription' ? t('subscription') : t('oneTimePayment')}
                       </span>
                       <Badge className={getStatusColor(payment.status)}>
                         {getStatusText(payment.status)}
@@ -272,19 +268,19 @@ export function BillingPage() {
                     </div>
                     {payment.interval && (
                       <div className='text-muted-foreground text-sm'>
-                        计费周期：{payment.interval === 'month' ? '月付' : '年付'}
+                        {t('billingCycle')}：{payment.interval === 'month' ? t('monthly') : t('yearly')}
                       </div>
                     )}
                   </div>
                   <div className="text-right">
-                    <div className='text-muted-foreground text-sm'>价格ID</div>
+                    <div className='text-muted-foreground text-sm'>{t('priceId')}</div>
                     <div className="font-mono text-sm">{payment.priceId}</div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="py-8 text-center text-muted-foreground">暂无支付记录</div>
+            <div className="py-8 text-center text-muted-foreground">{t('noPaymentRecords')}</div>
           )}
         </CardContent>
       </Card>

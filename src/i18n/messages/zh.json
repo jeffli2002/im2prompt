@@ -202,6 +202,40 @@
     "balance": "余款",
     "history": "历史"
   },
+  "billing": {
+    "title": "账单管理",
+    "description": "管理您的订阅和查看支付历史",
+    "syncButton": "同步订阅信息",
+    "syncing": "同步中...",
+    "currentSubscription": "当前订阅",
+    "noActiveSubscription": "当前没有活跃的订阅",
+    "noSubscriptionDescription": "您可以在定价页面选择适合的订阅计划",
+    "paymentHistory": "支付历史",
+    "allPaymentRecords": "您的所有支付记录",
+    "noPaymentRecords": "暂无支付记录",
+    "subscription": "订阅",
+    "oneTimePayment": "一次性支付",
+    "priceId": "价格ID",
+    "billingCycle": "计费周期",
+    "monthly": "月付",
+    "yearly": "年付",
+    "unknown": "未知",
+    "status": {
+      "active": "活跃",
+      "trialing": "试用中",
+      "past_due": "逾期",
+      "canceled": "已取消",
+      "incomplete": "未完成"
+    },
+    "toast": {
+      "getBillingInfoFailed": "获取账单信息失败",
+      "noSubscriptionFound": "没有找到订阅信息",
+      "syncSuccess": "订阅信息同步成功",
+      "syncFailed": "同步订阅信息失败",
+      "paymentSuccess": "支付成功！您的订阅已激活。",
+      "paymentCanceled": "支付已取消。您可以随时重新订阅。"
+    }
+  },
   "navbar": {
     "logo": {
       "title": "im2Prompt",

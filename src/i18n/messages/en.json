@@ -229,6 +229,40 @@
     "balance": "Balance",
     "history": "History"
   },
+  "billing": {
+    "title": "Billing Management",
+    "description": "Manage your subscription and view payment history",
+    "syncButton": "Sync Subscription Info",
+    "syncing": "Syncing...",
+    "currentSubscription": "Current Subscription",
+    "noActiveSubscription": "No Active Subscription",
+    "noSubscriptionDescription": "You can choose a suitable subscription plan on the pricing page",
+    "paymentHistory": "Payment History",
+    "allPaymentRecords": "All your payment records",
+    "noPaymentRecords": "No payment records yet",
+    "subscription": "Subscription",
+    "oneTimePayment": "One-time Payment",
+    "priceId": "Price ID",
+    "billingCycle": "Billing Cycle",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "unknown": "Unknown",
+    "status": {
+      "active": "Active",
+      "trialing": "Trial",
+      "past_due": "Past Due",
+      "canceled": "Canceled",
+      "incomplete": "Incomplete"
+    },
+    "toast": {
+      "getBillingInfoFailed": "Failed to get billing information",
+      "noSubscriptionFound": "No subscription found",
+      "syncSuccess": "Subscription information synced successfully",
+      "syncFailed": "Failed to sync subscription information",
+      "paymentSuccess": "Payment successful! Your subscription has been activated.",
+      "paymentCanceled": "Payment canceled. You can resubscribe at any time."
+    }
+  },
   "navbar": {
     "logo": {
       "title": "im2Prompt",
