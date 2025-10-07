@@ -16,8 +16,8 @@ export interface QuotaCheckResult {
 
 export const quotaService = {
   async checkImageToPromptQuota(userId: string): Promise<QuotaCheckResult> {
-    const today: string = new Date().toISOString().split('T')[0];
-    const currentMonth: string = new Date().toISOString().substring(0, 7); // YYYY-MM
+    const today = new Date().toISOString().split('T')[0]!;
+    const currentMonth = new Date().toISOString().substring(0, 7);
     const dailyLimit = creditsConfig.freeUser.imageToText.freeQuotaPerDay;
     const monthlyLimit = creditsConfig.freeUser.imageToText.freeQuotaPerMonth;
 
@@ -58,8 +58,8 @@ export const quotaService = {
   },
 
   async checkImageGenerationQuota(userId: string): Promise<QuotaCheckResult> {
-    const today: string = new Date().toISOString().split('T')[0];
-    const currentMonth: string = new Date().toISOString().substring(0, 7);
+    const today = new Date().toISOString().split('T')[0]!;
+    const currentMonth = new Date().toISOString().substring(0, 7);
     const dailyLimit = creditsConfig.freeUser.imageGeneration.freeQuotaPerDay;
     const monthlyLimit = creditsConfig.freeUser.imageGeneration.freeQuotaPerMonth;
 
@@ -100,8 +100,8 @@ export const quotaService = {
   },
 
   async checkVideoGenerationQuota(userId: string): Promise<QuotaCheckResult> {
-    const today: string = new Date().toISOString().split('T')[0];
-    const currentMonth: string = new Date().toISOString().substring(0, 7);
+    const today = new Date().toISOString().split('T')[0]!;
+    const currentMonth = new Date().toISOString().substring(0, 7);
     const dailyLimit = creditsConfig.freeUser.videoGeneration.freeQuotaPerDay;
     const monthlyLimit = creditsConfig.freeUser.videoGeneration.freeQuotaPerMonth;
 
@@ -142,8 +142,8 @@ export const quotaService = {
   },
 
   async incrementImageToPromptUsage(userId: string): Promise<void> {
-    const today: string = new Date().toISOString().split('T')[0];
-    const currentMonth: string = new Date().toISOString().substring(0, 7);
+    const today = new Date().toISOString().split('T')[0]!;
+    const currentMonth = new Date().toISOString().substring(0, 7);
 
     // Update daily tracking
     const existingDaily = await db.query.usageTracking.findFirst({
@@ -209,8 +209,8 @@ export const quotaService = {
   },
 
   async incrementImageGenerationUsage(userId: string): Promise<void> {
-    const today: string = new Date().toISOString().split('T')[0];
-    const currentMonth: string = new Date().toISOString().substring(0, 7);
+    const today = new Date().toISOString().split('T')[0]!;
+    const currentMonth = new Date().toISOString().substring(0, 7);
 
     // Update daily tracking
     const existingDaily = await db.query.usageTracking.findFirst({
@@ -276,8 +276,8 @@ export const quotaService = {
   },
 
   async incrementVideoGenerationUsage(userId: string): Promise<void> {
-    const today: string = new Date().toISOString().split('T')[0];
-    const currentMonth: string = new Date().toISOString().substring(0, 7);
+    const today = new Date().toISOString().split('T')[0]!;
+    const currentMonth = new Date().toISOString().substring(0, 7);
 
     // Update daily tracking
     const existingDaily = await db.query.usageTracking.findFirst({
