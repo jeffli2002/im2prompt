@@ -51,15 +51,22 @@ export async function GET(request: NextRequest) {
       imageToText: {
         daily: imageToTextDaily,
         dailyLimit: creditsConfig.freeUser.imageToText.freeQuotaPerDay,
+        monthlyLimit: creditsConfig.freeUser.imageToText.freeQuotaPerMonth,
       },
       textToPrompt: {
         unlimited: creditsConfig.freeUser.textToPrompt.unlimited,
       },
+      imageGeneration: {
+        dailyLimit: creditsConfig.freeUser.imageGeneration.freeQuotaPerDay,
+        monthlyLimit: creditsConfig.freeUser.imageGeneration.freeQuotaPerMonth,
+      },
+      videoGeneration: {
+        dailyLimit: creditsConfig.freeUser.videoGeneration.freeQuotaPerDay,
+        monthlyLimit: creditsConfig.freeUser.videoGeneration.freeQuotaPerMonth,
+      },
       credits: {
         dailyUsed: creditsUsedDaily,
-        dailyLimit: creditsConfig.freeUser.credits.dailyCredits,
         monthlyUsed: creditsUsedMonthly,
-        monthlyLimit: creditsConfig.freeUser.credits.monthlyCredits,
       },
       consumption: {
         imageGeneration: creditsConfig.consumption.imageGeneration['nano-banana'],
