@@ -359,7 +359,7 @@ export async function generatePromptFromImage(imageBuffer: Buffer, language: Sup
     }
     
     let mood = '';
-    if (faces.length > 0 && faces[0].joyLikelihood && 
+    if (faces.length > 0 && faces[0]?.joyLikelihood && 
         ['LIKELY', 'VERY_LIKELY'].includes(faces[0].joyLikelihood)) {
       mood = moodTranslations.joyful[language];
     } else if (isNature) {
