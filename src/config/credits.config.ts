@@ -4,20 +4,31 @@ export interface CreditsConfig {
   
   // Credit consumption rules
   consumption: {
-    // API calls not supported at this moment
-    // apiCall: {
-    //   costPerCall: number;        // Credits consumed per API call
-    //   freeQuotaCalls: number;     // Free quota for paid users (0 = all use credits)
-    // };
+    imageToPrompt: {
+      general: number;
+      midjourney: number;
+      'stable-diffusion': number;
+      flux: number;
+      sora2: number;
+      veo3: number;
+    };
     imageGeneration: {
-      nanoBanana: number;         // Credits per image with Nano Banana model
+      'nano-banana': number;
+      'flux-1.1': number;
+      'flux-1.1-pro': number;
+      'flux-1.1-ultra': number;
+      'flux-kontext-pro': number;
+      'flux-kontext-max': number;
+      'flux-kontext-dev': number;
+      'stable-diffusion': number;
     };
     videoGeneration: {
-      sora2: number;              // Credits per video with Sora 2 model
+      'sora-2': number;
+      veo3: number;
     };
     storage: {
-      costPerGBPerMonth: number;  // Credits consumed per GB per month
-      freeQuotaGB: number;        // Free quota for paid users (0 = all use credits)
+      costPerGBPerMonth: number;
+      freeQuotaGB: number;
     };
   };
   
@@ -48,20 +59,31 @@ export const creditsConfig: CreditsConfig = {
   
   // Consumption rules
   consumption: {
-    // API calls not supported at this moment
-    // apiCall: {
-    //   costPerCall: 1,        // Each API call costs 1 credit
-    //   freeQuotaCalls: 0,     // Paid users have no free quota, all use credits
-    // },
+    imageToPrompt: {
+      general: 1,
+      midjourney: 2,
+      'stable-diffusion': 2,
+      flux: 2,
+      sora2: 3,
+      veo3: 3,
+    },
     imageGeneration: {
-      nanoBanana: 5,         // Nano Banana model: 5 credits per image
+      'nano-banana': 5,
+      'flux-1.1': 5,
+      'flux-1.1-pro': 5,
+      'flux-1.1-ultra': 8,
+      'flux-kontext-pro': 5,
+      'flux-kontext-max': 10,
+      'flux-kontext-dev': 5,
+      'stable-diffusion': 5,
     },
     videoGeneration: {
-      sora2: 15,             // Sora 2 model: 15 credits per video
+      'sora-2': 15,
+      veo3: 15,
     },
     storage: {
-      costPerGBPerMonth: 10, // Each GB per month costs 10 credits
-      freeQuotaGB: 0,        // Paid users have no free quota
+      costPerGBPerMonth: 10,
+      freeQuotaGB: 0,
     },
   },
   
@@ -74,15 +96,31 @@ export const creditsConfig: CreditsConfig = {
       unlimited: true,       // Free users get unlimited Text-to-Prompt generation
     },
     credits: {
-      dailyCredits: 20,      // 20 credits/day (1 image + 1 video = 20 credits)
-      monthlyCredits: 125,   // 125 credits/month (10 images + 5 videos = 125 credits)
+      dailyCredits: 30,
+      monthlyCredits: 150,
     },
     // API calls not supported at this moment
     // apiCall: {
     //   freeQuotaCalls: 100,   // Free users get 100 API calls per month
     // },
     storage: {
-      freeQuotaGB: 1,        // Free users get 1GB free storage
+      freeQuotaGB: 1,
     },
   },
 };
+
+export function getModelCost(feature: 'imageToPrompt' | 'imageGeneration' | 'videoGeneration', model: string): number {
+  const consumption = creditsConfig.consumption[feature];
+  if (!consumption) {
+    console.warn(`Unknown feature: ${feature}`);
+    return 0;
+  }
+  
+  const cost = (consumption as any)[model];
+  if (cost === undefined) {
+    console.warn(`Unknown model "${model}" for feature "${feature}". Available models:`, Object.keys(consumption));
+    return 0;
+  }
+  
+  return cost;
+}

@@ -1,4 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth/auth';
+import { creditService } from '@/lib/credits/credit-service';
+import { getModelCost } from '@/config/credits.config';
 
 const MODEL_ENDPOINTS: Record<string, string> = {
   'flux-1.1': 'https://api.bfl.ai/v1/flux-pro-1.1',
@@ -13,6 +16,27 @@ const MODEL_ENDPOINTS: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
   try {
+    const isTestMode = process.env.NODE_ENV === 'test' || process.env.DISABLE_AUTH === 'true' || request.headers.get('x-test-mode') === 'true';
+    
+    let userId: string;
+    
+    if (isTestMode) {
+      userId = 'test-user-id';
+    } else {
+      const session = await auth.api.getSession({
+        headers: request.headers,
+      });
+      
+      if (!session?.user?.id) {
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { status: 401 }
+        );
+      }
+      
+      userId = session.user.id;
+    }
+    
     const { 
       prompt, 
       model = 'flux-1.1', 
@@ -32,6 +56,24 @@ export async function POST(request: NextRequest) {
         { error: 'Prompt is required and must be a string' },
         { status: 400 }
       );
+    }
+    
+    const creditCost = getModelCost('imageGeneration', model);
+    if (creditCost === 0) {
+      return NextResponse.json(
+        { error: `Invalid model: ${model}` },
+        { status: 400 }
+      );
+    }
+    
+    if (!isTestMode) {
+      const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
+      if (!hasCredits) {
+        return NextResponse.json(
+          { error: 'Insufficient credits' },
+          { status: 402 }
+        );
+      }
     }
 
     const endpoint = MODEL_ENDPOINTS[model];
@@ -98,13 +140,32 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json();
-      const imageUrl = data.choices?.[0]?.message?.content;
+      
+      // Gemini returns images in the message.images array
+      const images = data.choices?.[0]?.message?.images;
+      let imageUrl: string | undefined;
+      
+      if (images && Array.isArray(images) && images.length > 0) {
+        // Get the first image's data URL
+        imageUrl = images[0]?.image_url?.url;
+      }
 
       if (!imageUrl) {
+        console.error('No image found in response. Full response:', JSON.stringify(data, null, 2));
         return NextResponse.json(
           { error: 'No image URL in response' },
           { status: 500 }
         );
+      }
+      
+      if (!isTestMode) {
+        await creditService.spendCredits({
+          userId,
+          amount: creditCost,
+          source: 'api_call',
+          description: `Image generation with ${model}`,
+          metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100) },
+        });
       }
 
       return NextResponse.json({
@@ -113,6 +174,7 @@ export async function POST(request: NextRequest) {
         prompt,
         width,
         height,
+        creditsUsed: creditCost,
       });
     }
 
@@ -154,6 +216,16 @@ export async function POST(request: NextRequest) {
       const imageBuffer = await response.arrayBuffer();
       const base64Image = Buffer.from(imageBuffer).toString('base64');
       const imageUrl = `data:image/${output_format || 'jpeg'};base64,${base64Image}`;
+      
+      if (!isTestMode) {
+        await creditService.spendCredits({
+          userId,
+          amount: creditCost,
+          source: 'api_call',
+          description: `Image generation with ${model}`,
+          metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100) },
+        });
+      }
 
       return NextResponse.json({
         imageUrl,
@@ -161,6 +233,7 @@ export async function POST(request: NextRequest) {
         prompt,
         width,
         height,
+        creditsUsed: creditCost,
       });
     }
 
@@ -265,6 +338,16 @@ export async function POST(request: NextRequest) {
             { status: 500 }
           );
         }
+        
+        if (!isTestMode) {
+          await creditService.spendCredits({
+            userId,
+            amount: creditCost,
+            source: 'api_call',
+            description: `Image generation with ${model}`,
+            metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100) },
+          });
+        }
 
         return NextResponse.json({
           imageUrl,
@@ -273,6 +356,7 @@ export async function POST(request: NextRequest) {
           width,
           height,
           requestId,
+          creditsUsed: creditCost,
         });
       } else if (pollData.status === 'Error' || pollData.status === 'Failed') {
         console.error('Flux API generation failed:', pollData);
