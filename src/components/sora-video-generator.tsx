@@ -159,11 +159,26 @@ export default function SoraVideoGenerator() {
 
         setIsUploading(false)
 
+        // Log response for debugging
+        console.log('[Image-to-Video] Response status:', createResponse.status)
+        console.log('[Image-to-Video] Response headers:', Object.fromEntries(createResponse.headers.entries()))
+
+        // Check if response has content
+        const responseText = await createResponse.text()
+        console.log('[Image-to-Video] Response text length:', responseText.length)
+        console.log('[Image-to-Video] Response text preview:', responseText.substring(0, 200))
+
+        if (!responseText || responseText.trim() === '') {
+          console.error('[Image-to-Video] Empty response received from API')
+          throw new Error('Server returned empty response. The service may be experiencing issues. Please try again.')
+        }
+
         try {
-          createData = await createResponse.json()
+          createData = JSON.parse(responseText)
         } catch (jsonError) {
-          console.error('Failed to parse response:', jsonError)
-          throw new Error('Failed to process server response. Please try again.')
+          console.error('[Image-to-Video] Failed to parse response:', jsonError)
+          console.error('[Image-to-Video] Response was:', responseText)
+          throw new Error('Failed to process server response. The service may be experiencing issues. Please try again.')
         }
       }
 

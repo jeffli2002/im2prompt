@@ -6,6 +6,8 @@ import { getModelCost } from '@/config/credits.config';
 import { quotaService } from '@/lib/usage/quota-service';
 
 export async function POST(request: NextRequest) {
+  console.log('[sora-image-generate] Request received');
+  
   try {
     // Authentication check
     const session = await auth.api.getSession({
@@ -13,6 +15,7 @@ export async function POST(request: NextRequest) {
     });
     
     if (!session?.user?.id) {
+      console.log('[sora-image-generate] Unauthorized - no user session');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -20,6 +23,7 @@ export async function POST(request: NextRequest) {
     }
     
     const userId = session.user.id;
+    console.log('[sora-image-generate] User authenticated:', userId);
 
     const formData = await request.formData();
     const prompt = formData.get('prompt') as string;
@@ -101,8 +105,11 @@ export async function POST(request: NextRequest) {
         );
       }
       // If Vision API succeeded and no people/faces detected, continue
+      // Create a Blob from the buffer for upload
+      console.log('[sora-image-generate] Uploading image to KIE API, size:', imageBuffer.length, 'bytes');
+      const blob = new Blob([imageBuffer], { type: imageFile.type });
       const fileFormData = new FormData();
-      fileFormData.append('file', imageFile);
+      fileFormData.append('file', blob, imageFile.name);
 
       const uploadResponse = await fetch('https://api.kie.ai/api/v1/files/upload', {
         method: 'POST',
@@ -112,16 +119,19 @@ export async function POST(request: NextRequest) {
         body: fileFormData,
       });
 
+      console.log('[sora-image-generate] Upload response status:', uploadResponse.status);
+
       if (!uploadResponse.ok) {
         const errorData = await uploadResponse.json().catch(() => ({}));
-        console.error('Image upload error:', errorData);
+        console.error('[sora-image-generate] Image upload error:', errorData);
         return NextResponse.json(
-          { error: 'Failed to upload image' },
+          { error: 'Failed to upload image to video generation service' },
           { status: uploadResponse.status }
         );
       }
 
       const uploadData = await uploadResponse.json();
+      console.log('[sora-image-generate] Upload successful, response code:', uploadData.code);
       if (uploadData.code === 200 && uploadData.data?.url) {
         imageUrls = [uploadData.data.url];
       } else {
@@ -139,6 +149,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('[sora-image-generate] Creating video generation task');
+    console.log('[sora-image-generate] Image URLs:', imageUrls);
+    console.log('[sora-image-generate] Prompt:', prompt.substring(0, 100));
+    
     const response = await fetch('https://api.kie.ai/api/v1/jobs/createTask', {
       method: 'POST',
       headers: {
@@ -156,10 +170,13 @@ export async function POST(request: NextRequest) {
       }),
     });
 
+    console.log('[sora-image-generate] KIE API response status:', response.status);
+
     const responseText = await response.text();
+    console.log('[sora-image-generate] Response text length:', responseText.length);
     
     if (!responseText || responseText.trim() === '') {
-      console.error('Empty response from KIE API');
+      console.error('[sora-image-generate] Empty response from KIE API');
       return NextResponse.json(
         { error: 'Empty response from video generation service' },
         { status: 500 }
