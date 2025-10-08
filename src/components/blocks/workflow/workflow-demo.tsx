@@ -232,7 +232,7 @@ photorealistic, highly detailed, 8k resolution, cinematic lighting`;
         <div className="text-center mt-16 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-700">
           <p className="text-xl text-muted-foreground/80 mb-6 font-medium">Ready to extract prompts from your images?</p>
           <Button size="lg" className="px-10 py-6 text-lg font-semibold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300">
-            Try It Free
+            Try Image to Prompt
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <p className="text-sm text-muted-foreground/60 mt-4">No credit card required • Start immediately</p>

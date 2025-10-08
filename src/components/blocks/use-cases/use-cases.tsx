@@ -126,7 +126,7 @@ export function UseCases() {
             className="px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <a href="/image-to-prompt">
-              Try It Free
+              Try Image to Prompt
               <ArrowRight className="ml-2 h-5 w-5" />
             </a>
           </Button>

@@ -39,7 +39,7 @@ const FinalCTA = () => {
               size="lg"
               className="px-10 py-6 text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 shadow-xl hover:shadow-2xl rounded-2xl border-0"
             >
-              <a href="/signup">
+              <a href="/text-to-prompt">
                 Start Free Today
                 <ArrowRight className="ml-2 h-5 w-5" />
               </a>
@@ -50,7 +50,7 @@ const FinalCTA = () => {
               variant="outline"
               className="px-10 py-6 text-lg font-semibold border-2 border-muted-foreground/30 hover:bg-muted/50 hover:border-muted-foreground/50 transition-all duration-300 rounded-2xl backdrop-blur-sm"
             >
-              <a href="#sora-demo">
+              <a href="/text-to-video">
                 <Video className="mr-2 h-5 w-5" />
                 Generate with Sora 2
               </a>
