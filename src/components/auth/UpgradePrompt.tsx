@@ -28,7 +28,8 @@ export default function UpgradePrompt({
   limitType = 'daily'
 }: UpgradePromptProps) {
   const pathname = usePathname()
-  const locale = pathname.split('/')[1] || 'en'
+  const pathParts = pathname.split('/').filter(Boolean)
+  const locale = pathParts[0] && ['en', 'zh', 'es', 'fr', 'ja'].includes(pathParts[0]) ? pathParts[0] : 'en'
   const [userPlanId, setUserPlanId] = useState<string>('free')
   
   useEffect(() => {
