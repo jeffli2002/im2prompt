@@ -413,7 +413,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
           <div className="space-y-6">
             <TabsContent value="text-to-video" className="mt-0 space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-700">Video Description</label>
+                <label className="text-sm font-light text-gray-700 dark:text-gray-300">Video Description</label>
                 <Textarea
                   placeholder={textDefaultPrompt}
                   value={prompt}
@@ -421,19 +421,19 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
                   rows={8}
                   className="resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 font-light"
                 />
-                <div className="text-xs text-gray-400 text-right font-light">
+                <div className="text-xs text-gray-400 dark:text-gray-500 text-right font-light">
                   {prompt.length} / {maxPromptLength}
                 </div>
               </div>
             </TabsContent>
 
             <TabsContent value="image-to-video" className="mt-0 space-y-6">
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-4">
                 <div className="flex gap-3">
-                  <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-amber-900">Sora 2 Image Requirements</p>
-                    <p className="text-xs text-amber-700 leading-relaxed">
+                    <p className="text-sm font-medium text-amber-900 dark:text-amber-200">Sora 2 Image Requirements</p>
+                    <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
                       Sora 2 has strict requirements for uploaded images. <strong>Images containing people or faces are not supported</strong> and will be automatically rejected. Please use images with landscapes, objects, or scenes without any people.
                     </p>
                   </div>
@@ -441,7 +441,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-700">Source Image</label>
+                <label className="text-sm font-light text-gray-700 dark:text-gray-300">Source Image</label>
                 
                 {!imagePreview ? (
                   <div
@@ -449,13 +449,13 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
                     className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-purple-400 hover:bg-purple-50/50 transition-colors"
                   >
                     <Upload className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-                    <p className="text-sm font-light text-gray-600 mb-1">
+                    <p className="text-sm font-light text-gray-600 dark:text-gray-300 mb-1">
                       Click to upload or drag and drop
                     </p>
-                    <p className="text-xs font-light text-gray-400">
+                    <p className="text-xs font-light text-gray-400 dark:text-gray-500">
                       JPEG, PNG, or WebP (max 10MB)
                     </p>
-                    <p className="text-xs font-light text-amber-600 mt-2">
+                    <p className="text-xs font-light text-amber-600 dark:text-amber-400 mt-2">
                       ⚠️ No people or faces allowed
                     </p>
                   </div>
@@ -485,7 +485,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-700">
+                <label className="text-sm font-light text-gray-700 dark:text-gray-300">
                   Motion Prompt <span className="text-red-500">*</span>
                 </label>
                 <Textarea
@@ -495,7 +495,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
                   rows={4}
                   className="resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 font-light"
                 />
-                <div className="text-xs text-gray-400 text-right font-light">
+                <div className="text-xs text-gray-400 dark:text-gray-500 text-right font-light">
                   {prompt.length} / {maxPromptLength}
                 </div>
               </div>
@@ -504,7 +504,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
             {/* Common Settings */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-700">Aspect Ratio</label>
+                <label className="text-sm font-light text-gray-700 dark:text-gray-300">Aspect Ratio</label>
                 <Select value={aspectRatio} onValueChange={(v: 'landscape' | 'portrait') => setAspectRatio(v)}>
                   <SelectTrigger className="border-gray-200 font-light">
                     <SelectValue />
@@ -517,7 +517,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-700">Quality</label>
+                <label className="text-sm font-light text-gray-700 dark:text-gray-300">Quality</label>
                 <Select value={quality} onValueChange={(v: 'standard' | 'hd') => setQuality(v)}>
                   <SelectTrigger className="border-gray-200 font-light">
                     <SelectValue />
@@ -530,8 +530,8 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-              <p className="text-blue-800">
+            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm">
+              <p className="text-blue-800 dark:text-blue-200">
                 <strong>Credits:</strong> {videoCreditCost} credits per video | 
                 Free quota: {usage.videoGeneration.dailyLimit}/day, {usage.videoGeneration.monthlyLimit}/month
               </p>
@@ -569,7 +569,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
                 <div className="aspect-video bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl flex items-center justify-center">
                   <div className="text-center space-y-3">
                     <Video className="w-16 h-16 mx-auto text-purple-300" />
-                    <p className="text-sm font-light text-gray-500">Your generated video will appear here</p>
+                    <p className="text-sm font-light text-gray-500 dark:text-gray-400">Your generated video will appear here</p>
                   </div>
                 </div>
               )}
