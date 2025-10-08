@@ -121,8 +121,23 @@ export async function POST(request: NextRequest) {
       }),
     });
 
+    const responseText = await response.text();
+    
+    if (!responseText || responseText.trim() === '') {
+      console.error('Empty response from KIE API');
+      return NextResponse.json(
+        { error: 'Empty response from video generation service. The service may be experiencing issues. Please try again.' },
+        { status: 500 }
+      );
+    }
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      let errorData: any = {};
+      try {
+        errorData = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Failed to parse error response:', responseText);
+      }
       console.error('KIE API error:', errorData);
       return NextResponse.json(
         { error: errorData.msg || 'Failed to create video generation task' },
@@ -130,7 +145,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const data = await response.json();
+    let data: any;
+    try {
+      data = JSON.parse(responseText);
+    } catch (error) {
+      console.error('Failed to parse response. Response text:', responseText);
+      console.error('Parse error:', error);
+      return NextResponse.json(
+        { error: 'Invalid response from video generation service. The service may be experiencing issues. Please try again.' },
+        { status: 500 }
+      );
+    }
 
     if (data.code !== 200) {
       return NextResponse.json(
