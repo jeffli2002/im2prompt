@@ -108,72 +108,63 @@ export default function SoraVideoGenerator() {
     setResult(null)
 
     try {
-      let imageUrl = ''
+      let createResponse: Response
+      let createData: any
 
-      if (mode === 'image-to-video') {
+      if (mode === 'text-to-video') {
+        // Text to video mode - use JSON API
+        const requestBody = {
+          mode: 'text-to-video',
+          prompt: prompt.trim(),
+          aspect_ratio: aspectRatio,
+          quality
+        }
+
+        createResponse = await fetch('/api/v1/sora-generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        })
+
+        try {
+          createData = await createResponse.json()
+        } catch (jsonError) {
+          console.error('Failed to parse response:', jsonError)
+          throw new Error('Failed to process server response. Please try again.')
+        }
+      } else {
+        // Image to video mode - use FormData with sora-image-generate endpoint
         setIsUploading(true)
         
         if (!imageFile) {
           setIsUploading(false)
           throw new Error('Please select an image for image-to-video generation')
         }
-
-        const uploadFormData = new FormData()
-        uploadFormData.append('image', imageFile)
-
-        const uploadResponse = await fetch('/api/v1/upload-image', {
-          method: 'POST',
-          body: uploadFormData
-        })
-
-        const uploadData = await uploadResponse.json()
-
-        if (!uploadResponse.ok) {
-          setIsUploading(false)
-          throw new Error(uploadData.error || 'Failed to upload image')
-        }
-
-        if (!uploadData.imageUrl) {
-          setIsUploading(false)
-          throw new Error('Upload succeeded but no image URL returned')
-        }
-
-        imageUrl = uploadData.imageUrl
-        setIsUploading(false)
-      }
-
-      const requestBody: any = {
-        mode,
-        aspect_ratio: aspectRatio,
-        quality
-      }
-
-      if (mode === 'text-to-video') {
-        requestBody.prompt = prompt.trim()
-      } else {
-        if (!imageUrl) {
-          throw new Error('Image URL is missing after upload')
-        }
         
         if (!prompt.trim()) {
+          setIsUploading(false)
           throw new Error('Prompt is required for image-to-video')
         }
-        
-        requestBody.image_url = imageUrl
-        requestBody.prompt = prompt.trim()
-      }
 
-      const createResponse = await fetch('/api/v1/sora-generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      })
+        const formData = new FormData()
+        formData.append('prompt', prompt.trim())
+        formData.append('image', imageFile)
+        formData.append('aspect_ratio', aspectRatio)
+        formData.append('quality', quality)
 
-      let createData
-      try {
-        createData = await createResponse.json()
-      } catch (jsonError) {
-        throw new Error('Failed to process server response. Please try again.')
+        createResponse = await fetch('/api/v1/sora-image-generate', {
+          method: 'POST',
+          body: formData
+        })
+
+        setIsUploading(false)
+
+        try {
+          createData = await createResponse.json()
+        } catch (jsonError) {
+          console.error('Failed to parse response:', jsonError)
+          throw new Error('Failed to process server response. Please try again.')
+        }
       }
 
       if (!createResponse.ok) {
