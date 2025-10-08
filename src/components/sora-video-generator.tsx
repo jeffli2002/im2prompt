@@ -216,20 +216,29 @@ export default function SoraVideoGenerator() {
             let resultUrls: string[] = []
             try {
               if (!statusData.resultJson || statusData.resultJson.trim() === '') {
-                throw new Error('Empty result from video generation service')
+                throw new Error('Video generation completed but no result data was returned. The service may be experiencing issues. Please try again.')
               }
-              const parsedResult = JSON.parse(statusData.resultJson)
+              
+              let parsedResult
+              try {
+                parsedResult = JSON.parse(statusData.resultJson)
+              } catch (jsonError) {
+                console.error('JSON parse error:', jsonError)
+                console.error('Result JSON:', statusData.resultJson)
+                throw new Error('Invalid response format from video generation service. Please try again.')
+              }
+              
               resultUrls = parsedResult.resultUrls || []
               
               if (!resultUrls || resultUrls.length === 0) {
-                throw new Error('No video URL in generation result')
+                throw new Error('Video generation completed but no video URL was provided. Please try again.')
               }
             } catch (parseError) {
               clearInterval(pollInterval)
               const parseErrorResult = {
                 taskId,
                 status: 'failed' as const,
-                error: parseError instanceof Error ? parseError.message : 'Failed to parse generation result'
+                error: parseError instanceof Error ? parseError.message : 'Failed to process generation result'
               }
               setResult(parseErrorResult)
               setVideo(taskId, parseErrorResult)
