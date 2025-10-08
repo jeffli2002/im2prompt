@@ -12,6 +12,10 @@ export const auth = betterAuth({
   }),
   baseURL: env.NEXT_PUBLIC_APP_URL,
   secret: env.BETTER_AUTH_SECRET,
+  trustedOrigins: [
+    'https://im2prompt.com',
+    'https://www.im2prompt.com',
+  ],
   emailAndPassword: {
     enabled: true,
   },
