@@ -41,6 +41,12 @@ export async function POST(request: NextRequest) {
     const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME
     const CLOUDINARY_UPLOAD_PRESET = process.env.CLOUDINARY_UPLOAD_PRESET
     
+    console.log('[Upload Image] Cloudinary config check:', {
+      hasCloudName: !!CLOUDINARY_CLOUD_NAME,
+      hasUploadPreset: !!CLOUDINARY_UPLOAD_PRESET,
+      cloudName: CLOUDINARY_CLOUD_NAME ? CLOUDINARY_CLOUD_NAME.substring(0, 3) + '***' : 'missing'
+    })
+    
     if (CLOUDINARY_CLOUD_NAME && CLOUDINARY_UPLOAD_PRESET) {
       try {
         const cloudinaryFormData = new FormData()
@@ -48,96 +54,97 @@ export async function POST(request: NextRequest) {
         cloudinaryFormData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET)
         // Set folder for organization (helps with URL cleanliness)
         cloudinaryFormData.append('folder', 'sora-inputs')
-        // Ensure public access (critical for Sora API to fetch the image)
-        cloudinaryFormData.append('resource_type', 'image')
-        cloudinaryFormData.append('type', 'upload')
-        // Set access mode to public
-        cloudinaryFormData.append('access_mode', 'public')
         
-        const cloudinaryResponse = await fetch(
-          `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-          {
-            method: 'POST',
-            body: cloudinaryFormData
-          }
-        )
+        const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`
+        console.log('[Upload Image] Uploading to Cloudinary:', uploadUrl)
+        
+        const cloudinaryResponse = await fetch(uploadUrl, {
+          method: 'POST',
+          body: cloudinaryFormData
+        })
+        
+        console.log('[Upload Image] Cloudinary response status:', cloudinaryResponse.status)
+        
+        if (!cloudinaryResponse.ok) {
+          const errorText = await cloudinaryResponse.text()
+          console.error('[Upload Image] Cloudinary HTTP error:', {
+            status: cloudinaryResponse.status,
+            statusText: cloudinaryResponse.statusText,
+            body: errorText
+          })
+          throw new Error(`Cloudinary upload failed with status ${cloudinaryResponse.status}`)
+        }
         
         const cloudinaryData = await cloudinaryResponse.json()
+        console.log('[Upload Image] Cloudinary response data:', JSON.stringify(cloudinaryData, null, 2))
         
-        if (cloudinaryData.secure_url) {
-          const imageUrl = cloudinaryData.secure_url.trim()
-          console.log('[Upload Image] Successfully uploaded to Cloudinary:', imageUrl)
-          console.log('[Upload Image] Cloudinary full response:', JSON.stringify({
-            secure_url: cloudinaryData.secure_url,
-            url: cloudinaryData.url,
-            format: cloudinaryData.format,
-            width: cloudinaryData.width,
-            height: cloudinaryData.height,
-            bytes: cloudinaryData.bytes,
-            resource_type: cloudinaryData.resource_type
-          }, null, 2))
-          
-          console.log('[Upload Image] Waiting 3 seconds for CDN propagation...')
-          await new Promise(resolve => setTimeout(resolve, 3000))
-          
-          let validated = false
-          for (let attempt = 1; attempt <= 5; attempt++) {
-            try {
-              const validationResponse = await fetch(imageUrl, { 
-                method: 'GET',
-                headers: { 'Range': 'bytes=0-1023' },
-                signal: AbortSignal.timeout(15000)
-              })
-              
-              if (validationResponse.ok || validationResponse.status === 206) {
-                console.log(`[Upload Image] Cloudinary URL validation passed (attempt ${attempt})`)
-                validated = true
-                break
-              } else {
-                console.warn(`[Upload Image] Cloudinary URL validation failed attempt ${attempt}:`, validationResponse.status)
-              }
-            } catch (validationError) {
-              console.warn(`[Upload Image] Cloudinary URL validation error attempt ${attempt}:`, validationError)
-            }
+        if (!cloudinaryData.secure_url) {
+          console.error('[Upload Image] Cloudinary response missing secure_url:', cloudinaryData)
+          throw new Error('Cloudinary upload succeeded but no URL returned')
+        }
+        
+        const imageUrl = cloudinaryData.secure_url.trim()
+        console.log('[Upload Image] Successfully uploaded to Cloudinary:', imageUrl)
+        console.log('[Upload Image] Image details:', {
+          format: cloudinaryData.format,
+          width: cloudinaryData.width,
+          height: cloudinaryData.height,
+          bytes: cloudinaryData.bytes
+        })
+        
+        // Validate URL is accessible with a simple retry mechanism
+        console.log('[Upload Image] Validating Cloudinary URL accessibility...')
+        let validated = false
+        
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          try {
+            const validationResponse = await fetch(imageUrl, { 
+              method: 'HEAD',
+              signal: AbortSignal.timeout(10000)
+            })
             
-            if (attempt < 5) {
-              await new Promise(resolve => setTimeout(resolve, attempt * 1000))
+            if (validationResponse.ok) {
+              console.log(`[Upload Image] URL validation passed on attempt ${attempt}`)
+              validated = true
+              break
+            } else {
+              console.warn(`[Upload Image] URL validation failed attempt ${attempt}: status ${validationResponse.status}`)
             }
+          } catch (validationError) {
+            console.warn(`[Upload Image] URL validation error attempt ${attempt}:`, validationError)
           }
           
-          if (validated) {
-            return NextResponse.json({ 
-              imageUrl,
-              fileName: file.name,
-              fileSize: file.size,
-              fileType: file.type
-            })
-          } else {
-            console.error('[Upload Image] Cloudinary URL never became accessible after 5 attempts')
-            return NextResponse.json(
-              { error: 'Image uploaded but not yet accessible. Please try again in a few seconds.' },
-              { status: 503 }
-            )
+          if (attempt < 3) {
+            await new Promise(resolve => setTimeout(resolve, 1000))
           }
         }
         
-        console.error('[Upload Image] Cloudinary upload failed:', cloudinaryData)
+        if (!validated) {
+          console.warn('[Upload Image] URL validation failed but proceeding anyway - CDN might need time to propagate')
+        }
+        
+        return NextResponse.json({ 
+          imageUrl,
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type
+        })
+        
       } catch (cloudinaryError) {
         console.error('[Upload Image] Cloudinary error:', cloudinaryError)
+        // Don't fall back - throw the error so caller knows what went wrong
+        return NextResponse.json(
+          { error: `Cloudinary upload failed: ${cloudinaryError instanceof Error ? cloudinaryError.message : 'Unknown error'}` },
+          { status: 500 }
+        )
       }
+    } else {
+      console.error('[Upload Image] Cloudinary not configured - missing environment variables')
+      return NextResponse.json(
+        { error: 'Cloudinary is not configured. Please set CLOUDINARY_CLOUD_NAME and CLOUDINARY_UPLOAD_PRESET environment variables.' },
+        { status: 500 }
+      )
     }
-    
-    // Fallback: return data URL (not ideal but works for testing)
-    const dataUrl = `data:${file.type};base64,${base64}`
-    
-    console.warn('[Upload Image] Cloudinary not configured or failed, using data URL fallback')
-    return NextResponse.json({ 
-      imageUrl: dataUrl,
-      fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
-      warning: 'Using data URL fallback - Cloudinary not configured'
-    })
 
   } catch (error) {
     console.error('Image upload error:', error)
@@ -147,3 +154,4 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+

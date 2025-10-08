@@ -123,7 +123,12 @@ export async function POST(request: NextRequest) {
         const uploadFormData = new FormData();
         uploadFormData.append('image', imageFile);
 
-        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/v1/sora/upload-image`, {
+        // Construct the upload URL using the request origin
+        const requestUrl = new URL(request.url);
+        const uploadUrl = `${requestUrl.origin}/api/v1/sora/upload-image`;
+        console.log('[sora-image-generate] Calling upload endpoint:', uploadUrl);
+
+        const uploadResponse = await fetch(uploadUrl, {
           method: 'POST',
           body: uploadFormData
         });
