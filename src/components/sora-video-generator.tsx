@@ -188,9 +188,26 @@ export default function SoraVideoGenerator() {
           throw new Error(createData.error || 'Video generation limit reached')
         }
         
-        if (createData.error && (createData.error.includes('face') || createData.error.includes('people') || createData.error.includes('person'))) {
-          alert(`❌ ${createData.error}\n\n💡 Please upload an image without people or faces (landscapes, objects, scenes, etc.)`)
-          throw new Error(createData.error)
+        // Handle face/people detection blocking
+        if (createResponse.status === 400 && createData.error && 
+            (createData.error.toLowerCase().includes('face') || 
+             createData.error.toLowerCase().includes('people') || 
+             createData.error.toLowerCase().includes('person') ||
+             createData.error.toLowerCase().includes('sora 2'))) {
+          
+          // Show user-friendly error in the result area
+          const blockErrorResult = {
+            taskId: '',
+            status: 'failed' as const,
+            error: createData.error
+          }
+          setResult(blockErrorResult)
+          setIsGenerating(false)
+          
+          // Also show alert for immediate attention
+          alert(`🚫 图片被阻止 / Image Blocked\n\n${createData.error}\n\n💡 建议 / Suggestion:\n请上传不包含人物或人脸的图片，如：\n- 风景照片 (Landscapes)\n- 物品照片 (Objects)\n- 建筑场景 (Architecture)\n- 动物照片 (Animals - no people)`)
+          
+          return // Don't throw, just stop processing
         }
         
         throw new Error(createData.error || 'Failed to create task')
@@ -594,11 +611,60 @@ export default function SoraVideoGenerator() {
               )}
 
               {result?.status === 'failed' && (
-                <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
-                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                  <div>
-                    <p className="font-light text-red-900">Generation Failed</p>
-                    <p className="text-sm font-light text-red-700">{result.error}</p>
+                <div className={`p-4 rounded-xl ${
+                  result.error?.toLowerCase().includes('face') || 
+                  result.error?.toLowerCase().includes('people') || 
+                  result.error?.toLowerCase().includes('person')
+                    ? 'bg-amber-50 border border-amber-300'
+                    : 'bg-red-50 border border-red-200'
+                }`}>
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className={`w-6 h-6 flex-shrink-0 mt-0.5 ${
+                      result.error?.toLowerCase().includes('face') || 
+                      result.error?.toLowerCase().includes('people') || 
+                      result.error?.toLowerCase().includes('person')
+                        ? 'text-amber-600'
+                        : 'text-red-600'
+                    }`} />
+                    <div className="flex-1">
+                      <p className={`font-medium mb-1 ${
+                        result.error?.toLowerCase().includes('face') || 
+                        result.error?.toLowerCase().includes('people') || 
+                        result.error?.toLowerCase().includes('person')
+                          ? 'text-amber-900'
+                          : 'text-red-900'
+                      }`}>
+                        {result.error?.toLowerCase().includes('face') || 
+                         result.error?.toLowerCase().includes('people') || 
+                         result.error?.toLowerCase().includes('person')
+                          ? '🚫 图片被阻止 / Image Blocked'
+                          : '❌ 生成失败 / Generation Failed'}
+                      </p>
+                      <p className={`text-sm font-light mb-3 ${
+                        result.error?.toLowerCase().includes('face') || 
+                        result.error?.toLowerCase().includes('people') || 
+                        result.error?.toLowerCase().includes('person')
+                          ? 'text-amber-800'
+                          : 'text-red-700'
+                      }`}>
+                        {result.error}
+                      </p>
+                      
+                      {(result.error?.toLowerCase().includes('face') || 
+                        result.error?.toLowerCase().includes('people') || 
+                        result.error?.toLowerCase().includes('person')) && (
+                        <div className="bg-white/70 rounded-lg p-3 text-xs">
+                          <p className="font-medium text-amber-900 mb-2">💡 建议使用的图片类型：</p>
+                          <ul className="space-y-1 text-amber-800">
+                            <li>✓ 风景照片（山、海、天空）</li>
+                            <li>✓ 建筑物和城市景观</li>
+                            <li>✓ 物品和产品照片</li>
+                            <li>✓ 动物照片（不含人物）</li>
+                            <li>✓ 抽象艺术和图案</li>
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

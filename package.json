@@ -32,6 +32,7 @@
     "test:e2e:headed": "playwright test --headed",
     "test:all": "pnpm test && pnpm test:e2e",
     "test:image-to-video": "node test-image-to-video-simple.mjs",
+    "test:vision-config": "node test-vision-config.mjs",
     "analyze": "ANALYZE=true pnpm build",
     "analyze:server": "BUNDLE_ANALYZE=server pnpm build",
     "analyze:browser": "BUNDLE_ANALYZE=browser pnpm build",

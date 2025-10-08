@@ -142,6 +142,16 @@ export async function checkForPeopleAndFaces(imageBuffer: Buffer) {
     
     const blocked = hasFaces || hasPeople;
     
+    // Generate bilingual error message
+    let reason = null;
+    if (blocked) {
+      if (hasFaces) {
+        reason = `检测到 ${faces.length} 个人脸 / Detected ${faces.length} face(s). Sora 2 不支持包含人物或人脸的图片 / Sora 2 does not support images with people or faces.`;
+      } else {
+        reason = `检测到 ${personObjects.length} 个人物 / Detected ${personObjects.length} person(s). Sora 2 不支持包含人物的图片 / Sora 2 does not support images with people.`;
+      }
+    }
+    
     return {
       success: true,
       blocked,
@@ -150,11 +160,7 @@ export async function checkForPeopleAndFaces(imageBuffer: Buffer) {
       hasPeople,
       peopleCount: personObjects.length,
       hasPersonLabels,
-      reason: blocked 
-        ? hasFaces 
-          ? `Detected ${faces.length} face(s) in image. Sora 2 does not support images with people or faces.`
-          : `Detected ${personObjects.length} person(s) in image. Sora 2 does not support images with people.`
-        : null,
+      reason,
       details: {
         faces: faces.length,
         peopleObjects: personObjects.length,
