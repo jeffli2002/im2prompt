@@ -115,120 +115,21 @@ export async function POST(request: NextRequest) {
         console.error('[sora-image-generate] Vision API exception:', visionError);
         console.error('[sora-image-generate] Proceeding without face detection');
       }
-      // Continue with image upload
-      // Create a Blob from the buffer for upload
-      console.log('[sora-image-generate] Uploading image to KIE API, size:', imageBuffer.length, 'bytes');
-      const blob = new Blob([imageBuffer], { type: imageFile.type });
-      const fileFormData = new FormData();
-      fileFormData.append('file', blob, imageFile.name);
-
-      // KIE API 文件上传端点
-      // 注意：根据 KIE API 文档，可能需要使用不同的端点
-      // 常见的可能端点：
-      // - https://api.kie.ai/v1/files/upload
-      // - https://api.kie.ai/api/v1/file/upload (单数)
-      // - https://api.kie.ai/v1/upload
-      const uploadUrl = 'https://api.kie.ai/v1/files/upload'; // 移除 /api 前缀试试
       
-      console.log('[sora-image-generate] Attempting upload to:', uploadUrl);
+      // Upload image to R2/S3 to get a public URL
+      // KIE API doesn't provide file upload - it expects a publicly accessible image URL
+      console.log('[sora-image-generate] Uploading image to storage, size:', imageBuffer.length, 'bytes');
       
-      const uploadResponse = await fetch(uploadUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${kieApiKey}`,
+      // TODO: Implement R2/S3 upload
+      // For now, return a helpful error message
+      return NextResponse.json(
+        { 
+          error: 'Image upload to storage not yet implemented. Please use an image URL instead.',
+          message: 'Currently, image-to-video only works with image URLs. Upload your image to a hosting service first and use the imageUrl parameter.',
+          workaround: 'Use the imageUrl parameter with a publicly accessible image URL'
         },
-        body: fileFormData,
-      });
-
-      console.log('[sora-image-generate] Upload response status:', uploadResponse.status);
-
-      if (!uploadResponse.ok) {
-        const errorText = await uploadResponse.text();
-        let errorData: any = {};
-        try {
-          errorData = JSON.parse(errorText);
-        } catch (e) {
-          errorData = { rawError: errorText };
-        }
-        
-        // Get response headers for debugging
-        const responseHeaders: Record<string, string> = {};
-        uploadResponse.headers.forEach((value, key) => {
-          responseHeaders[key] = value;
-        });
-        
-        console.error('[sora-image-generate] ==================== UPLOAD FAILED ====================');
-        console.error('[sora-image-generate] Image details:');
-        console.error('[sora-image-generate]   - Size:', imageBuffer.length, 'bytes', `(${(imageBuffer.length / 1024 / 1024).toFixed(2)} MB)`);
-        console.error('[sora-image-generate]   - Type:', imageFile.type);
-        console.error('[sora-image-generate]   - Name:', imageFile.name);
-        console.error('[sora-image-generate] HTTP Response:');
-        console.error('[sora-image-generate]   - Status:', uploadResponse.status, uploadResponse.statusText);
-        console.error('[sora-image-generate]   - Headers:', JSON.stringify(responseHeaders, null, 2));
-        console.error('[sora-image-generate] Response body:');
-        console.error('[sora-image-generate]   - Raw text:', errorText.substring(0, 500));
-        console.error('[sora-image-generate]   - Parsed data:', JSON.stringify(errorData, null, 2));
-        console.error('[sora-image-generate] API Configuration:');
-        console.error('[sora-image-generate]   - KIE API Key:', kieApiKey ? `Configured (${kieApiKey.substring(0, 10)}...)` : 'NOT CONFIGURED');
-        console.error('[sora-image-generate]   - Upload URL:', 'https://api.kie.ai/api/v1/files/upload');
-        console.error('[sora-image-generate] ===========================================================');
-        
-        // Provide more detailed error message
-        let errorMessage = 'Failed to upload image to video generation service';
-        let debugInfo = '';
-        
-        if (uploadResponse.status === 401 || uploadResponse.status === 403) {
-          errorMessage = 'KIE API authentication failed. Please check your API key configuration.';
-          debugInfo = 'Authentication error - API key may be invalid or expired';
-        } else if (uploadResponse.status === 413) {
-          errorMessage = `Image file too large (${(imageBuffer.length / 1024 / 1024).toFixed(2)} MB). Maximum size is typically 10MB.`;
-          debugInfo = 'File size exceeds limit';
-        } else if (uploadResponse.status === 415) {
-          errorMessage = `Unsupported image format: ${imageFile.type}. Please use JPEG, PNG, or WebP.`;
-          debugInfo = 'Unsupported media type';
-        } else if (errorData.msg) {
-          errorMessage = `Upload failed: ${errorData.msg}`;
-          debugInfo = errorData.msg;
-        } else if (errorData.message) {
-          errorMessage = `Upload failed: ${errorData.message}`;
-          debugInfo = errorData.message;
-        } else if (errorData.error) {
-          errorMessage = `Upload failed: ${errorData.error}`;
-          debugInfo = errorData.error;
-        } else if (errorText && errorText.trim()) {
-          errorMessage = `Upload failed: ${errorText.substring(0, 100)}`;
-          debugInfo = errorText.substring(0, 200);
-        } else {
-          errorMessage = `Upload failed with status ${uploadResponse.status}: No message available`;
-          debugInfo = `HTTP ${uploadResponse.status} ${uploadResponse.statusText}`;
-        }
-        
-        return NextResponse.json(
-          { 
-            error: errorMessage,
-            debug: debugInfo,
-            statusCode: uploadResponse.status,
-            details: process.env.NODE_ENV === 'development' ? {
-              errorData,
-              imageSize: imageBuffer.length,
-              imageType: imageFile.type,
-              headers: responseHeaders
-            } : undefined
-          },
-          { status: uploadResponse.status >= 500 ? 500 : 400 }
-        );
-      }
-
-      const uploadData = await uploadResponse.json();
-      console.log('[sora-image-generate] Upload successful, response code:', uploadData.code);
-      if (uploadData.code === 200 && uploadData.data?.url) {
-        imageUrls = [uploadData.data.url];
-      } else {
-        return NextResponse.json(
-          { error: 'Failed to get uploaded image URL' },
-          { status: 500 }
-        );
-      }
+        { status: 501 }
+      );
     } else if (imageUrl) {
       imageUrls = [imageUrl];
     } else {
