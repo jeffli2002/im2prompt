@@ -133,11 +133,36 @@ export async function POST(request: NextRequest) {
       console.log('[sora-image-generate] Upload response status:', uploadResponse.status);
 
       if (!uploadResponse.ok) {
-        const errorData = await uploadResponse.json().catch(() => ({}));
-        console.error('[sora-image-generate] Image upload error:', errorData);
+        const errorText = await uploadResponse.text();
+        let errorData: any = {};
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { rawError: errorText };
+        }
+        
+        console.error('[sora-image-generate] Image upload failed');
+        console.error('[sora-image-generate] Status:', uploadResponse.status, uploadResponse.statusText);
+        console.error('[sora-image-generate] Error data:', errorData);
+        console.error('[sora-image-generate] KIE API Key configured:', kieApiKey ? `Yes (${kieApiKey.substring(0, 10)}...)` : 'No');
+        
+        // Provide more detailed error message
+        let errorMessage = 'Failed to upload image to video generation service';
+        if (uploadResponse.status === 401 || uploadResponse.status === 403) {
+          errorMessage = 'KIE API authentication failed. Please check your API key configuration.';
+        } else if (errorData.msg) {
+          errorMessage = `Upload failed: ${errorData.msg}`;
+        } else if (errorData.message) {
+          errorMessage = `Upload failed: ${errorData.message}`;
+        }
+        
         return NextResponse.json(
-          { error: 'Failed to upload image to video generation service' },
-          { status: uploadResponse.status }
+          { 
+            error: errorMessage,
+            details: process.env.NODE_ENV === 'development' ? errorData : undefined,
+            statusCode: uploadResponse.status
+          },
+          { status: uploadResponse.status >= 500 ? 500 : 400 }
         );
       }
 
