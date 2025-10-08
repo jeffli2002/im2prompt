@@ -212,7 +212,31 @@ export default function SoraVideoGenerator() {
 
           if (statusData.state === 'success') {
             clearInterval(pollInterval)
-            const resultUrls = JSON.parse(statusData.resultJson).resultUrls
+            
+            let resultUrls: string[] = []
+            try {
+              if (!statusData.resultJson || statusData.resultJson.trim() === '') {
+                throw new Error('Empty result from video generation service')
+              }
+              const parsedResult = JSON.parse(statusData.resultJson)
+              resultUrls = parsedResult.resultUrls || []
+              
+              if (!resultUrls || resultUrls.length === 0) {
+                throw new Error('No video URL in generation result')
+              }
+            } catch (parseError) {
+              clearInterval(pollInterval)
+              const parseErrorResult = {
+                taskId,
+                status: 'failed' as const,
+                error: parseError instanceof Error ? parseError.message : 'Failed to parse generation result'
+              }
+              setResult(parseErrorResult)
+              setVideo(taskId, parseErrorResult)
+              setIsGenerating(false)
+              return
+            }
+            
             const successResult = {
               taskId,
               videoUrl: resultUrls[0],
