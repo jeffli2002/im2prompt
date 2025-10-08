@@ -91,43 +91,74 @@ export async function GET(request: NextRequest) {
     const formData = new FormData();
     formData.append('file', blob, 'test.png');
 
-    const uploadResponse = await fetch('https://api.kie.ai/api/v1/files/upload', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${kieApiKey}`,
-      },
-      body: formData,
-    });
+    // 测试多个可能的上传端点
+    const uploadEndpoints = [
+      'https://api.kie.ai/v1/files/upload',
+      'https://api.kie.ai/api/v1/files/upload',
+      'https://api.kie.ai/v1/file/upload',
+      'https://api.kie.ai/api/v1/file/upload',
+      'https://api.kie.ai/v1/upload',
+    ];
+    
+    const uploadResults: any[] = [];
+    
+    for (const endpoint of uploadEndpoints) {
+      try {
+        console.log(`[test-kie] Testing endpoint: ${endpoint}`);
+        const uploadResponse = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${kieApiKey}`,
+          },
+          body: formData,
+        });
 
-    const uploadText = await uploadResponse.text();
-    let uploadData: any = {};
-    try {
-      uploadData = JSON.parse(uploadText);
-    } catch (e) {
-      uploadData = { rawText: uploadText };
+        const uploadText = await uploadResponse.text();
+        let uploadData: any = {};
+        try {
+          uploadData = JSON.parse(uploadText);
+        } catch (e) {
+          uploadData = { rawText: uploadText };
+        }
+
+        uploadResults.push({
+          endpoint,
+          status: uploadResponse.status,
+          statusText: uploadResponse.statusText,
+          ok: uploadResponse.ok,
+          response: uploadData
+        });
+        
+        // 如果成功，停止测试
+        if (uploadResponse.ok) {
+          break;
+        }
+      } catch (error: any) {
+        uploadResults.push({
+          endpoint,
+          error: error.message
+        });
+      }
     }
 
-    // 获取响应 headers
-    const responseHeaders: Record<string, string> = {};
-    uploadResponse.headers.forEach((value, key) => {
-      responseHeaders[key] = value;
-    });
-
+    const successfulEndpoint = uploadResults.find(r => r.ok);
+    
     results.tests.push({
-      name: 'File Upload',
-      status: uploadResponse.ok ? 'PASS' : 'FAIL',
+      name: 'File Upload - Multiple Endpoints',
+      status: successfulEndpoint ? 'PASS' : 'FAIL',
       details: {
-        httpStatus: uploadResponse.status,
-        httpStatusText: uploadResponse.statusText,
-        responseHeaders,
-        responseBody: uploadData,
+        testedEndpoints: uploadResults.length,
+        successfulEndpoint: successfulEndpoint?.endpoint,
+        allResults: uploadResults,
         testImageSize: testImageBuffer.length,
-        uploadUrl: 'https://api.kie.ai/api/v1/files/upload'
+        recommendation: successfulEndpoint 
+          ? `Use endpoint: ${successfulEndpoint.endpoint}`
+          : 'All tested endpoints failed. Check API documentation or contact KIE support.'
       }
     });
 
-    if (!uploadResponse.ok) {
-      console.error('[test-kie] Upload test failed:', uploadData);
+    if (!successfulEndpoint) {
+      console.error('[test-kie] All upload endpoints failed');
     }
   } catch (error: any) {
     results.tests.push({

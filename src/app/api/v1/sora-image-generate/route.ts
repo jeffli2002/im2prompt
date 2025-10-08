@@ -122,7 +122,17 @@ export async function POST(request: NextRequest) {
       const fileFormData = new FormData();
       fileFormData.append('file', blob, imageFile.name);
 
-      const uploadResponse = await fetch('https://api.kie.ai/api/v1/files/upload', {
+      // KIE API 文件上传端点
+      // 注意：根据 KIE API 文档，可能需要使用不同的端点
+      // 常见的可能端点：
+      // - https://api.kie.ai/v1/files/upload
+      // - https://api.kie.ai/api/v1/file/upload (单数)
+      // - https://api.kie.ai/v1/upload
+      const uploadUrl = 'https://api.kie.ai/v1/files/upload'; // 移除 /api 前缀试试
+      
+      console.log('[sora-image-generate] Attempting upload to:', uploadUrl);
+      
+      const uploadResponse = await fetch(uploadUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${kieApiKey}`,
