@@ -33,6 +33,13 @@ export const auth = betterAuth({
       maxAge: 60 * 60 
     },
   },
+  advanced: {
+    useSecureCookies: env.NODE_ENV === 'production',
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: '.im2prompt.com',
+    },
+  },
   plugins: [
     admin(),
     apiKey()
