@@ -141,26 +141,69 @@ export async function POST(request: NextRequest) {
           errorData = { rawError: errorText };
         }
         
-        console.error('[sora-image-generate] Image upload failed');
-        console.error('[sora-image-generate] Status:', uploadResponse.status, uploadResponse.statusText);
-        console.error('[sora-image-generate] Error data:', errorData);
-        console.error('[sora-image-generate] KIE API Key configured:', kieApiKey ? `Yes (${kieApiKey.substring(0, 10)}...)` : 'No');
+        // Get response headers for debugging
+        const responseHeaders: Record<string, string> = {};
+        uploadResponse.headers.forEach((value, key) => {
+          responseHeaders[key] = value;
+        });
+        
+        console.error('[sora-image-generate] ==================== UPLOAD FAILED ====================');
+        console.error('[sora-image-generate] Image details:');
+        console.error('[sora-image-generate]   - Size:', imageBuffer.length, 'bytes', `(${(imageBuffer.length / 1024 / 1024).toFixed(2)} MB)`);
+        console.error('[sora-image-generate]   - Type:', imageFile.type);
+        console.error('[sora-image-generate]   - Name:', imageFile.name);
+        console.error('[sora-image-generate] HTTP Response:');
+        console.error('[sora-image-generate]   - Status:', uploadResponse.status, uploadResponse.statusText);
+        console.error('[sora-image-generate]   - Headers:', JSON.stringify(responseHeaders, null, 2));
+        console.error('[sora-image-generate] Response body:');
+        console.error('[sora-image-generate]   - Raw text:', errorText.substring(0, 500));
+        console.error('[sora-image-generate]   - Parsed data:', JSON.stringify(errorData, null, 2));
+        console.error('[sora-image-generate] API Configuration:');
+        console.error('[sora-image-generate]   - KIE API Key:', kieApiKey ? `Configured (${kieApiKey.substring(0, 10)}...)` : 'NOT CONFIGURED');
+        console.error('[sora-image-generate]   - Upload URL:', 'https://api.kie.ai/api/v1/files/upload');
+        console.error('[sora-image-generate] ===========================================================');
         
         // Provide more detailed error message
         let errorMessage = 'Failed to upload image to video generation service';
+        let debugInfo = '';
+        
         if (uploadResponse.status === 401 || uploadResponse.status === 403) {
           errorMessage = 'KIE API authentication failed. Please check your API key configuration.';
+          debugInfo = 'Authentication error - API key may be invalid or expired';
+        } else if (uploadResponse.status === 413) {
+          errorMessage = `Image file too large (${(imageBuffer.length / 1024 / 1024).toFixed(2)} MB). Maximum size is typically 10MB.`;
+          debugInfo = 'File size exceeds limit';
+        } else if (uploadResponse.status === 415) {
+          errorMessage = `Unsupported image format: ${imageFile.type}. Please use JPEG, PNG, or WebP.`;
+          debugInfo = 'Unsupported media type';
         } else if (errorData.msg) {
           errorMessage = `Upload failed: ${errorData.msg}`;
+          debugInfo = errorData.msg;
         } else if (errorData.message) {
           errorMessage = `Upload failed: ${errorData.message}`;
+          debugInfo = errorData.message;
+        } else if (errorData.error) {
+          errorMessage = `Upload failed: ${errorData.error}`;
+          debugInfo = errorData.error;
+        } else if (errorText && errorText.trim()) {
+          errorMessage = `Upload failed: ${errorText.substring(0, 100)}`;
+          debugInfo = errorText.substring(0, 200);
+        } else {
+          errorMessage = `Upload failed with status ${uploadResponse.status}: No message available`;
+          debugInfo = `HTTP ${uploadResponse.status} ${uploadResponse.statusText}`;
         }
         
         return NextResponse.json(
           { 
             error: errorMessage,
-            details: process.env.NODE_ENV === 'development' ? errorData : undefined,
-            statusCode: uploadResponse.status
+            debug: debugInfo,
+            statusCode: uploadResponse.status,
+            details: process.env.NODE_ENV === 'development' ? {
+              errorData,
+              imageSize: imageBuffer.length,
+              imageType: imageFile.type,
+              headers: responseHeaders
+            } : undefined
           },
           { status: uploadResponse.status >= 500 ? 500 : 400 }
         );
