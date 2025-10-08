@@ -10,12 +10,15 @@ function getClient() {
         client = new vision.ImageAnnotatorClient({
           credentials,
         });
+        console.log('Google Vision API client initialized successfully');
       } catch (error) {
         console.error('Failed to initialize Google Vision client with credentials:', error);
-        throw new Error('Google Vision API not properly configured');
+        console.error('Vision API will be disabled for this session');
+        return null;
       }
     } else {
-      throw new Error('Google Vision API credentials not found. Please configure GOOGLE_APPLICATION_CREDENTIALS.');
+      console.warn('GOOGLE_APPLICATION_CREDENTIALS not configured - Vision API disabled');
+      return null;
     }
   }
   return client;
@@ -94,6 +97,18 @@ export async function detectFaces(imageBuffer: Buffer) {
 export async function checkForPeopleAndFaces(imageBuffer: Buffer) {
   try {
     const visionClient = getClient();
+    
+    // If client is null (API not configured), return success but don't block
+    if (!visionClient) {
+      console.warn('Vision API client not available - skipping face detection');
+      return {
+        success: false,
+        blocked: false,
+        error: 'Vision API not configured',
+        reason: 'Face detection unavailable',
+      };
+    }
+    
     const [result] = await visionClient.annotateImage({
       image: { content: imageBuffer },
       features: [
@@ -151,11 +166,13 @@ export async function checkForPeopleAndFaces(imageBuffer: Buffer) {
     };
   } catch (error) {
     console.error('Vision API error:', error);
+    // Return success: false but blocked: false
+    // This allows the request to continue even if Vision API is unavailable
     return {
       success: false,
-      blocked: true,
+      blocked: false,
       error: error instanceof Error ? error.message : 'Unknown error',
-      reason: 'Failed to analyze image. Please try again.',
+      reason: error instanceof Error ? error.message : 'Vision API unavailable',
     };
   }
 }

@@ -87,24 +87,35 @@ export async function POST(request: NextRequest) {
       imageBuffer = Buffer.from(arrayBuffer);
       
       // Check for people and faces using Google Cloud Vision API
-      const visionCheck = await checkForPeopleAndFaces(imageBuffer);
-      
-      if (!visionCheck.success) {
-        // Vision API failed - log warning but continue
-        // This prevents service unavailability due to Vision API issues
-        console.warn('Vision API check failed:', visionCheck.error);
-        console.warn('Proceeding without face detection for this request');
-      } else if (visionCheck.blocked) {
-        // Vision API succeeded and detected people/faces - block the request
-        return NextResponse.json(
-          { 
-            error: visionCheck.reason || 'Image contains people or faces. Sora 2 does not support images with people or faces.',
-            details: visionCheck.details,
-          },
-          { status: 400 }
-        );
+      try {
+        console.log('[sora-image-generate] Checking image for people/faces with Vision API');
+        const visionCheck = await checkForPeopleAndFaces(imageBuffer);
+        
+        if (!visionCheck.success) {
+          // Vision API failed - log warning but continue
+          // This prevents service unavailability due to Vision API issues
+          console.warn('[sora-image-generate] Vision API check failed:', visionCheck.error);
+          console.warn('[sora-image-generate] Proceeding without face detection for this request');
+        } else if (visionCheck.blocked) {
+          // Vision API succeeded and detected people/faces - block the request
+          console.log('[sora-image-generate] Vision API blocked image:', visionCheck.reason);
+          return NextResponse.json(
+            { 
+              error: visionCheck.reason || 'Image contains people or faces. Sora 2 does not support images with people or faces.',
+              details: visionCheck.details,
+            },
+            { status: 400 }
+          );
+        } else {
+          console.log('[sora-image-generate] Vision API check passed - no people/faces detected');
+        }
+      } catch (visionError) {
+        // Vision API threw an exception - log error but continue
+        // This ensures the service remains available even if Vision API is down
+        console.error('[sora-image-generate] Vision API exception:', visionError);
+        console.error('[sora-image-generate] Proceeding without face detection');
       }
-      // If Vision API succeeded and no people/faces detected, continue
+      // Continue with image upload
       // Create a Blob from the buffer for upload
       console.log('[sora-image-generate] Uploading image to KIE API, size:', imageBuffer.length, 'bytes');
       const blob = new Blob([imageBuffer], { type: imageFile.type });
