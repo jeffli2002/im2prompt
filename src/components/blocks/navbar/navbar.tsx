@@ -137,10 +137,19 @@ const Navbar = ({
                 <li key={subItem.title} className="relative">
                   <NavigationMenuLink asChild>
                     <Link
-                      href={subItem.url || '#'}
-                      className={`block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground ${
+                      href={subItem.disabled ? '#' : (subItem.url || '#')}
+                      className={`block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors ${
+                        subItem.disabled 
+                          ? 'opacity-50 cursor-not-allowed pointer-events-none' 
+                          : 'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground'
+                      } ${
                         subItem.highlight ? 'border-2 border-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-gradient-to-r from-red-500/5 via-orange-500/5 to-yellow-500/5' : ''
                       }`}
+                      onClick={(e) => {
+                        if (subItem.disabled) {
+                          e.preventDefault();
+                        }
+                      }}
                     >
                       <div className="flex items-center gap-2 font-medium text-sm leading-none">
                         {subItem.icon}
@@ -148,7 +157,14 @@ const Navbar = ({
                           {subItem.title}
                         </span>
                         {subItem.badge && (
-                          <Badge variant="secondary" className="ml-auto text-[10px] px-1.5 py-0 h-4 bg-gradient-to-r from-red-500 to-orange-500 text-white border-0">
+                          <Badge 
+                            variant="secondary" 
+                            className={`ml-auto text-[10px] px-1.5 py-0 h-4 border-0 ${
+                              subItem.disabled 
+                                ? 'bg-amber-500 text-white' 
+                                : 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
+                            }`}
+                          >
                             {subItem.badge}
                           </Badge>
                         )}
@@ -156,7 +172,7 @@ const Navbar = ({
                       <p className="line-clamp-2 text-muted-foreground text-sm leading-snug">
                         {subItem.description}
                       </p>
-                      {subItem.highlight && (
+                      {subItem.highlight && !subItem.disabled && (
                         <div className="absolute -top-1 -right-1 flex h-3 w-3">
                           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
                           <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
@@ -206,10 +222,19 @@ const Navbar = ({
               {item.items.map((subItem) => (
                 <Link
                   key={subItem.title}
-                  href={subItem.url || '#'}
-                  className={`flex items-start gap-2 rounded-md p-2 hover:bg-accent relative ${
+                  href={subItem.disabled ? '#' : (subItem.url || '#')}
+                  className={`flex items-start gap-2 rounded-md p-2 relative ${
+                    subItem.disabled 
+                      ? 'opacity-50 cursor-not-allowed pointer-events-none' 
+                      : 'hover:bg-accent'
+                  } ${
                     subItem.highlight ? 'bg-gradient-to-r from-red-500/5 via-orange-500/5 to-yellow-500/5 border border-orange-500/30' : ''
                   }`}
+                  onClick={(e) => {
+                    if (subItem.disabled) {
+                      e.preventDefault();
+                    }
+                  }}
                 >
                   {subItem.icon}
                   <div className="flex-1">
@@ -218,7 +243,14 @@ const Navbar = ({
                         {subItem.title}
                       </span>
                       {subItem.badge && (
-                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-gradient-to-r from-red-500 to-orange-500 text-white border-0">
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-[10px] px-1.5 py-0 h-4 border-0 ${
+                            subItem.disabled 
+                              ? 'bg-amber-500 text-white' 
+                              : 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
+                          }`}
+                        >
                           {subItem.badge}
                         </Badge>
                       )}
@@ -227,7 +259,7 @@ const Navbar = ({
                       <div className="text-muted-foreground text-xs">{subItem.description}</div>
                     )}
                   </div>
-                  {subItem.highlight && (
+                  {subItem.highlight && !subItem.disabled && (
                     <div className="absolute -top-1 -right-1 flex h-2 w-2">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
                       <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>

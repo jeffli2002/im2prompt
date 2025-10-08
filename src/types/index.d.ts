@@ -335,6 +335,7 @@ export interface NavbarMenuItem {
   onClick?: string;
   badge?: string;
   highlight?: boolean;
+  disabled?: boolean;
 }
 
 export interface SidebarGroup {

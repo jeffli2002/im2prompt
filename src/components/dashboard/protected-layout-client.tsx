@@ -39,18 +39,7 @@ export function ProtectedLayoutClient({ children }: ProtectedLayoutClientProps) 
       });
     }
 
-    // AI Tools menu - available to all users
-    groups.push({
-      title: t('aiTools'),
-      defaultOpen: true,
-      items: [
-        {
-          title: t('promptLibrary'),
-          href: '/prompt-library',
-          icon: Sparkles,
-        },
-      ],
-    });
+    // AI Tools menu - removed prompt-library as it doesn't exist
 
     // all users can see Credits menu
     groups.push({

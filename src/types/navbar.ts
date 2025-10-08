@@ -10,6 +10,7 @@ export interface MenuItem {
   onClick?: () => void;
   badge?: string;
   highlight?: boolean;
+  disabled?: boolean;
 }
 
 // Logo配置类型

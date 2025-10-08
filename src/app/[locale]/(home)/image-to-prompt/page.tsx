@@ -451,16 +451,6 @@ export default function ImageToPromptPage() {
             </div>
           </CardContent>
         </Card>
-
-
-        {/* View History Link */}
-        {promptHistory.length > 0 && (
-          <div className="text-center">
-            <Button variant="link" onClick={() => router.push('/prompt-library')}>
-              View History →
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Bottom Section */}
