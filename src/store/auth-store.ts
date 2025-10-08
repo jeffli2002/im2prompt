@@ -220,7 +220,7 @@ export const useAuthStore = create<AuthState>()(
         },
 
         signInWithGithub: async (callbackUrl?: string) => {
-          set({ isLoading: true, error: null });
+          set({ error: null });
 
           try {
             await authClient.signIn.social({
@@ -231,12 +231,12 @@ export const useAuthStore = create<AuthState>()(
             authErrorLogger.logError(error as Error, {
               operation: 'signInWithGithub',
             });
-            set({ isLoading: false, error: 'Failed to sign in with GitHub' });
+            set({ error: 'Failed to sign in with GitHub' });
           }
         },
 
         signInWithGoogle: async (callbackUrl?: string) => {
-          set({ isLoading: true, error: null });
+          set({ error: null });
 
           try {
             await authClient.signIn.social({
@@ -247,7 +247,7 @@ export const useAuthStore = create<AuthState>()(
             authErrorLogger.logError(error as Error, {
               operation: 'signInWithGoogle',
             });
-            set({ isLoading: false, error: 'Failed to sign in with Google' });
+            set({ error: 'Failed to sign in with Google' });
           }
         },
 
