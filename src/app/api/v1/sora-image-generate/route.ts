@@ -107,6 +107,14 @@ export async function POST(request: NextRequest) {
 
     const responseText = await response.text();
     
+    if (!responseText || responseText.trim() === '') {
+      console.error('Empty response from KIE API');
+      return NextResponse.json(
+        { error: 'Empty response from video generation service' },
+        { status: 500 }
+      );
+    }
+
     if (!response.ok) {
       let errorData: any = {};
       try {
@@ -125,9 +133,10 @@ export async function POST(request: NextRequest) {
     try {
       data = JSON.parse(responseText);
     } catch (error) {
-      console.error('Failed to parse response:', responseText);
+      console.error('Failed to parse response. Response text:', responseText);
+      console.error('Parse error:', error);
       return NextResponse.json(
-        { error: 'Invalid response from video generation service' },
+        { error: 'Invalid response from video generation service. The service may be experiencing issues.' },
         { status: 500 }
       );
     }
