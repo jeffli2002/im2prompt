@@ -116,20 +116,46 @@ export async function POST(request: NextRequest) {
         console.error('[sora-image-generate] Proceeding without face detection');
       }
       
-      // Upload image to R2/S3 to get a public URL
-      // KIE API doesn't provide file upload - it expects a publicly accessible image URL
-      console.log('[sora-image-generate] Uploading image to storage, size:', imageBuffer.length, 'bytes');
+      // Upload image to Cloudinary to get a public URL
+      console.log('[sora-image-generate] Uploading image to Cloudinary, size:', imageBuffer.length, 'bytes');
       
-      // TODO: Implement R2/S3 upload
-      // For now, return a helpful error message
-      return NextResponse.json(
-        { 
-          error: 'Image upload to storage not yet implemented. Please use an image URL instead.',
-          message: 'Currently, image-to-video only works with image URLs. Upload your image to a hosting service first and use the imageUrl parameter.',
-          workaround: 'Use the imageUrl parameter with a publicly accessible image URL'
-        },
-        { status: 501 }
-      );
+      try {
+        const uploadFormData = new FormData();
+        uploadFormData.append('image', imageFile);
+
+        const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/v1/sora/upload-image`, {
+          method: 'POST',
+          body: uploadFormData
+        });
+
+        const uploadData = await uploadResponse.json();
+        console.log('[sora-image-generate] Upload response:', { ok: uploadResponse.ok, status: uploadResponse.status, data: uploadData });
+
+        if (!uploadResponse.ok) {
+          console.error('[sora-image-generate] Upload failed:', uploadData);
+          return NextResponse.json(
+            { error: uploadData.error || 'Failed to upload image' },
+            { status: 500 }
+          );
+        }
+
+        if (!uploadData.imageUrl) {
+          console.error('[sora-image-generate] Upload response missing imageUrl:', uploadData);
+          return NextResponse.json(
+            { error: 'Upload succeeded but no image URL returned' },
+            { status: 500 }
+          );
+        }
+
+        imageUrls = [uploadData.imageUrl];
+        console.log('[sora-image-generate] Image uploaded successfully, URL:', uploadData.imageUrl);
+      } catch (uploadError) {
+        console.error('[sora-image-generate] Upload error:', uploadError);
+        return NextResponse.json(
+          { error: 'Failed to upload image to storage service' },
+          { status: 500 }
+        );
+      }
     } else if (imageUrl) {
       imageUrls = [imageUrl];
     } else {

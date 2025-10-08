@@ -22,11 +22,15 @@ interface GenerationResult {
 
 type GenerationMode = 'text-to-video' | 'image-to-video'
 
-export default function SoraVideoGenerator() {
+interface SoraVideoGeneratorProps {
+  defaultMode?: GenerationMode;
+}
+
+export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: SoraVideoGeneratorProps = {}) {
   const { user } = useAuth()
   const { usage, canGenerateVideo, trackVideoGeneration } = useQuota()
   const { setVideo, getLatestVideo } = useVideoStore()
-  const [mode, setMode] = useState<GenerationMode>('text-to-video')
+  const [mode, setMode] = useState<GenerationMode>(defaultMode)
   const [prompt, setPrompt] = useState('')
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
