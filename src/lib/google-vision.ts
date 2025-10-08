@@ -4,20 +4,35 @@ let client: InstanceType<typeof vision.ImageAnnotatorClient> | null = null;
 
 function getClient() {
   if (!client) {
-    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-      try {
-        const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-        client = new vision.ImageAnnotatorClient({
-          credentials,
-        });
-        console.log('Google Vision API client initialized successfully');
-      } catch (error) {
-        console.error('Failed to initialize Google Vision client with credentials:', error);
-        console.error('Vision API will be disabled for this session');
-        return null;
+    const credsEnv = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    
+    if (!credsEnv) {
+      console.warn('[Google Vision] GOOGLE_APPLICATION_CREDENTIALS not configured - Vision API disabled');
+      return null;
+    }
+    
+    console.log('[Google Vision] Attempting to initialize client...');
+    console.log('[Google Vision] Credentials env var length:', credsEnv.length);
+    
+    try {
+      const credentials = JSON.parse(credsEnv);
+      console.log('[Google Vision] JSON parse successful');
+      console.log('[Google Vision] Project ID:', credentials.project_id);
+      console.log('[Google Vision] Client email:', credentials.client_email);
+      console.log('[Google Vision] Has private_key:', !!credentials.private_key);
+      
+      client = new vision.ImageAnnotatorClient({
+        credentials,
+      });
+      
+      console.log('[Google Vision] ✅ Client initialized successfully');
+    } catch (error) {
+      console.error('[Google Vision] ❌ Failed to initialize client:', error);
+      console.error('[Google Vision] Error details:', error instanceof Error ? error.message : 'Unknown error');
+      if (error instanceof Error && error.stack) {
+        console.error('[Google Vision] Stack trace:', error.stack);
       }
-    } else {
-      console.warn('GOOGLE_APPLICATION_CREDENTIALS not configured - Vision API disabled');
+      console.error('[Google Vision] Vision API will be disabled for this session');
       return null;
     }
   }
