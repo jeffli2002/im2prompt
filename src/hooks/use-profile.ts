@@ -62,6 +62,10 @@ export function useProfile(): UseProfileReturn {
 
       const result = await uploadAvatarAction(formData);
 
+      if (!result.success || !result.url) {
+        throw new Error(result.error || 'Upload failed: No URL returned');
+      }
+
       const updateResult = await updateUser({ image: result.url });
       if (updateResult.success) {
         toastMessages.success.avatarUpdated();
@@ -69,7 +73,8 @@ export function useProfile(): UseProfileReturn {
         toastMessages.error.avatarUpdateFailed(updateResult.error);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : undefined;
+      console.error('Avatar upload error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed';
       toastMessages.error.fileUploadFailed(errorMessage);
     } finally {
       setIsUpdatingAvatar(false);

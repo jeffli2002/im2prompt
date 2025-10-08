@@ -9,7 +9,12 @@ import type { User } from 'better-auth/types';
 
 const avatarErrorLogger = new ErrorLogger('upload-avatar');
 
-export async function uploadAvatarAction(formData: FormData) {
+export async function uploadAvatarAction(formData: FormData): Promise<{
+  success: boolean;
+  url?: string;
+  error?: string;
+  fileInfo?: any;
+}> {
   let session: { user?: User } | null = null;
   let file: File | null = null;
   
@@ -19,21 +24,25 @@ export async function uploadAvatarAction(formData: FormData) {
     });
 
     if (!session?.user) {
-      throw new Error(await getErrorMessage('unauthorizedAccess'));
+      const errorMsg = await getErrorMessage('unauthorizedAccess');
+      return { success: false, error: errorMsg };
     }
 
     file = formData.get('avatar') as File;
 
     if (!file) {
-      throw new Error(await getErrorMessage('fileNotFound'));
+      const errorMsg = await getErrorMessage('fileNotFound');
+      return { success: false, error: errorMsg };
     }
 
     if (!file.type.startsWith('image/')) {
-      throw new Error(await getErrorMessage('onlyImageFiles'));
+      const errorMsg = await getErrorMessage('onlyImageFiles');
+      return { success: false, error: errorMsg };
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      throw new Error(await getErrorMessage('fileSizeLimit'));
+      const errorMsg = await getErrorMessage('fileSizeLimit');
+      return { success: false, error: errorMsg };
     }
 
     // Use the unified file upload logic that saves to database
@@ -53,8 +62,7 @@ export async function uploadAvatarAction(formData: FormData) {
       fileType: file?.type,
     });
     
-    throw new Error(
-      error instanceof Error ? error.message : await getErrorMessage('fileUploadFailed')
-    );
+    const errorMsg = error instanceof Error ? error.message : await getErrorMessage('fileUploadFailed');
+    return { success: false, error: errorMsg };
   }
 } 
