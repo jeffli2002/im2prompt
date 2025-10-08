@@ -27,6 +27,12 @@ function getClient() {
 export async function analyzeImage(imageBuffer: Buffer) {
   try {
     const visionClient = getClient();
+    if (!visionClient) {
+      return {
+        success: false,
+        error: 'Vision API client not initialized',
+      };
+    }
     const [result] = await visionClient.labelDetection(imageBuffer);
     const labels = result.labelAnnotations || [];
     
@@ -49,6 +55,12 @@ export async function analyzeImage(imageBuffer: Buffer) {
 export async function detectText(imageBuffer: Buffer) {
   try {
     const visionClient = getClient();
+    if (!visionClient) {
+      return {
+        success: false,
+        error: 'Vision API client not initialized',
+      };
+    }
     const [result] = await visionClient.textDetection(imageBuffer);
     const detections = result.textAnnotations || [];
     
@@ -72,6 +84,12 @@ export async function detectText(imageBuffer: Buffer) {
 export async function detectFaces(imageBuffer: Buffer) {
   try {
     const visionClient = getClient();
+    if (!visionClient) {
+      return {
+        success: false,
+        error: 'Vision API client not initialized',
+      };
+    }
     const [result] = await visionClient.faceDetection(imageBuffer);
     const faces = result.faceAnnotations || [];
     
@@ -186,6 +204,12 @@ export async function checkForPeopleAndFaces(imageBuffer: Buffer) {
 export async function analyzeImageFull(imageBuffer: Buffer) {
   try {
     const visionClient = getClient();
+    if (!visionClient) {
+      return {
+        success: false,
+        error: 'Vision API client not initialized',
+      };
+    }
     const [result] = await visionClient.annotateImage({
       image: { content: imageBuffer },
       features: [
@@ -215,6 +239,13 @@ type SupportedLanguage = 'en' | 'zh' | 'fr' | 'ja' | 'es';
 export async function generatePromptFromImage(imageBuffer: Buffer, language: SupportedLanguage = 'en', modelStyle: string = 'general') {
   try {
     const visionClient = getClient();
+    if (!visionClient) {
+      return {
+        success: false,
+        error: 'Vision API client not initialized',
+        prompt: '',
+      };
+    }
     const [result] = await visionClient.annotateImage({
       image: { content: imageBuffer },
       features: [
