@@ -232,28 +232,32 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(cozePayload),
     });
 
-    if (!cozeResponse.ok) {
-      const errorText = await cozeResponse.text();
-      console.error('Coze API error:', {
-        status: cozeResponse.status,
-        statusText: cozeResponse.statusText,
-        response: errorText
-      });
-      return NextResponse.json(
-        { error: `Failed to analyze image: ${cozeResponse.status} ${cozeResponse.statusText}` },
-        { status: 500 }
-      );
-    }
-
     const cozeData = await cozeResponse.json();
     console.log('Coze Workflow API response:', JSON.stringify(cozeData, null, 2));
+    
+    // Check Coze API response status code
+    // code: 0 means success, other codes indicate errors
+    if (!cozeResponse.ok || (cozeData.code && cozeData.code !== 0)) {
+      const errorMsg = cozeData.msg || cozeData.message || cozeResponse.statusText;
+      console.error('Coze API error:', {
+        httpStatus: cozeResponse.status,
+        cozeCode: cozeData.code,
+        message: errorMsg,
+        debugUrl: cozeData.debug_url
+      });
+      console.log('❌ Coze API 调用失败，自动切换到 Google Vision API fallback');
+      
+      // Don't return error, instead fall through to Google Vision fallback
+      // by setting extractedPrompt to empty string
+    }
     
     // Extract the prompt from Coze Workflow response
     let extractedPrompt = '';
     let negativePrompt = '';
     
     // Workflow API returns data in different format
-    if (cozeData.data) {
+    // Only process if Coze API was successful (code === 0 or undefined)
+    if (cozeData.data && (!cozeData.code || cozeData.code === 0)) {
       // Check if output contains the prompt
       const output = cozeData.data.output || cozeData.data;
       
