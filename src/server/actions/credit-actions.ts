@@ -201,7 +201,7 @@ export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageRespons
       ? paymentConfig.plans.find(p => p.stripePriceIds?.monthly === subscription.priceId || p.stripePriceIds?.yearly === subscription.priceId)
       : paymentConfig.plans.find(p => p.id === 'free');
     
-    const planLimits = userPlan?.limits || paymentConfig.plans[0].limits!; // Default to free plan
+    const planLimits = userPlan?.limits || paymentConfig.plans[0]?.limits || {}; // Default to free plan
     
     // Determine limits
     const baseStorageLimit = creditsConfig.freeUser.storage.freeQuotaGB * 1024 * 1024 * 1024;
