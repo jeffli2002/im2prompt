@@ -222,7 +222,6 @@ function ToolRow({ tool, index }: ToolRowProps) {
                     muted
                     playsInline
                     poster={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dvskpqqvv'}/video/upload/so_0,q_auto/${tool.videoPublicId}.jpg`}
-                    loading="lazy"
                   >
                     <source 
                       src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dvskpqqvv'}/video/upload/q_auto,f_auto/${tool.videoPublicId}.mp4`}
