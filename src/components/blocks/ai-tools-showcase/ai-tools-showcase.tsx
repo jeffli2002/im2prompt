@@ -221,10 +221,10 @@ function ToolRow({ tool, index }: ToolRowProps) {
                     loop
                     muted
                     playsInline
-                    poster={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dvskpqqvv'}/video/upload/so_0,q_auto/${tool.videoPublicId}.jpg`}
+                    poster={`https://res.cloudinary.com/dvskpqqvv/video/upload/so_0,q_auto/${tool.videoPublicId}.jpg`}
                   >
                     <source 
-                      src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dvskpqqvv'}/video/upload/q_auto,f_auto/${tool.videoPublicId}.mp4`}
+                      src={`https://res.cloudinary.com/dvskpqqvv/video/upload/q_auto,f_auto/${tool.videoPublicId}.mp4`}
                       type="video/mp4"
                     />
                   </video>
