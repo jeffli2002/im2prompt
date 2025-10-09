@@ -1,12 +1,45 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { setRequestLocale } from 'next-intl/server';
-import { ArrowLeft, FileText, Shield, Users, AlertTriangle, RefreshCw, Mail, Scale, CreditCard, Server, Ban, AlertCircle, FileWarning } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  FileText, 
+  Shield, 
+  Users, 
+  AlertTriangle, 
+  RefreshCw, 
+  Mail, 
+  Scale, 
+  CreditCard, 
+  Server, 
+  Ban, 
+  AlertCircle, 
+  FileWarning,
+  CheckCircle2,
+  Globe,
+  MapPin
+} from 'lucide-react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 interface TermsPageProps {
   params: Promise<{ locale: string }>;
 }
+
+export const metadata: Metadata = {
+  title: 'Terms of Service - im2Prompt',
+  description: 'Terms of service for im2Prompt AI platform. Read our terms and conditions for using our AI-powered prompt generation and image/video creation services.',
+  keywords: [
+    'terms of service',
+    'terms and conditions',
+    'user agreement',
+    'legal terms',
+    'service agreement',
+    'usage terms',
+    'sora 2 terms',
+    'ai service terms'
+  ],
+};
 
 export default async function TermsPage({ params }: TermsPageProps) {
   const { locale } = await params;
@@ -19,74 +52,10 @@ export default async function TermsPage({ params }: TermsPageProps) {
 
 function TermsPageContent() {
   const effectiveDate = '2025-01-01';
-  const lastUpdated = '2025-01-01';
-
-  const sectionsWithIcons = [
-    {
-      title: '1. Eligibility',
-      icon: Users,
-      content: 'You must be at least 18 years old (or the age of majority in your jurisdiction) to use this Service. By using the Service, you represent that you meet these requirements.'
-    },
-    {
-      title: '2. Service Overview',
-      icon: FileText,
-      content: 'Our platform enables users to: Convert images and text into AI prompts; Generate outputs such as AI images and videos using models like Sora 2, Veo3, Stable Diffusion, Flux, and Midjourney; Save, refine, and manage prompts in a personal or team library.'
-    },
-    {
-      title: '3. Accounts & Authentication',
-      icon: Shield,
-      content: 'You agree to provide accurate information when creating an account. You are responsible for safeguarding your account credentials. We may suspend or terminate accounts involved in abuse, fraud, or violations of these Terms.'
-    },
-    {
-      title: '4. Acceptable Use',
-      icon: Ban,
-      content: 'You agree not to use the Service to: Generate content that is unlawful, harmful, abusive, harassing, defamatory, or violates intellectual property rights; Create deepfakes or misleading content intended to deceive, impersonate, or cause harm; Circumvent restrictions, reverse-engineer, or exploit vulnerabilities in the Service; Violate any applicable laws or regulations.'
-    },
-    {
-      title: '5. Content Ownership',
-      icon: Scale,
-      content: 'User Content: You retain ownership of the inputs (text, images, video prompts) you upload. Generated Content: You own rights to outputs you generate, subject to compliance with these Terms and any restrictions imposed by third-party AI model providers (e.g., Sora 2, Veo3). Platform Rights: By using the Service, you grant us a limited license to store, process, and display content solely for the purpose of operating the Service.'
-    },
-    {
-      title: '6. Credits & Payments',
-      icon: CreditCard,
-      content: 'The Service uses a credit-based system to meter usage (e.g., image generation, video generation, prompt extractions). Credits and subscriptions are managed via Creem payment service. Payments are non-refundable except as required by law. Free plan includes daily rate limits (3 images + 1 video per day), while paid plans (Pro $16.99, Pro+ $29.99) offer higher monthly allocations without daily restrictions.'
-    },
-    {
-      title: '7. Third-Party Services',
-      icon: Server,
-      content: 'The Service integrates with third-party AI providers (e.g., OpenAI Sora 2, Google Veo3, Stable Diffusion APIs). We do not control these services and are not responsible for their performance or policies.'
-    },
-    {
-      title: '8. Termination',
-      icon: AlertTriangle,
-      content: 'We may suspend or terminate access to the Service for violations of these Terms or misuse of the platform.'
-    },
-    {
-      title: '9. Disclaimers',
-      icon: AlertCircle,
-      content: 'The Service is provided "as is" without warranties of any kind. We do not guarantee accuracy, reliability, or suitability of AI-generated outputs. Use outputs responsibly — do not present them as factual without verification.'
-    },
-    {
-      title: '10. Limitation of Liability',
-      icon: FileWarning,
-      content: 'To the maximum extent permitted by law, we are not liable for any damages arising from use of the Service, including but not limited to loss of profits, data, or reputation.'
-    },
-    {
-      title: '11. Changes to Terms',
-      icon: RefreshCw,
-      content: 'We may update these Terms at any time. Updates will be posted on this page with a new effective date.'
-    },
-    {
-      title: '12. Contact Us',
-      icon: Mail,
-      content: 'If you have questions about these Terms, please contact: support@im2prompt.com'
-    }
-  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Enhanced header with better contrast */}
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
+      {/* Header */}
       <div className="bg-background/95 backdrop-blur-lg border-b border-border/50 sticky top-0 z-10">
         <div className="container mx-auto max-w-6xl px-4 py-4">
           <div className="flex items-center justify-between">
@@ -103,76 +72,352 @@ function TermsPageContent() {
         </div>
       </div>
 
-      <div className="container mx-auto max-w-4xl px-4 py-12">
-        {/* Hero Section - Consistent with homepage style */}
+      <div className="container mx-auto px-4 py-16 max-w-5xl">
+        {/* Hero Section */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-6">
-            <FileText className="h-8 w-8 text-primary" />
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <FileText className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent mb-4">
             Terms of Service
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-            Welcome to im2Prompt. By accessing or using our AI Image/Text ⇄ Prompt ⇄ Image/Video Platform, you agree to comply with these Terms of Service. Please read carefully.
-          </p>
-          <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Effective Date: {effectiveDate}
-            </div>
-            <div>Last Updated: {lastUpdated}</div>
+          <div className="flex items-center justify-center gap-2 text-muted-foreground">
+            <CheckCircle2 className="w-5 h-5 text-green-500" />
+            <p className="text-lg">Effective Date: {effectiveDate}</p>
           </div>
         </div>
 
-        {/* Content Sections */}
+        {/* Quick Navigation */}
+        <div className="bg-blue-50 dark:bg-blue-950/30 rounded-2xl p-6 mb-12 border border-blue-100 dark:border-blue-900">
+          <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            Quick Navigation
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <a href="#accounts" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">User Accounts</a>
+            <a href="#subscription" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Subscription & Payment</a>
+            <a href="#content" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Content & Licensing</a>
+            <a href="#acceptable-use" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Acceptable Use</a>
+            <a href="#privacy" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Privacy</a>
+            <a href="#liability" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Liability</a>
+            <a href="#termination" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Termination</a>
+            <a href="#contact" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Contact Us</a>
+          </div>
+        </div>
+
+        {/* Main Content */}
         <div className="space-y-8">
-          {sectionsWithIcons.map((section, index) => {
-            const Icon = section.icon;
-            return (
-              <div key={index} className="group hover:shadow-lg transition-all duration-300 border border-border/50 shadow-md bg-card/80 backdrop-blur-sm rounded-xl p-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
-                    <Icon className="h-6 w-6 text-primary" />
+          {/* Section 1: Agreement to Terms */}
+          <section className="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">1. Agreement to Terms</h2>
+            <div className="prose prose-gray dark:prose-invert max-w-none">
+              <p className="text-muted-foreground leading-relaxed">
+                By accessing or using im2Prompt ("Service", "Platform", or "We"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you do not have permission to access our Service.
+              </p>
+              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg p-4 mt-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    <strong>Important:</strong> These Terms constitute a legally binding agreement between you and im2Prompt. Please read them carefully.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Section 2: Service Description */}
+          <section className="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">2. Our Service</h2>
+            <p className="text-muted-foreground mb-6">
+              im2Prompt is an AI-powered platform that enables users to:
+            </p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-muted/50 rounded-lg p-4">
+                <h4 className="text-lg font-medium text-foreground mb-2">Core Features</h4>
+                <ul className="space-y-1 text-muted-foreground text-sm">
+                  <li>• Image to Prompt generation</li>
+                  <li>• Text to Prompt conversion</li>
+                  <li>• Text to Image (Flux, Stable Diffusion)</li>
+                  <li>• Text to Video (Sora 2)</li>
+                  <li>• Image to Video (Sora 2)</li>
+                </ul>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-4">
+                <h4 className="text-lg font-medium text-foreground mb-2">AI Models</h4>
+                <ul className="space-y-1 text-muted-foreground text-sm">
+                  <li>• OpenAI Sora 2</li>
+                  <li>• Google Veo3</li>
+                  <li>• Stable Diffusion</li>
+                  <li>• Flux</li>
+                  <li>• Nano Banana (via KIE.AI)</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          {/* Section 3: User Accounts - Following CoverImage format */}
+          <section id="accounts" className="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-6 flex items-center gap-3">
+              <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              3. User Accounts
+            </h2>
+            
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xl font-medium text-foreground mb-3">3.1 Account Registration</h3>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>You must provide accurate and complete information during registration</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>You must be at least 18 years old (or age of majority in your jurisdiction)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>One person or legal entity may maintain only one free account</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-medium text-foreground mb-3">3.2 Account Security</h3>
+                <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-4">
+                  <p className="text-muted-foreground">
+                    You are responsible for:
+                  </p>
+                  <ul className="mt-2 space-y-1 text-muted-foreground text-sm">
+                    <li>• Maintaining the confidentiality of your account credentials</li>
+                    <li>• All activities that occur under your account</li>
+                    <li>• Notifying us immediately of any unauthorized access</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Subscription & Payment Section - Based on CoverImage comprehensive format */}
+          <section id="subscription" className="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-6 flex items-center gap-3">
+              <CreditCard className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              4. Subscription Plans & Payment
+            </h2>
+
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xl font-medium text-foreground mb-4">4.1 Available Plans</h3>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="border border-border rounded-lg p-4">
+                    <h4 className="text-lg font-medium text-foreground mb-2">Free Plan</h4>
+                    <p className="text-sm font-medium text-foreground mb-2">$0/forever</p>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>✓ 3 images + 1 video per day</li>
+                      <li>✓ Basic AI models</li>
+                      <li>✓ Email support</li>
+                      <li>✓ Personal use only</li>
+                    </ul>
                   </div>
-                  <div className="flex-1">
-                    <h2 className="text-xl font-semibold text-foreground mb-3">
-                      {section.title}
-                    </h2>
-                    <p className="text-muted-foreground leading-relaxed text-base whitespace-pre-wrap">
-                      {section.content}
+                  <div className="border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30 rounded-lg p-4">
+                    <h4 className="text-lg font-medium text-foreground mb-2">Pro Plan</h4>
+                    <p className="text-sm font-medium text-foreground mb-2">$16.99/month</p>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>✓ 100 images + 30 videos/month</li>
+                      <li>✓ All AI models</li>
+                      <li>✓ Priority support</li>
+                      <li>✓ Commercial usage rights</li>
+                    </ul>
+                  </div>
+                  <div className="border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/30 rounded-lg p-4">
+                    <h4 className="text-lg font-medium text-foreground mb-2">Pro+ Plan</h4>
+                    <p className="text-sm font-medium text-foreground mb-2">$29.99/month</p>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>✓ 200 images + 60 videos/month</li>
+                      <li>✓ Full commercial license</li>
+                      <li>✓ Dedicated support</li>
+                      <li>✓ API access</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-medium text-foreground mb-3">4.2 Billing & Payment Terms</h3>
+                <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                  <p className="text-muted-foreground">• <strong>Billing Cycles:</strong> Subscriptions are billed monthly in advance</p>
+                  <p className="text-muted-foreground">• <strong>Payment Methods:</strong> We accept credit cards via Creem payment service</p>
+                  <p className="text-muted-foreground">• <strong>Currency:</strong> Prices displayed in USD</p>
+                  <p className="text-muted-foreground">• <strong>Failed Payments:</strong> Service may be suspended if payment fails</p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-medium text-foreground mb-3">4.3 Cancellation Policy</h3>
+                <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                  <p className="text-muted-foreground">• <strong>Cancel Anytime:</strong> You can cancel your subscription at any time</p>
+                  <p className="text-muted-foreground">• <strong>Access Until End of Period:</strong> You'll retain access until the end of your current billing period</p>
+                  <p className="text-muted-foreground">• <strong>No Partial Refunds:</strong> We don't offer refunds for partial billing periods</p>
+                  <p className="text-muted-foreground">• <strong>See Refund Policy:</strong> For detailed refund information, see our <Link href="/refund" className="text-blue-600 hover:underline">Refund Policy</Link></p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Content & Licensing - Following CoverImage structure */}
+          <section id="content" className="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-6">5. Content Rights & Licensing</h2>
+
+            <div className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-xl font-medium text-foreground mb-3">5.1 Your Content</h3>
+                  <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 rounded-lg p-4">
+                    <p className="text-muted-foreground text-sm">
+                      <strong>You retain all rights</strong> to content you upload. We only use your content to provide our services to you.
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-medium text-foreground mb-3">5.2 Generated Content</h3>
+                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-4">
+                    <p className="text-muted-foreground text-sm">
+                      <strong>You own all generated content</strong>, subject to compliance with applicable laws and these Terms.
                     </p>
                   </div>
                 </div>
               </div>
-            );
-          })}
+
+              <div>
+                <h3 className="text-xl font-medium text-foreground mb-3">5.3 AI Generation Disclaimer</h3>
+                <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg p-4 space-y-3">
+                  <p className="text-muted-foreground">
+                    <strong>Important:</strong> im2Prompt uses advanced AI models. Please understand:
+                  </p>
+                  <ul className="space-y-2 text-muted-foreground text-sm">
+                    <li>• <strong>Quality Variance:</strong> Results depend on prompt quality and AI model capabilities</li>
+                    <li>• <strong>No Guarantee:</strong> We cannot guarantee every generation meets your expectations</li>
+                    <li>• <strong>Network Dependencies:</strong> Service quality affected by connectivity and server availability</li>
+                    <li>• <strong>AI Limitations:</strong> AI may produce unexpected or unsuitable results</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Acceptable Use */}
+          <section id="acceptable-use" className="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-6">6. Acceptable Use Policy</h2>
+            
+            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-3">Prohibited Uses</h3>
+              <p className="text-muted-foreground mb-3">You may NOT use our Service to:</p>
+              <ul className="space-y-2 text-muted-foreground">
+                <li>❌ Generate illegal, harmful, or abusive content</li>
+                <li>❌ Create misleading or deceptive materials</li>
+                <li>❌ Violate third-party intellectual property rights</li>
+                <li>❌ Bypass service limitations or security measures</li>
+                <li>❌ Use automated systems without permission</li>
+              </ul>
+            </div>
+          </section>
+
+          {/* Liability */}
+          <section id="liability" className="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-6">7. Disclaimers & Limitations</h2>
+            
+            <div className="space-y-6">
+              <div className="bg-muted/50 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-foreground mb-3">7.1 Service Disclaimer</h3>
+                <p className="text-muted-foreground">
+                  The Service is provided "AS IS" and "AS AVAILABLE". We do not guarantee uninterrupted, error-free operation or consistent AI generation quality.
+                </p>
+              </div>
+
+              <div className="bg-muted/50 rounded-lg p-6">
+                <h3 className="text-lg font-medium text-foreground mb-3">7.2 Limitation of Liability</h3>
+                <p className="text-muted-foreground mb-3">
+                  To the fullest extent permitted by law, im2Prompt shall not be liable for:
+                </p>
+                <ul className="space-y-2 text-muted-foreground text-sm">
+                  <li>• Any indirect, incidental, or consequential damages</li>
+                  <li>• Lost profits or business opportunities</li>
+                  <li>• Damages from AI generation failures</li>
+                  <li>• Any damages exceeding fees paid in the past 12 months</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          {/* Privacy */}
+          <section id="privacy" className="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">8. Privacy & Data Protection</h2>
+            <p className="text-muted-foreground mb-4">
+              Your privacy is important to us. Our use of your personal information is governed by our Privacy Policy.
+            </p>
+            <Link href="/privacy" className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+              View Privacy Policy
+              <span className="text-sm">→</span>
+            </Link>
+          </section>
+
+          {/* Termination */}
+          <section id="termination" className="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">9. Termination</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-2">By You</h3>
+                <p className="text-muted-foreground text-sm">
+                  You may terminate your account at any time through account settings.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-2">By Us</h3>
+                <p className="text-muted-foreground text-sm">
+                  We may suspend or terminate accounts for violations of these Terms.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Governing Law */}
+          <section className="bg-card rounded-2xl shadow-sm border border-border p-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-3">
+              <Scale className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              10. Governing Law & Disputes
+            </h2>
+            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-6">
+              <p className="text-muted-foreground mb-3">
+                These Terms are governed by applicable laws. Any disputes shall be subject to the jurisdiction of competent courts.
+              </p>
+            </div>
+          </section>
+
+          {/* Contact Information */}
+          <section id="contact" className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-2xl shadow-sm border border-blue-100 dark:border-blue-900 p-8">
+            <h2 className="text-2xl font-semibold text-foreground mb-6">11. Contact Us</h2>
+            
+            <div className="bg-card rounded-lg p-6">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Email</p>
+                    <a href="mailto:support@im2prompt.com" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+                      support@im2prompt.com
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
 
         {/* Footer */}
-        <div className="mt-16 text-center">
-          <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-8 shadow-md border border-border/50">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Mail className="h-5 w-5 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">Need Help?</h3>
-            </div>
-            <p className="text-muted-foreground mb-6">
-              If you have any questions about these terms, please don't hesitate to contact us.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/">
-                <Button variant="outline" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to Home
-                </Button>
-              </Link>
-              <Link href="/privacy">
-                <Button variant="default" className="gap-2">
-                  <Shield className="h-4 w-4" />
-                  Privacy Policy
-                </Button>
-              </Link>
-            </div>
-          </div>
+        <div className="mt-12 text-center">
+          <p className="text-muted-foreground">
+            © 2025 im2Prompt. All rights reserved.
+          </p>
         </div>
       </div>
     </div>
