@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import { appConfig } from '../config/app.config';
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 
 export const metadata: Metadata = {
   title: appConfig.metadata.title.default,
@@ -61,12 +62,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  
   return (
     <html
       lang={routing.defaultLocale}
       className={`${geist.variable} ${geistMono.variable} antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        {gaId && <GoogleAnalytics gaId={gaId} />}
+      </head>
       <body>
         <script
           dangerouslySetInnerHTML={{
