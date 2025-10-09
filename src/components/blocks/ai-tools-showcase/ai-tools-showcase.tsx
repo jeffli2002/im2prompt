@@ -239,6 +239,7 @@ function ToolRow({ tool, index }: ToolRowProps) {
                   src={tool.demoImage}
                   alt={tool.demoImageAlt}
                   fill
+                  unoptimized
                   className={cn(
                     'object-cover',
                     'transition-all duration-700 ease-out',
@@ -246,7 +247,7 @@ function ToolRow({ tool, index }: ToolRowProps) {
                     'group-hover:brightness-105'
                   )}
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  loading="lazy"
+                  priority={index < 2}
                 />
               )}
             </div>
