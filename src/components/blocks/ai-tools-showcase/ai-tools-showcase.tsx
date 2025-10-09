@@ -235,15 +235,18 @@ function ToolRow({ tool, index }: ToolRowProps) {
                   )}
                 </>
               ) : (
-                <img
+                <Image
                   src={tool.demoImage}
                   alt={tool.demoImageAlt}
+                  fill
                   className={cn(
-                    'w-full h-full object-cover',
+                    'object-cover',
                     'transition-all duration-700 ease-out',
                     'group-hover:scale-110',
                     'group-hover:brightness-105'
                   )}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  loading="lazy"
                 />
               )}
             </div>
