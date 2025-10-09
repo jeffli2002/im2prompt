@@ -18,8 +18,8 @@ export default async function RefundPage({ params }: RefundPageProps) {
 }
 
 function RefundPageContent() {
-  const effectiveDate = '2025-01-01';
-  const lastUpdated = '2025-01-01';
+  const effectiveDate = '2025-10-01';
+  const lastUpdated = '2025-10-01';
 
   const sectionsWithIcons = [
     {

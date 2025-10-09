@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { setRequestLocale } from 'next-intl/server';
+import { paymentConfig } from '@/config';
 import { 
   ArrowLeft, 
   FileText, 
@@ -51,7 +52,8 @@ export default async function TermsPage({ params }: TermsPageProps) {
 }
 
 function TermsPageContent() {
-  const effectiveDate = '2025-01-01';
+  const effectiveDate = '2025-10-01';
+  const plans = paymentConfig.plans;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
@@ -208,36 +210,26 @@ function TermsPageContent() {
               <div>
                 <h3 className="text-xl font-medium text-foreground mb-4">4.1 Available Plans</h3>
                 <div className="grid md:grid-cols-3 gap-4">
-                  <div className="border border-border rounded-lg p-4">
-                    <h4 className="text-lg font-medium text-foreground mb-2">Free Plan</h4>
-                    <p className="text-sm font-medium text-foreground mb-2">$0/forever</p>
-                    <ul className="space-y-1 text-sm text-muted-foreground">
-                      <li>✓ 3 images + 1 video per day</li>
-                      <li>✓ Basic AI models</li>
-                      <li>✓ Email support</li>
-                      <li>✓ Personal use only</li>
-                    </ul>
-                  </div>
-                  <div className="border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30 rounded-lg p-4">
-                    <h4 className="text-lg font-medium text-foreground mb-2">Pro Plan</h4>
-                    <p className="text-sm font-medium text-foreground mb-2">$16.99/month</p>
-                    <ul className="space-y-1 text-sm text-muted-foreground">
-                      <li>✓ 100 images + 30 videos/month</li>
-                      <li>✓ All AI models</li>
-                      <li>✓ Priority support</li>
-                      <li>✓ Commercial usage rights</li>
-                    </ul>
-                  </div>
-                  <div className="border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/30 rounded-lg p-4">
-                    <h4 className="text-lg font-medium text-foreground mb-2">Pro+ Plan</h4>
-                    <p className="text-sm font-medium text-foreground mb-2">$29.99/month</p>
-                    <ul className="space-y-1 text-sm text-muted-foreground">
-                      <li>✓ 200 images + 60 videos/month</li>
-                      <li>✓ Full commercial license</li>
-                      <li>✓ Dedicated support</li>
-                      <li>✓ API access</li>
-                    </ul>
-                  </div>
+                  {plans.map((plan, index) => {
+                    const isFree = plan.id === 'free';
+                    const isPro = plan.id === 'pro';
+                    const isProPlus = plan.id === 'proplus';
+                    const borderColor = isFree ? 'border-border' : isPro ? 'border-blue-200 dark:border-blue-800' : 'border-purple-200 dark:border-purple-800';
+                    const bgColor = isFree ? '' : isPro ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-purple-50 dark:bg-purple-950/30';
+                    const priceDisplay = isFree ? '$0/forever' : `$${plan.price}/month`;
+                    
+                    return (
+                      <div key={plan.id} className={`border ${borderColor} ${bgColor} rounded-lg p-4`}>
+                        <h4 className="text-lg font-medium text-foreground mb-2">{plan.name} Plan</h4>
+                        <p className="text-sm font-medium text-foreground mb-2">{priceDisplay}</p>
+                        <ul className="space-y-1 text-sm text-muted-foreground">
+                          {plan.features.map((feature, idx) => (
+                            <li key={idx}>✓ {feature}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 

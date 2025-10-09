@@ -57,21 +57,6 @@ const FinalCTA = () => {
             </Button>
           </div>
 
-          {/* Trust badges */}
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-yellow-500" />
-              <span>No credit card required</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-green-500" />
-              <span>20 free extractions/month</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-blue-500" />
-              <span>Cancel anytime</span>
-            </div>
-          </div>
         </div>
       </div>
     </section>

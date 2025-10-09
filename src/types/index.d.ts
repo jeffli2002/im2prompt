@@ -236,7 +236,6 @@ export interface PaymentPlan {
   popular?: boolean;
   metadata?: Record<string, string>;
   limits?: {
-    storage?: number; // in GB
     users?: number;
     projects?: number;
     apiCalls?: number;
