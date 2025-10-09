@@ -564,22 +564,22 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
 
           {/* Right Column - Video Preview */}
           <div className="lg:sticky lg:top-24 lg:h-fit">
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
               {!result && (
-                <div className="aspect-video bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl flex items-center justify-center">
+                <div className="aspect-video bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl flex items-center justify-center">
                   <div className="text-center space-y-3">
-                    <Video className="w-16 h-16 mx-auto text-purple-300" />
+                    <Video className="w-16 h-16 mx-auto text-purple-300 dark:text-purple-400" />
                     <p className="text-sm font-light text-gray-500 dark:text-gray-400">Your generated video will appear here</p>
                   </div>
                 </div>
               )}
 
               {result?.status === 'generating' && (
-                <div className="aspect-video bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl flex items-center justify-center">
+                <div className="aspect-video bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl flex items-center justify-center">
                   <div className="text-center space-y-4">
-                    <Loader2 className="w-12 h-12 animate-spin mx-auto text-purple-600" />
-                    <p className="text-base font-light text-gray-700">Generating your video...</p>
-                    <p className="text-xs font-light text-gray-500">This may take a few minutes</p>
+                    <Loader2 className="w-12 h-12 animate-spin mx-auto text-purple-600 dark:text-purple-400" />
+                    <p className="text-base font-light text-gray-700 dark:text-gray-300">Generating your video...</p>
+                    <p className="text-xs font-light text-gray-500 dark:text-gray-400">This may take a few minutes</p>
                   </div>
                 </div>
               )}
@@ -641,8 +641,8 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
                         {result.error?.toLowerCase().includes('face') || 
                          result.error?.toLowerCase().includes('people') || 
                          result.error?.toLowerCase().includes('person')
-                          ? '🚫 图片被阻止 / Image Blocked'
-                          : '❌ 生成失败 / Generation Failed'}
+                          ? '🚫 Image Blocked'
+                          : '❌ Generation Failed'}
                       </p>
                       <p className={`text-sm font-light mb-3 ${
                         result.error?.toLowerCase().includes('face') || 
@@ -657,14 +657,14 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
                       {(result.error?.toLowerCase().includes('face') || 
                         result.error?.toLowerCase().includes('people') || 
                         result.error?.toLowerCase().includes('person')) && (
-                        <div className="bg-white/70 rounded-lg p-3 text-xs">
-                          <p className="font-medium text-amber-900 mb-2">💡 建议使用的图片类型：</p>
-                          <ul className="space-y-1 text-amber-800">
-                            <li>✓ 风景照片（山、海、天空）</li>
-                            <li>✓ 建筑物和城市景观</li>
-                            <li>✓ 物品和产品照片</li>
-                            <li>✓ 动物照片（不含人物）</li>
-                            <li>✓ 抽象艺术和图案</li>
+                        <div className="bg-white/70 dark:bg-gray-800/70 rounded-lg p-3 text-xs">
+                          <p className="font-medium text-amber-900 dark:text-amber-100 mb-2">💡 Recommended Image Types:</p>
+                          <ul className="space-y-1 text-amber-800 dark:text-amber-200">
+                            <li>✓ Landscapes (mountains, ocean, sky)</li>
+                            <li>✓ Buildings and cityscapes</li>
+                            <li>✓ Objects and product photos</li>
+                            <li>✓ Animal photos (without people)</li>
+                            <li>✓ Abstract art and patterns</li>
                           </ul>
                         </div>
                       )}
