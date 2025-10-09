@@ -95,7 +95,7 @@ const Hero = ({
             <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
               Your All-in-One AI Creation Flow — From{' '}
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Text & Image to Prompt, Image, and Video
+                Text to Prompt, Image, and Video
               </span>
             </span>
           </h1>

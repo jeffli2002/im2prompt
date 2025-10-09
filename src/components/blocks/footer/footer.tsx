@@ -45,6 +45,7 @@ const defaultSections = [
   {
     title: 'Resources',
     links: [
+      { name: 'Templates', href: '/prompt-library' },
       { name: 'Blog', href: '/blog' },
       { name: 'Pricing', href: '#pricing' },
       { name: 'Contact Us', href: 'mailto:support@im2prompt.com' },

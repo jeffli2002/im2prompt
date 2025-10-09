@@ -64,6 +64,10 @@ export const navbarConfig: NavbarConfig = {
         ],
       },
       {
+        title: 'menu.promptLibrary', // i18n key
+        url: '/prompt-library' // Will be prefixed with locale in hook
+      },
+      {
         title: 'menu.blog', // i18n key
         url: '/blog' // Will be prefixed with locale in hook
       },

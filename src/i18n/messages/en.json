@@ -274,6 +274,7 @@
       "tools": "Tools",
       "pricing": "Pricing",
       "resources": "Resources",
+      "promptLibrary": "Templates",
       "imageToPrompt": "Image to Prompt",
       "imageToPromptDescription": "Convert images to AI prompts",
       "textToPrompt": "Text to Prompt",
@@ -459,5 +460,53 @@
     "description": "Explore our carefully designed component collection, each optimized for direct use in your projects",
     "viewComponents": "View components",
     "backToBlocks": "Back to Blocks"
+  },
+  "promptLibrary": {
+    "title": "AI Prompt Library",
+    "description": "Explore curated prompt examples with AI-generated images",
+    "subtitle": "Get inspired by 50+ professional AI prompts across 6 categories",
+    "categories": {
+      "all": "All Categories",
+      "peoplePortraits": "People & Portraits",
+      "peoplePortraitsDesc": "Professional portraits, character designs, and human-focused prompts",
+      "animalsWildlife": "Animals & Wildlife",
+      "animalsWildlifeDesc": "Wildlife photography, pet portraits, and creature designs",
+      "sceneryEnvironment": "Scenery & Environment",
+      "sceneryEnvironmentDesc": "Landscapes, cityscapes, and environmental scenes",
+      "objectsProducts": "Objects & Products",
+      "objectsProductsDesc": "Product photography and object-focused compositions",
+      "scienceEduTech": "Science, Education & Technology",
+      "scienceEduTechDesc": "Scientific visualizations, educational diagrams, and tech concepts",
+      "fashionLifestyle": "Fashion, Lifestyle & Aesthetic Design",
+      "fashionLifestyleDesc": "Fashion photography, lifestyle scenes, and aesthetic designs"
+    },
+    "filters": {
+      "search": "Search prompts...",
+      "model": "AI Model",
+      "allModels": "All Models"
+    },
+    "actions": {
+      "copyPrompt": "Copy Prompt",
+      "viewDetails": "View Details",
+      "useThisPrompt": "Use This Prompt",
+      "copied": "Copied!",
+      "backToLibrary": "Back to Library",
+      "exploreCategory": "Explore Category",
+      "viewAllPrompts": "View All Prompts"
+    },
+    "showcase": {
+      "title": "Get Inspired by Our Prompt Library",
+      "description": "Explore 50+ curated prompt examples across 6 categories. Copy and use instantly to create stunning AI-generated images.",
+      "viewLibrary": "Browse Prompt Library"
+    },
+    "prompts": {
+      "total": "{count} prompts",
+      "featured": "Featured",
+      "new": "New"
+    },
+    "empty": {
+      "title": "No prompts found",
+      "description": "Try adjusting your filters or search terms"
+    }
   }
 }
