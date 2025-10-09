@@ -39,6 +39,42 @@ interface QuotaUsageData {
     limit: number;
     isUnlimited: boolean;
   };
+  imageGeneration?: {
+    daily: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+    monthly: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+  };
+  videoGeneration?: {
+    daily: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+    monthly: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+  };
+  imageExtraction?: {
+    daily: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+    monthly: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+  };
 }
 
 export function UsagePage() {
@@ -166,26 +202,28 @@ export function UsagePage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {quotaUsage?.apiCalls && (
-          <Card>
+      {/* Daily & Monthly Quota Usage Section */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {/* Image Generation - Daily */}
+        {quotaUsage?.imageGeneration && (
+          <Card className="border-l-4 border-l-blue-500">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImageIcon className="h-5 w-5" />
-                Image-to-Text Usage
+              <CardTitle className="flex items-center gap-2 text-base">
+                <ImageIcon className="h-5 w-5 text-blue-500" />
+                Images (Daily)
               </CardTitle>
-              <CardDescription>Monthly extraction quota</CardDescription>
+              <CardDescription>Today's generation limit</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Used</span>
                 <span className="text-sm font-medium">
-                  {quotaUsage.apiCalls.used || 0} / {quotaUsage.apiCalls.isUnlimited ? '∞' : quotaUsage.apiCalls.limit || 0}
+                  {quotaUsage.imageGeneration.daily.used || 0} / {quotaUsage.imageGeneration.daily.isUnlimited ? '∞' : quotaUsage.imageGeneration.daily.limit || 0}
                 </span>
               </div>
-              {!quotaUsage.apiCalls.isUnlimited && (
+              {!quotaUsage.imageGeneration.daily.isUnlimited && (
                 <Progress 
-                  value={((quotaUsage.apiCalls.used || 0) / (quotaUsage.apiCalls.limit || 1)) * 100} 
+                  value={((quotaUsage.imageGeneration.daily.used || 0) / (quotaUsage.imageGeneration.daily.limit || 1)) * 100} 
                   className="h-2"
                 />
               )}
@@ -193,29 +231,113 @@ export function UsagePage() {
           </Card>
         )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Video className="h-5 w-5" />
-              Storage Usage
-            </CardTitle>
-            <CardDescription>Monthly storage quota</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Used</span>
-              <span className="text-sm font-medium">
-                {formatBytes(quotaUsage?.storage.used || 0)} / {quotaUsage?.storage.isUnlimited ? '∞' : formatBytes(quotaUsage?.storage.limit || 0)}
-              </span>
-            </div>
-            {!quotaUsage?.storage.isUnlimited && (
-              <Progress 
-                value={((quotaUsage?.storage.used || 0) / (quotaUsage?.storage.limit || 1)) * 100} 
-                className="h-2"
-              />
-            )}
-          </CardContent>
-        </Card>
+        {/* Image Generation - Monthly */}
+        {quotaUsage?.imageGeneration && (
+          <Card className="border-l-4 border-l-indigo-500">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <ImageIcon className="h-5 w-5 text-indigo-500" />
+                Images (Monthly)
+              </CardTitle>
+              <CardDescription>This month's generation limit</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Used</span>
+                <span className="text-sm font-medium">
+                  {quotaUsage.imageGeneration.monthly.used || 0} / {quotaUsage.imageGeneration.monthly.isUnlimited ? '∞' : quotaUsage.imageGeneration.monthly.limit || 0}
+                </span>
+              </div>
+              {!quotaUsage.imageGeneration.monthly.isUnlimited && (
+                <Progress 
+                  value={((quotaUsage.imageGeneration.monthly.used || 0) / (quotaUsage.imageGeneration.monthly.limit || 1)) * 100} 
+                  className="h-2"
+                />
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Video Generation - Daily */}
+        {quotaUsage?.videoGeneration && (
+          <Card className="border-l-4 border-l-purple-500">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Video className="h-5 w-5 text-purple-500" />
+                Videos (Daily)
+              </CardTitle>
+              <CardDescription>Today's generation limit</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Used</span>
+                <span className="text-sm font-medium">
+                  {quotaUsage.videoGeneration.daily.used || 0} / {quotaUsage.videoGeneration.daily.isUnlimited ? '∞' : quotaUsage.videoGeneration.daily.limit || 0}
+                </span>
+              </div>
+              {!quotaUsage.videoGeneration.daily.isUnlimited && (
+                <Progress 
+                  value={((quotaUsage.videoGeneration.daily.used || 0) / (quotaUsage.videoGeneration.daily.limit || 1)) * 100} 
+                  className="h-2"
+                />
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Video Generation - Monthly */}
+        {quotaUsage?.videoGeneration && (
+          <Card className="border-l-4 border-l-pink-500">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Video className="h-5 w-5 text-pink-500" />
+                Videos (Monthly)
+              </CardTitle>
+              <CardDescription>This month's generation limit</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Used</span>
+                <span className="text-sm font-medium">
+                  {quotaUsage.videoGeneration.monthly.used || 0} / {quotaUsage.videoGeneration.monthly.isUnlimited ? '∞' : quotaUsage.videoGeneration.monthly.limit || 0}
+                </span>
+              </div>
+              {!quotaUsage.videoGeneration.monthly.isUnlimited && (
+                <Progress 
+                  value={((quotaUsage.videoGeneration.monthly.used || 0) / (quotaUsage.videoGeneration.monthly.limit || 1)) * 100} 
+                  className="h-2"
+                />
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Image Extraction - Monthly */}
+        {quotaUsage?.imageExtraction && (
+          <Card className="border-l-4 border-l-green-500">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <ImageIcon className="h-5 w-5 text-green-500" />
+                Image-to-Prompt
+              </CardTitle>
+              <CardDescription>Monthly extraction quota</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Used</span>
+                <span className="text-sm font-medium">
+                  {quotaUsage.imageExtraction.monthly.used || 0} / {quotaUsage.imageExtraction.monthly.isUnlimited ? '∞' : quotaUsage.imageExtraction.monthly.limit || 0}
+                </span>
+              </div>
+              {!quotaUsage.imageExtraction.monthly.isUnlimited && (
+                <Progress 
+                  value={((quotaUsage.imageExtraction.monthly.used || 0) / (quotaUsage.imageExtraction.monthly.limit || 1)) * 100} 
+                  className="h-2"
+                />
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <Card>

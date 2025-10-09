@@ -3,7 +3,7 @@ import db from '@/server/db';
 import { userQuotaUsage } from '@/server/db/schema';
 import { v4 as uuidv4 } from 'uuid';
 
-export type QuotaService = 'api_call' | 'storage' | 'custom';
+export type QuotaService = 'api_call' | 'storage' | 'custom' | 'image_generation' | 'video_generation' | 'image_extraction';
 
 export interface UpdateQuotaUsageParams {
   userId: string;
@@ -23,11 +23,19 @@ export interface QuotaUsageRecord {
 }
 
 /**
- * Get current period in YYYY-MM format
+ * Get current period in YYYY-MM format (for monthly tracking)
  */
 function getCurrentPeriod(): string {
   const date = new Date();
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/**
+ * Get current period in YYYY-MM-DD format (for daily tracking)
+ */
+function getCurrentDailyPeriod(): string {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
 /**
@@ -154,7 +162,7 @@ export async function initializeQuotaUsage(
   userId: string,
   period: string = getCurrentPeriod()
 ): Promise<QuotaUsageRecord[]> {
-  const services = ['api_call', 'storage'] as const;
+  const services = ['api_call', 'storage', 'image_generation', 'video_generation', 'image_extraction'] as const;
   const records = [];
 
   try {
@@ -202,6 +210,27 @@ export const quotaService = {
   trackStorageUsage: (userId: string, bytes: number) => 
     updateQuotaUsage({ userId, service: 'storage', amount: bytes }),
 
+  // Image generation tracking
+  trackImageGeneration: (userId: string, count = 1) => 
+    updateQuotaUsage({ userId, service: 'image_generation', amount: count }),
+  
+  trackImageGenerationDaily: (userId: string, count = 1) => 
+    updateQuotaUsage({ userId, service: 'image_generation', amount: count, period: getCurrentDailyPeriod() }),
+
+  // Video generation tracking
+  trackVideoGeneration: (userId: string, count = 1) => 
+    updateQuotaUsage({ userId, service: 'video_generation', amount: count }),
+  
+  trackVideoGenerationDaily: (userId: string, count = 1) => 
+    updateQuotaUsage({ userId, service: 'video_generation', amount: count, period: getCurrentDailyPeriod() }),
+
+  // Image extraction tracking
+  trackImageExtraction: (userId: string, count = 1) => 
+    updateQuotaUsage({ userId, service: 'image_extraction', amount: count }),
+  
+  trackImageExtractionDaily: (userId: string, count = 1) => 
+    updateQuotaUsage({ userId, service: 'image_extraction', amount: count, period: getCurrentDailyPeriod() }),
+
   // Get current usage
   getCurrentUsage: (userId: string) => getQuotaUsageByPeriod(userId),
   
@@ -211,6 +240,25 @@ export const quotaService = {
     
   getStorageUsage: (userId: string, period?: string) => 
     getQuotaUsageByService(userId, 'storage', period),
+
+  getImageGenerationUsage: (userId: string, period?: string) => 
+    getQuotaUsageByService(userId, 'image_generation', period),
+  
+  getVideoGenerationUsage: (userId: string, period?: string) => 
+    getQuotaUsageByService(userId, 'video_generation', period),
+  
+  getImageExtractionUsage: (userId: string, period?: string) => 
+    getQuotaUsageByService(userId, 'image_extraction', period),
+
+  // Get daily usage
+  getDailyImageGeneration: (userId: string) => 
+    getQuotaUsageByService(userId, 'image_generation', getCurrentDailyPeriod()),
+  
+  getDailyVideoGeneration: (userId: string) => 
+    getQuotaUsageByService(userId, 'video_generation', getCurrentDailyPeriod()),
+  
+  getDailyImageExtraction: (userId: string) => 
+    getQuotaUsageByService(userId, 'image_extraction', getCurrentDailyPeriod()),
 
   // Initialize for new users
   initializeForUser: (userId: string) => initializeQuotaUsage(userId),

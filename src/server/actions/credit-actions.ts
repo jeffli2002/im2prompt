@@ -32,6 +32,42 @@ export interface GetQuotaUsageResponse {
     limit: number; // in bytes
     isUnlimited: boolean;
   };
+  imageGeneration?: {
+    daily: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+    monthly: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+  };
+  videoGeneration?: {
+    daily: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+    monthly: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+  };
+  imageExtraction?: {
+    daily: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+    monthly: {
+      used: number;
+      limit: number;
+      isUnlimited: boolean;
+    };
+  };
 }
 
 /**
@@ -107,7 +143,7 @@ export async function getCreditHistory(
 }
 
 /**
- * Get user's quota usage for current month
+ * Get user's quota usage for current month and day
  */
 export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageResponse>> {
   try {
@@ -122,15 +158,16 @@ export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageRespons
       };
     }
 
-    // Get current period (YYYY-MM format)
+    // Get current periods
     const currentDate = new Date();
     const currentPeriod = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+    const currentDailyPeriod = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
 
     // Get user's current subscription to determine limits
     const subscription = await paymentRepository.findActiveSubscriptionByUserId(session.user.id);
     
-    // Get actual usage from database
-    const usageRecords = await db.select({
+    // Get monthly usage records
+    const monthlyUsageRecords = await db.select({
       service: userQuotaUsage.service,
       usedAmount: userQuotaUsage.usedAmount,
     }).from(userQuotaUsage)
@@ -139,32 +176,46 @@ export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageRespons
       eq(userQuotaUsage.period, currentPeriod)
     ));
 
+    // Get daily usage records
+    const dailyUsageRecords = await db.select({
+      service: userQuotaUsage.service,
+      usedAmount: userQuotaUsage.usedAmount,
+    }).from(userQuotaUsage)
+    .where(and(
+      eq(userQuotaUsage.userId, session.user.id),
+      eq(userQuotaUsage.period, currentDailyPeriod)
+    ));
+
     // Extract usage data
-    // API calls not supported at this moment
-    // const apiCallUsage = usageRecords.find(record => record.service === 'api_call')?.usedAmount || 0;
-    const storageUsage = usageRecords.find(record => record.service === 'storage')?.usedAmount || 0;
+    const storageUsage = monthlyUsageRecords.find(record => record.service === 'storage')?.usedAmount || 0;
+    const monthlyImageGenUsage = monthlyUsageRecords.find(record => record.service === 'image_generation')?.usedAmount || 0;
+    const monthlyVideoGenUsage = monthlyUsageRecords.find(record => record.service === 'video_generation')?.usedAmount || 0;
+    const monthlyImageExtUsage = monthlyUsageRecords.find(record => record.service === 'image_extraction')?.usedAmount || 0;
+    const dailyImageGenUsage = dailyUsageRecords.find(record => record.service === 'image_generation')?.usedAmount || 0;
+    const dailyVideoGenUsage = dailyUsageRecords.find(record => record.service === 'video_generation')?.usedAmount || 0;
+    const dailyImageExtUsage = dailyUsageRecords.find(record => record.service === 'image_extraction')?.usedAmount || 0;
     
-    // Determine limits based on subscription
-    // API calls not supported at this moment
-    // const baseApiCallLimit = creditsConfig.freeUser.apiCall.freeQuotaCalls;
-    const baseStorageLimit = creditsConfig.freeUser.storage.freeQuotaGB * 1024 * 1024 * 1024; // Convert GB to bytes
+    // Get limits from payment config
+    const { paymentConfig } = await import('@/config');
+    const userPlan = subscription 
+      ? paymentConfig.plans.find(p => p.stripePriceIds?.monthly === subscription.priceId || p.stripePriceIds?.yearly === subscription.priceId)
+      : paymentConfig.plans.find(p => p.id === 'free');
     
-    // let apiCallLimit = baseApiCallLimit;
+    const planLimits = userPlan?.limits || paymentConfig.plans[0].limits!; // Default to free plan
+    
+    // Determine limits
+    const baseStorageLimit = creditsConfig.freeUser.storage.freeQuotaGB * 1024 * 1024 * 1024;
     let storageLimit = baseStorageLimit;
-    // const isApiUnlimited = false;
     let isStorageUnlimited = false;
 
     if (subscription) {
-      // User has an active subscription, get limits from payment config
       switch (subscription.priceId) {
         case process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY:
         case process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY:
-          // apiCallLimit = 10000;
-          storageLimit = 10 * 1024 * 1024 * 1024; // 10GB
+          storageLimit = 10 * 1024 * 1024 * 1024;
           break;
         case process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE_MONTHLY:
         case process.env.NEXT_PUBLIC_STRIPE_PRICE_ENTERPRISE_YEARLY:
-          // apiCallLimit = 100000;
           isStorageUnlimited = true;
           break;
       }
@@ -173,16 +224,46 @@ export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageRespons
     return {
       success: true,
       data: {
-        // API calls not supported at this moment
-        // apiCalls: {
-        //   used: apiCallUsage,
-        //   limit: apiCallLimit,
-        //   isUnlimited: isApiUnlimited,
-        // },
         storage: {
           used: storageUsage,
           limit: storageLimit,
           isUnlimited: isStorageUnlimited,
+        },
+        imageGeneration: {
+          daily: {
+            used: dailyImageGenUsage,
+            limit: planLimits.dailyImages || 0,
+            isUnlimited: (planLimits.dailyImages || 0) === -1,
+          },
+          monthly: {
+            used: monthlyImageGenUsage,
+            limit: planLimits.images || 0,
+            isUnlimited: (planLimits.images || 0) === -1,
+          },
+        },
+        videoGeneration: {
+          daily: {
+            used: dailyVideoGenUsage,
+            limit: planLimits.dailyVideos || 0,
+            isUnlimited: (planLimits.dailyVideos || 0) === -1,
+          },
+          monthly: {
+            used: monthlyVideoGenUsage,
+            limit: planLimits.videos || 0,
+            isUnlimited: (planLimits.videos || 0) === -1,
+          },
+        },
+        imageExtraction: {
+          daily: {
+            used: dailyImageExtUsage,
+            limit: planLimits.extractions || 0,
+            isUnlimited: (planLimits.extractions || 0) === -1,
+          },
+          monthly: {
+            used: monthlyImageExtUsage,
+            limit: planLimits.extractions || 0,
+            isUnlimited: (planLimits.extractions || 0) === -1,
+          },
         },
       },
     };

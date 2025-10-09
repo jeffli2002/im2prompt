@@ -172,7 +172,7 @@ export const userQuotaUsage = pgTable('user_quota_usage', {
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   service: text('service', { 
-    enum: ['api_call', 'storage', 'custom'] 
+    enum: ['api_call', 'storage', 'custom', 'image_generation', 'video_generation', 'image_extraction'] 
   }).notNull(),
   period: text('period').notNull(), // Format: YYYY-MM
   usedAmount: integer('used_amount').notNull().default(0),
