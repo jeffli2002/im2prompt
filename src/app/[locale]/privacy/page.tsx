@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { setRequestLocale } from 'next-intl/server';
 import { ArrowLeft, Shield, Database, Share2, Lock, Cookie, UserCheck, RefreshCw, Mail, FileText, Server, Baby, Eye, Globe, Clock, MapPin, CreditCard, Image, Zap } from 'lucide-react';
 import Link from 'next/link';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 
 interface PrivacyPageProps {
   params: Promise<{ locale: string }>;
