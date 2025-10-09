@@ -84,7 +84,7 @@ export function AIToolsIntro() {
       description: 'Create cinematic motion with Sora 2. Transform your ideas into stunning videos with AI-powered video generation.',
       ctaText: 'Generate Video',
       href: '/text-to-video',
-      demoImage: '/images/demos/text-to-video-demo.jpg',
+      demoImage: '/images/text2video.mp4',
       demoImageAlt: 'Text to Video demonstration - Sora 2 generated video frame',
       imagePosition: 'right' as const,
       badge: 'New',
@@ -235,18 +235,15 @@ function ToolRow({ tool, index }: ToolRowProps) {
                   )}
                 </>
               ) : (
-                <Image
+                <img
                   src={tool.demoImage}
                   alt={tool.demoImageAlt}
-                  fill
                   className={cn(
-                    'object-cover',
+                    'w-full h-full object-cover',
                     'transition-all duration-700 ease-out',
                     'group-hover:scale-110',
                     'group-hover:brightness-105'
                   )}
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority={index < 2}
                 />
               )}
             </div>
