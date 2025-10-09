@@ -56,7 +56,7 @@ export function AIToolsIntro() {
       href: '/image-to-prompt',
       demoImage: '/images/img2prompt.png',
       demoImageAlt: 'Image to Prompt demonstration - upload an image and get AI-generated prompts',
-      imagePosition: 'left', // Image on left, text on right
+      imagePosition: 'left' as const,
     },
     {
       id: 'text-to-prompt',
@@ -66,7 +66,7 @@ export function AIToolsIntro() {
       href: '/text-to-prompt',
       demoImage: '/images/text2prompt.png',
       demoImageAlt: 'Text to Prompt demonstration - enhance simple text into detailed AI prompts',
-      imagePosition: 'right', // Text on left, image on right
+      imagePosition: 'right' as const,
     },
     {
       id: 'text-to-image',
@@ -76,7 +76,7 @@ export function AIToolsIntro() {
       href: '/text-to-image',
       demoImage: '/images/prompt2imgv2.png',
       demoImageAlt: 'Text to Image demonstration - AI-generated image from prompt',
-      imagePosition: 'left', // Image on left, text on right
+      imagePosition: 'left' as const,
     },
     {
       id: 'text-to-video',
@@ -86,7 +86,7 @@ export function AIToolsIntro() {
       href: '/text-to-video',
       demoImage: '/images/demos/text-to-video-demo.jpg',
       demoImageAlt: 'Text to Video demonstration - Sora 2 generated video frame',
-      imagePosition: 'right', // Text on left, image on right
+      imagePosition: 'right' as const,
       badge: 'New',
       isVideo: true,
       videoPublicId: 'homepage-videos/text2video-demo',
