@@ -11,7 +11,7 @@ export function getPromptImageUrl(
   };
 
   const params = transformations[size];
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dvskpqqvv';
   
   return `https://res.cloudinary.com/${cloudName}/image/upload/w_${params.width},h_${params.height},c_${params.crop},q_${params.quality},f_auto/${cloudinaryPublicId}`;
 }
