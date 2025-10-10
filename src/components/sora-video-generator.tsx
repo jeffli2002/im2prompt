@@ -44,7 +44,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
 
   useEffect(() => {
     const latestVideo = getLatestVideo()
-    if (latestVideo) {
+    if (latestVideo && latestVideo.status === 'success') {
       setResult(latestVideo)
     }
   }, [])

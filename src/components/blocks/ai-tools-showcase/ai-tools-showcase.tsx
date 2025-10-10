@@ -74,7 +74,7 @@ export function AIToolsIntro() {
       description: 'Use Image Prompt to effortlessly generate stunning images, enhancing creativity and streamlining your design process with AI-powered precision.',
       ctaText: 'Generate Image Now!',
       href: '/text-to-image',
-      demoImage: 'https://res.cloudinary.com/dvskpqqvv/image/upload/homepage-demos/prompt2imgv2.png',
+      demoImage: 'https://res.cloudinary.com/dvskpqqvv/image/upload/v1760032048/homepage-demos/prompt2imgv2.png',
       demoImageAlt: 'Text to Image demonstration - AI-generated image from prompt',
       imagePosition: 'left' as const,
     },
