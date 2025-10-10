@@ -61,14 +61,6 @@ const aiModels: AIModel[] = [
     icon: <Video className="h-5 w-5" />,
     badge: 'NEW',
     gradient: 'from-red-500/20 to-orange-600/20'
-  },
-  {
-    id: 'veo3',
-    name: 'Veo3',
-    description: `Short-form video prompts (${creditsConfig.consumption.imageToPrompt.veo3} credits)`,
-    icon: <Video className="h-5 w-5" />,
-    badge: 'HOT',
-    gradient: 'from-green-500/20 to-emerald-600/20'
   }
 ];
 

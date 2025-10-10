@@ -10,7 +10,6 @@ export interface CreditsConfig {
       'stable-diffusion': number;
       flux: number;
       sora2: number;
-      veo3: number;
     };
     imageGeneration: {
       'nano-banana': number;
@@ -24,7 +23,6 @@ export interface CreditsConfig {
     };
     videoGeneration: {
       'sora-2': number;
-      veo3: number;
     };
     storage: {
       costPerGBPerMonth: number;
@@ -67,7 +65,6 @@ export const creditsConfig: CreditsConfig = {
       'stable-diffusion': 2,
       flux: 2,
       sora2: 2,
-      veo3: 2,
     },
     imageGeneration: {
       'nano-banana': 5,
@@ -81,7 +78,6 @@ export const creditsConfig: CreditsConfig = {
     },
     videoGeneration: {
       'sora-2': 15,
-      veo3: 15,
     },
     storage: {
       costPerGBPerMonth: 10,
