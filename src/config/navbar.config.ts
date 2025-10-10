@@ -71,12 +71,11 @@ export const navbarConfig: NavbarConfig = {
         title: 'menu.blog', // i18n key
         url: '/blog' // Will be prefixed with locale in hook
       },
-      // Temporarily commented out pricing
-      // {
-      //   title: 'menu.pricing', // i18n key
-      //   url: '#pricing',
-      //   onClick: 'handlePricingClick', // Special handler
-      // },
+      {
+        title: 'menu.pricing', // i18n key
+        url: '#pricing',
+        onClick: 'handlePricingClick', // Special handler
+      },
     ],
   },
 };
