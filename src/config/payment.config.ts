@@ -12,6 +12,13 @@ export const paymentConfig: PaymentConfig = {
     apiVersion: '2025-06-30.basil',
   },
 
+  creem: {
+    apiKey: process.env.CREEM_API_KEY || '',
+    webhookSecret: process.env.CREEM_WEBHOOK_SECRET || '',
+    proProductKey: process.env.CREEM_PRO_PLAN_PRODUCT_KEY || '',
+    proplusProductKey: process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY || '',
+  },
+
   plans: [
     {
       id: 'free',
@@ -54,6 +61,10 @@ export const paymentConfig: PaymentConfig = {
         monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY || 'price_pro_monthly',
         yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY || 'price_pro_yearly',
       },
+      creemPriceIds: {
+        monthly: process.env.NEXT_PUBLIC_CREEM_PRICE_PRO_MONTHLY || '',
+        yearly: process.env.NEXT_PUBLIC_CREEM_PRICE_PRO_YEARLY || '',
+      },
       credits: {
         monthly: 500,
         onSubscribe: 0,
@@ -84,6 +95,10 @@ export const paymentConfig: PaymentConfig = {
       stripePriceIds: {
         monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PROPLUS_MONTHLY || 'price_proplus_monthly',
         yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PROPLUS_YEARLY || 'price_proplus_yearly',
+      },
+      creemPriceIds: {
+        monthly: process.env.NEXT_PUBLIC_CREEM_PRICE_PROPLUS_MONTHLY || '',
+        yearly: process.env.NEXT_PUBLIC_CREEM_PRICE_PROPLUS_YEARLY || '',
       },
       credits: {
         monthly: 900,
@@ -116,7 +131,7 @@ export const paymentConfig: PaymentConfig = {
 
   invoice: {
     footer: 'Thank you for your business! If you have any questions, please contact our support team.',
-    logo: '/logo.png',
+    logo: '/images/logo3.png',
     supportEmail: 'support@im2prompt.com',
   },
 

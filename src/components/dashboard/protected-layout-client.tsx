@@ -79,11 +79,11 @@ export function ProtectedLayoutClient({ children }: ProtectedLayoutClientProps) 
           href: '/settings/billing',
           icon: CreditCard,
         },
-        {
-          title: t('security'),
-          href: '/settings/security',
-          icon: Shield,
-        },
+        // {
+        //   title: t('security'),
+        //   href: '/settings/security',
+        //   icon: Shield,
+        // },
       ],
     });
 

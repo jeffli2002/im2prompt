@@ -79,18 +79,18 @@ export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: Protect
     >
       {/* Header */}
       <div className="flex h-16 items-center justify-between border-b px-4">
-        {!collapsed && (
+        {collapsed ? (
+          <img src="/images/logo3.png" alt="im2Prompt logo" className="h-8 w-8 rounded-lg" />
+        ) : (
           <div className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="font-bold text-primary-foreground text-sm">i2P</span>
-            </div>
+            <img src="/images/logo3.png" alt="im2Prompt logo" className="h-8 w-8 rounded-lg" />
             <Link href="/">
               <span className="font-semibold text-lg">im2Prompt</span>
             </Link>
           </div>
         )}
         <Button variant="ghost" size="icon" onClick={onToggle} className="h-8 w-8">
-          {collapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
       </div>
 
