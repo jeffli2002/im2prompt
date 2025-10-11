@@ -349,7 +349,7 @@ const Pricing = ({
         onClose={handleCancelPurchase}
         onConfirm={handleConfirmPurchase}
         planName={selectedPlan?.name}
-        isProcessing={isPending}
+        isProcessing={processingPlanId !== null}
       />
     </section>
   );
