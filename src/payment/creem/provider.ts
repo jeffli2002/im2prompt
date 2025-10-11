@@ -1,0 +1,287 @@
+import { creemConfig } from './client';
+import type {
+  PaymentProvider,
+  CreatePaymentParams,
+  CreateSubscriptionParams,
+  UpdateSubscriptionParams,
+  PaymentResult,
+  SubscriptionResult,
+  PaymentStatus,
+  CreemCheckoutParams,
+  CreemSubscriptionParams,
+} from '@/payment/types';
+import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { createHmac } from 'crypto';
+
+const creemErrorLogger = new ErrorLogger('creem-provider');
+
+export class CreemProvider implements PaymentProvider {
+  private apiKey: string;
+  private baseUrl = 'https://api.creem.io/v1';
+
+  constructor() {
+    this.apiKey = creemConfig.apiKey;
+  }
+
+  private async makeRequest<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    try {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        ...options,
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'makeRequest',
+        endpoint,
+        method: options.method || 'GET',
+      });
+      throw error;
+    }
+  }
+
+
+  async createPayment(params: CreatePaymentParams): Promise<PaymentResult> {
+    try {
+      const { userId, priceId, successUrl, cancelUrl, metadata } = params;
+
+      const requestBody: any = {
+        product_id: priceId,
+        success_url: successUrl || `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing?success=true`,
+        metadata: {
+          userId,
+          ...metadata,
+        },
+      };
+
+      if (metadata?.email) {
+        requestBody.customer = {
+          email: metadata.email,
+        };
+      }
+
+      const response = await this.makeRequest<{
+        checkout_url: string;
+        checkout_id: string;
+      }>('/checkouts', {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+      });
+
+      return {
+        id: response.checkout_id,
+        status: 'pending' as PaymentStatus,
+        url: response.checkout_url,
+        customerId: params.customerId || '',
+      };
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'createPayment',
+        userId: params.userId,
+        priceId: params.priceId,
+      });
+      throw error;
+    }
+  }
+
+  async createSubscription(params: CreateSubscriptionParams): Promise<SubscriptionResult> {
+    try {
+      const { userId, priceId, trialPeriodDays, metadata } = params;
+
+      const requestBody: any = {
+        product_id: priceId,
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing?success=true`,
+        metadata: {
+          userId,
+          ...metadata,
+        },
+      };
+
+      if (metadata?.email) {
+        requestBody.customer = {
+          email: metadata.email,
+        };
+      }
+
+      if (trialPeriodDays) {
+        requestBody.trial_period_days = trialPeriodDays;
+      }
+
+      const response = await this.makeRequest<{
+        checkout_url: string;
+        checkout_id: string;
+      }>('/checkouts', {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+      });
+
+      return {
+        id: response.checkout_id,
+        status: 'pending' as PaymentStatus,
+        url: response.checkout_url,
+        customerId: params.customerId || '',
+        priceId: params.priceId,
+        interval: null,
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(),
+      };
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'createSubscription',
+        userId: params.userId,
+        priceId: params.priceId,
+      });
+      throw error;
+    }
+  }
+
+  async updateSubscription(
+    subscriptionId: string,
+    params: UpdateSubscriptionParams
+  ): Promise<SubscriptionResult> {
+    try {
+      const { priceId, cancelAtPeriodEnd, metadata } = params;
+
+      const response = await this.makeRequest<{
+        id: string;
+        customerId: string;
+        priceId: string;
+        status: string;
+        interval: 'month' | 'year';
+        currentPeriodStart: number;
+        currentPeriodEnd: number;
+        trialStart?: number;
+        trialEnd?: number;
+        cancelAtPeriodEnd: boolean;
+      }>(`/subscriptions/${subscriptionId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          priceId,
+          cancelAtPeriodEnd,
+          metadata,
+        }),
+      });
+
+      return {
+        id: response.id,
+        status: response.status as PaymentStatus,
+        customerId: response.customerId,
+        priceId: response.priceId,
+        interval: response.interval,
+        currentPeriodStart: new Date(response.currentPeriodStart * 1000),
+        currentPeriodEnd: new Date(response.currentPeriodEnd * 1000),
+        periodStart: new Date(response.currentPeriodStart * 1000),
+        periodEnd: new Date(response.currentPeriodEnd * 1000),
+        trialStart: response.trialStart ? new Date(response.trialStart * 1000) : undefined,
+        trialEnd: response.trialEnd ? new Date(response.trialEnd * 1000) : undefined,
+        cancelAtPeriodEnd: response.cancelAtPeriodEnd,
+      };
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'updateSubscription',
+        subscriptionId,
+      });
+      throw new Error('Failed to update Creem subscription');
+    }
+  }
+
+  async cancelSubscription(subscriptionId: string): Promise<boolean> {
+    try {
+      await this.makeRequest(`/subscriptions/${subscriptionId}`, {
+        method: 'DELETE',
+      });
+      return true;
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'cancelSubscription',
+        subscriptionId,
+      });
+      return false;
+    }
+  }
+
+  async getSubscription(subscriptionId: string): Promise<SubscriptionResult | null> {
+    try {
+      const response = await this.makeRequest<{
+        id: string;
+        customerId: string;
+        priceId: string;
+        status: string;
+        interval: 'month' | 'year';
+        currentPeriodStart: number;
+        currentPeriodEnd: number;
+        trialStart?: number;
+        trialEnd?: number;
+        cancelAtPeriodEnd: boolean;
+      }>(`/subscriptions/${subscriptionId}`);
+
+      return {
+        id: response.id,
+        status: response.status as PaymentStatus,
+        customerId: response.customerId,
+        priceId: response.priceId,
+        interval: response.interval,
+        currentPeriodStart: new Date(response.currentPeriodStart * 1000),
+        currentPeriodEnd: new Date(response.currentPeriodEnd * 1000),
+        periodStart: new Date(response.currentPeriodStart * 1000),
+        periodEnd: new Date(response.currentPeriodEnd * 1000),
+        trialStart: response.trialStart ? new Date(response.trialStart * 1000) : undefined,
+        trialEnd: response.trialEnd ? new Date(response.trialEnd * 1000) : undefined,
+        cancelAtPeriodEnd: response.cancelAtPeriodEnd,
+      };
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'getSubscription',
+        subscriptionId,
+      });
+      return null;
+    }
+  }
+
+  async getPaymentStatus(paymentId: string): Promise<PaymentStatus> {
+    try {
+      const response = await this.makeRequest<{ status: string }>(
+        `/payments/${paymentId}`
+      );
+      return response.status as PaymentStatus;
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'getPaymentStatus',
+        paymentId,
+      });
+      throw new Error('Failed to get payment status');
+    }
+  }
+
+  async verifyWebhook(payload: string, signature: string): Promise<boolean> {
+    try {
+      const expectedSignature = createHmac('sha256', creemConfig.webhookSecret)
+        .update(payload)
+        .digest('hex');
+      
+      return signature === expectedSignature;
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'verifyWebhook',
+      });
+      return false;
+    }
+  }
+
+  constructWebhookEvent(payload: string): any {
+    return JSON.parse(payload);
+  }
+}

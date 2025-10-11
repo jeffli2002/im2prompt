@@ -142,3 +142,5 @@ Video Generation 功能已完全恢复：
 5. 测试基本的视频生成流程
 
 Video Generation 功能现在已完全恢复并可以正常使用！🎬✨
+
+

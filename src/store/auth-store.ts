@@ -314,6 +314,27 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true });
           const previousUser = get().user;
 
+          // Check if auth is disabled via environment variable
+          if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
+            const mockUser: User = {
+              id: 'dev-user',
+              email: 'dev@example.com',
+              name: 'Dev User',
+              emailVerified: true,
+              image: null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+            set({
+              user: mockUser,
+              isAuthenticated: true,
+              isLoading: false,
+              isInitialized: true,
+              lastUpdated: Date.now(),
+            });
+            return;
+          }
+
           try {
             // Always check server session to ensure consistency
             const session = await authClient.getSession();

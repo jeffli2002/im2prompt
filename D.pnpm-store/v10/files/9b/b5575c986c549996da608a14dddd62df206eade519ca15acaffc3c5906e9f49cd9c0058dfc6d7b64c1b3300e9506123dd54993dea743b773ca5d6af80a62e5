@@ -1,0 +1,18 @@
+import { a as RuntimeAsync } from '../types-Dk7DhSKZ.js';
+import { L as LoadedConfig } from '../types-DvTNxAvo.js';
+import '@standard-schema/spec';
+import 'fumadocs-core/source';
+import 'mdx/types';
+import 'fumadocs-core/mdx-plugins';
+import 'fumadocs-core/server';
+import '@mdx-js/mdx';
+import 'unified';
+import 'react';
+import 'zod';
+import '@fumadocs/mdx-remote';
+
+declare function buildConfig(config: Record<string, unknown>): [err: string, value: null] | [err: null, value: LoadedConfig];
+
+declare const _runtimeAsync: RuntimeAsync;
+
+export { _runtimeAsync, buildConfig };

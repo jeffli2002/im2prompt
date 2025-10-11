@@ -1,0 +1,77 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Fragment, useMemo } from 'react';
+import { getLinks } from '../layouts/shared.js';
+import { Sidebar, SidebarCollapseTrigger, SidebarFooter, SidebarHeader, SidebarPageTree, SidebarViewport, } from '../components/layout/sidebar.js';
+import { TreeContextProvider } from '../contexts/tree.js';
+import { cn } from '../utils/cn.js';
+import { buttonVariants } from '../components/ui/button.js';
+import { ChevronDown, Languages, Sidebar as SidebarIcon } from '../icons.js';
+import { BaseLinkItem } from '../layouts/links.js';
+import { LanguageToggle } from '../components/layout/language-toggle.js';
+import { ThemeToggle } from '../components/layout/theme-toggle.js';
+import { Popover, PopoverContent, PopoverTrigger, } from '../components/ui/popover.js';
+import { getSidebarTabsFromOptions, SidebarLinkItem, } from '../layouts/docs/shared.js';
+import { LayoutBody, LayoutTabs, Navbar, NavbarSidebarTrigger, } from './notebook-client.js';
+import { NavProvider } from '../contexts/layout.js';
+import { RootToggle } from '../components/layout/root-toggle.js';
+import Link from 'fumadocs-core/link';
+import { LargeSearchToggle, SearchToggle, } from '../components/layout/search-toggle.js';
+import { HideIfEmpty } from 'fumadocs-core/hide-if-empty';
+export function DocsLayout(props) {
+    const { tabMode = 'sidebar', nav: { transparentMode, ...nav } = {}, sidebar: { tabs: tabOptions, banner: sidebarBanner, footer: sidebarFooter, components: sidebarComponents, ...sidebar } = {}, i18n = false, disableThemeSwitch = false, themeSwitch = { enabled: !disableThemeSwitch }, } = props;
+    const navMode = nav.mode ?? 'auto';
+    const links = getLinks(props.links ?? [], props.githubUrl);
+    const tabs = useMemo(() => getSidebarTabsFromOptions(tabOptions, props.tree) ?? [], [tabOptions, props.tree]);
+    const variables = cn('[--fd-nav-height:56px] md:[--fd-sidebar-width:286px] md:[--fd-nav-height:64px] xl:[--fd-toc-width:286px]', tabs.length > 0 && tabMode === 'navbar' && 'lg:[--fd-nav-height:104px]');
+    const sidebarHeader = (_jsxs("div", { className: "flex justify-between max-md:hidden", children: [_jsx(Link, { href: nav.url ?? '/', className: "inline-flex items-center gap-2.5 font-medium", children: nav.title }), (sidebar.collapsible ?? true) && (_jsx(SidebarCollapseTrigger, { className: cn(buttonVariants({
+                    color: 'ghost',
+                    size: 'icon-sm',
+                    className: 'mt-px mb-auto text-fd-muted-foreground',
+                })), children: _jsx(SidebarIcon, {}) }))] }));
+    return (_jsx(TreeContextProvider, { tree: props.tree, children: _jsx(NavProvider, { transparentMode: transparentMode, children: _jsxs(LayoutBody, { ...props.containerProps, className: cn(variables, props.containerProps?.className), children: [_jsxs(Sidebar, { ...sidebar, className: cn(navMode === 'top'
+                            ? 'border-e-0 md:bg-transparent'
+                            : 'md:[--fd-nav-height:0px]', sidebar.className), children: [_jsx(HideIfEmpty, { children: _jsxs(SidebarHeader, { className: "data-[empty=true]:hidden", children: [navMode === 'auto' && sidebarHeader, nav.children, sidebarBanner, tabMode === 'sidebar' && tabs.length > 0 ? (_jsx(RootToggle, { className: "mb-2", options: tabs })) : null, tabMode === 'navbar' && tabs.length > 0 && (_jsx(RootToggle, { options: tabs, className: "lg:hidden" }))] }) }), _jsxs(SidebarViewport, { children: [links
+                                        .filter((item) => item.type !== 'icon')
+                                        .map((item, i) => (_jsx(SidebarLinkItem, { item: item, className: cn('lg:hidden', i === links.length - 1 && 'mb-4') }, i))), _jsx(SidebarPageTree, { components: sidebarComponents })] }), _jsx(HideIfEmpty, { children: _jsxs(SidebarFooter, { className: "flex flex-row items-center justify-end data-[empty=true]:hidden", children: [_jsx("div", { className: "flex items-center flex-1 empty:hidden lg:hidden", children: links
+                                                .filter((item) => item.type === 'icon')
+                                                .map((item, i) => (_jsx(BaseLinkItem, { item: item, className: cn(buttonVariants({
+                                                    size: 'icon-sm',
+                                                    color: 'ghost',
+                                                    className: 'text-fd-muted-foreground',
+                                                })), "aria-label": item.label, children: item.icon }, i))) }), i18n ? (_jsx(LanguageToggle, { className: "me-auto md:hidden", children: _jsx(Languages, { className: "size-4.5 text-fd-muted-foreground" }) })) : null, themeSwitch.enabled !== false &&
+                                            (themeSwitch.component ?? (_jsx(ThemeToggle, { className: "md:hidden", mode: themeSwitch?.mode ?? 'light-dark-system' }))), sidebarFooter] }) })] }), _jsx(DocsNavbar, { ...props, links: links, tabs: tabMode == 'navbar' ? tabs : [] }), props.children] }) }) }));
+}
+function DocsNavbar({ links, tabs, searchToggle = {}, themeSwitch = {}, ...props }) {
+    const navMode = props.nav?.mode ?? 'auto';
+    const sidebarCollapsible = props.sidebar?.collapsible ?? true;
+    const nav = (_jsx(Link, { href: props.nav?.url ?? '/', className: cn('inline-flex items-center gap-2.5 font-semibold empty:hidden', navMode === 'auto' && 'md:hidden'), children: props.nav?.title }));
+    return (_jsxs(Navbar, { mode: navMode, children: [_jsxs("div", { className: cn('flex border-b px-4 flex-1', navMode === 'auto' && 'md:px-6'), children: [_jsxs("div", { className: cn('flex flex-row items-center', navMode === 'top' && 'flex-1 pe-4'), children: [sidebarCollapsible && navMode === 'auto' ? (_jsx(SidebarCollapseTrigger, { className: cn(buttonVariants({
+                                    color: 'ghost',
+                                    size: 'icon-sm',
+                                }), 'text-fd-muted-foreground -ms-1.5 me-2 data-[collapsed=false]:hidden max-md:hidden'), children: _jsx(SidebarIcon, {}) })) : null, nav] }), searchToggle.enabled !== false &&
+                        (searchToggle.components?.lg ? (_jsx("div", { className: cn('w-full my-auto max-md:hidden', navMode === 'top' ? 'rounded-xl max-w-sm' : 'max-w-[240px]'), children: searchToggle.components?.lg })) : (_jsx(LargeSearchToggle, { hideIfDisabled: true, className: cn('w-full my-auto max-md:hidden', navMode === 'top'
+                                ? 'rounded-xl max-w-sm ps-2.5'
+                                : 'max-w-[240px]') }))), _jsxs("div", { className: "flex flex-1 flex-row items-center justify-end", children: [_jsx("div", { className: "flex flex-row items-center gap-6 px-4 empty:hidden max-lg:hidden", children: links
+                                    .filter((item) => item.type !== 'icon')
+                                    .map((item, i) => (_jsx(NavbarLinkItem, { item: item, className: "text-sm text-fd-muted-foreground transition-colors hover:text-fd-accent-foreground" }, i))) }), props.nav?.children, searchToggle.enabled !== false &&
+                                (searchToggle.components?.sm ?? (_jsx(SearchToggle, { hideIfDisabled: true, className: "p-2 md:hidden" }))), _jsx(NavbarSidebarTrigger, { className: "p-2 -me-1.5 md:hidden" }), links
+                                .filter((item) => item.type === 'icon')
+                                .map((item, i) => (_jsx(BaseLinkItem, { item: item, className: cn(buttonVariants({ size: 'icon-sm', color: 'ghost' }), 'text-fd-muted-foreground max-lg:hidden'), "aria-label": item.label, children: item.icon }, i))), props.i18n ? (_jsx(LanguageToggle, { className: "max-md:hidden", children: _jsx(Languages, { className: "size-4.5 text-fd-muted-foreground" }) })) : null, themeSwitch.enabled !== false &&
+                                (themeSwitch.component ?? (_jsx(ThemeToggle, { className: "ms-2 max-md:hidden", mode: themeSwitch.mode ?? 'light-dark-system' }))), sidebarCollapsible && navMode === 'top' ? (_jsx(SidebarCollapseTrigger, { className: cn(buttonVariants({
+                                    color: 'secondary',
+                                    size: 'icon-sm',
+                                }), 'ms-2 text-fd-muted-foreground rounded-full max-md:hidden'), children: _jsx(SidebarIcon, {}) })) : null] })] }), tabs.length > 0 && (_jsx(LayoutTabs, { className: cn('border-b h-10 max-lg:hidden', navMode === 'top' ? 'px-4' : 'px-6'), options: tabs }))] }));
+}
+function NavbarLinkItem({ item, ...props }) {
+    if (item.type === 'menu') {
+        return (_jsxs(Popover, { children: [_jsxs(PopoverTrigger, { ...props, className: cn('inline-flex items-center gap-1.5', props.className), children: [item.text, _jsx(ChevronDown, { className: "size-3" })] }), _jsx(PopoverContent, { className: "flex flex-col", children: item.items.map((child, i) => {
+                        if (child.type === 'custom')
+                            return _jsx(Fragment, { children: child.children }, i);
+                        return (_jsxs(BaseLinkItem, { item: child, className: "inline-flex items-center gap-2 rounded-md p-2 text-start hover:bg-fd-accent hover:text-fd-accent-foreground data-[active=true]:text-fd-primary [&_svg]:size-4", children: [child.icon, child.text] }, i));
+                    }) })] }));
+    }
+    if (item.type === 'custom')
+        return item.children;
+    return (_jsx(BaseLinkItem, { item: item, ...props, children: item.text }));
+}
+export { Navbar, NavbarSidebarTrigger };

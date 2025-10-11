@@ -101,6 +101,13 @@ export class CreditService {
   }
 
   /**
+   * Get user credits (alias for getOrCreateCreditAccount for backward compatibility)
+   */
+  async getUserCredits(userId: string): Promise<UserCreditAccount> {
+    return this.getOrCreateCreditAccount(userId);
+  }
+
+  /**
    * Earn credits (add to balance)
    */
   async earnCredits(params: EarnCreditsParams): Promise<CreditTransaction> {

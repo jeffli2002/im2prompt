@@ -104,6 +104,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      creem:
+        specifier: ^0.4.0
+        version: 0.4.0
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -4152,6 +4155,15 @@ packages:
   cosmiconfig@5.2.1:
     resolution: {integrity: sha512-H65gsXo1SKjf8zmrJ67eJk8aIRKV5ff2D4uKZIBZShbhGSpEmsQOPW/SKMKYhSTrqR7ufy6RP69rPogdaPh/kA==}
     engines: {node: '>=4'}
+
+  creem@0.4.0:
+    resolution: {integrity: sha512-1RENze+vqUSq478DzisYaFuHmHt24QKg2zASuThQ9GqXi1XnW1KQa6ekuO0rA2RGqiDSYyfR6+DxaGJBYuVghg==}
+    hasBin: true
+    peerDependencies:
+      '@modelcontextprotocol/sdk': '>=1.5.0 <1.10.0'
+    peerDependenciesMeta:
+      '@modelcontextprotocol/sdk':
+        optional: true
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -11909,6 +11921,10 @@ snapshots:
       is-directory: 0.3.1
       js-yaml: 3.14.1
       parse-json: 4.0.0
+
+  creem@0.4.0:
+    dependencies:
+      zod: 3.25.67
 
   cross-spawn@7.0.6:
     dependencies:

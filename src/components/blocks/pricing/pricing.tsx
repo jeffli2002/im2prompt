@@ -204,7 +204,7 @@ const Pricing = ({
 
   // Helper function to adjust feature text based on yearly/monthly
   const adjustFeatureText = (featureText: string, plan: PricingPlan, isYearly: boolean): string => {
-    if (!isYearly || plan.price === 0) return featureText;
+    if (!isYearly || plan.monthlyPrice === 'Free') return featureText;
     
     // Match patterns like "300 Image-to-Text per month" or "500 credits/month"
     const imageToTextMatch = featureText.match(/^(\d+)\s+Image-to-Text per month$/);

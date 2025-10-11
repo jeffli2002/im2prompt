@@ -84,7 +84,9 @@ export const file = pgTable('file', {
 
 export const payment = pgTable('payment', {
   id: text('id').primaryKey(),
+  provider: text('provider', { enum: ['stripe', 'creem'] }).notNull().default('stripe'),
   priceId: text('price_id').notNull(),
+  productId: text('product_id'),
   type: text('type').notNull(),
   interval: text('interval'),
   userId: text('user_id')
@@ -113,6 +115,7 @@ export const paymentEvent = pgTable('payment_event', {
     .references(() => payment.id, { onDelete: 'cascade' }),
   eventType: text('event_type').notNull(),
   stripeEventId: text('stripe_event_id').unique(),
+  creemEventId: text('creem_event_id').unique(),
   eventData: text('event_data'), // JSON string
   createdAt: timestamp('created_at')
     .$defaultFn(() => /* @__PURE__ */ new Date())
@@ -280,5 +283,166 @@ export const monthlyUsageTracking = pgTable('monthly_usage_tracking', {
     columns: [table.userId, table.month],
     unique: true,
   },
+}));
+
+export const publicContent = pgTable('public_content', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  contentType: text('content_type', { 
+    enum: ['image', 'video'] 
+  }).notNull(),
+  promptText: text('prompt_text').notNull(),
+  negativePrompt: text('negative_prompt'),
+  modelStyle: text('model_style', {
+    enum: ['general', 'midjourney', 'stable-diffusion', 'flux', 'sora2', 'veo3']
+  }).notNull(),
+  cloudinaryPublicId: text('cloudinary_public_id').notNull(),
+  cloudinaryUrl: text('cloudinary_url').notNull(),
+  thumbnailUrl: text('thumbnail_url'),
+  visibilityStatus: text('visibility_status', {
+    enum: ['pending', 'approved', 'rejected', 'flagged', 'removed']
+  }).notNull().default('pending'),
+  creditAwarded: boolean('credit_awarded').notNull().default(false),
+  creditTransactionId: text('credit_transaction_id')
+    .references(() => creditTransactions.id),
+  moderationNotes: text('moderation_notes'),
+  moderatedBy: text('moderated_by')
+    .references(() => user.id),
+  moderatedAt: timestamp('moderated_at'),
+  flagCount: integer('flag_count').notNull().default(0),
+  viewCount: integer('view_count').notNull().default(0),
+  likeCount: integer('like_count').notNull().default(0),
+  metadata: text('metadata'),
+  tags: text('tags').array(),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+}, (table) => ({
+  userIdIdx: { name: 'public_content_user_id_idx', columns: [table.userId] },
+  statusIdx: { name: 'public_content_status_idx', columns: [table.visibilityStatus] },
+  createdAtIdx: { name: 'public_content_created_at_idx', columns: [table.createdAt] },
+}));
+
+export const userContentHistory = pgTable('user_content_history', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  contentType: text('content_type', { 
+    enum: ['image_to_prompt', 'image_generation', 'video_generation'] 
+  }).notNull(),
+  promptText: text('prompt_text').notNull(),
+  negativePrompt: text('negative_prompt'),
+  modelStyle: text('model_style'),
+  cloudinaryPublicId: text('cloudinary_public_id'),
+  cloudinaryUrl: text('cloudinary_url'),
+  thumbnailUrl: text('thumbnail_url'),
+  creditsSpent: integer('credits_spent').notNull().default(0),
+  generationParams: text('generation_params'),
+  status: text('status', {
+    enum: ['processing', 'completed', 'failed', 'expired']
+  }).notNull().default('completed'),
+  errorMessage: text('error_message'),
+  expiresAt: timestamp('expires_at'),
+  isPublic: boolean('is_public').notNull().default(false),
+  publicContentId: text('public_content_id')
+    .references(() => publicContent.id),
+  metadata: text('metadata'),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+}, (table) => ({
+  userIdIdx: { name: 'history_user_id_idx', columns: [table.userId] },
+  expiresAtIdx: { name: 'history_expires_at_idx', columns: [table.expiresAt] },
+  createdAtIdx: { name: 'history_created_at_idx', columns: [table.createdAt] },
+  statusIdx: { name: 'history_status_idx', columns: [table.status] },
+}));
+
+export const contentFlags = pgTable('content_flags', {
+  id: text('id').primaryKey(),
+  contentId: text('content_id')
+    .notNull()
+    .references(() => publicContent.id, { onDelete: 'cascade' }),
+  reportedBy: text('reported_by')
+    .notNull()
+    .references(() => user.id),
+  reason: text('reason', {
+    enum: ['inappropriate', 'copyright', 'spam', 'misleading', 'other']
+  }).notNull(),
+  description: text('description'),
+  status: text('status', {
+    enum: ['pending', 'reviewed', 'resolved', 'dismissed']
+  }).notNull().default('pending'),
+  reviewedBy: text('reviewed_by')
+    .references(() => user.id),
+  reviewedAt: timestamp('reviewed_at'),
+  reviewNotes: text('review_notes'),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+}, (table) => ({
+  contentIdIdx: { name: 'flags_content_id_idx', columns: [table.contentId] },
+  statusIdx: { name: 'flags_status_idx', columns: [table.status] },
+  reportedByIdx: { name: 'flags_reported_by_idx', columns: [table.reportedBy] },
+}));
+
+export const systemConfig = pgTable('system_config', {
+  id: text('id').primaryKey(),
+  category: text('category', {
+    enum: ['credits', 'storage', 'moderation', 'features']
+  }).notNull(),
+  key: text('key').notNull(),
+  value: text('value').notNull(),
+  valueType: text('value_type', {
+    enum: ['string', 'number', 'boolean', 'json']
+  }).notNull(),
+  description: text('description'),
+  isEditable: boolean('is_editable').notNull().default(true),
+  updatedBy: text('updated_by')
+    .references(() => user.id),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+}, (table) => ({
+  categoryKeyIdx: { 
+    name: 'config_category_key_idx', 
+    columns: [table.category, table.key],
+    unique: true 
+  },
+}));
+
+export const moderationLogs = pgTable('moderation_logs', {
+  id: text('id').primaryKey(),
+  contentId: text('content_id')
+    .references(() => publicContent.id),
+  moderatorId: text('moderator_id')
+    .notNull()
+    .references(() => user.id),
+  action: text('action', {
+    enum: ['approve', 'reject', 'flag', 'unflag', 'remove']
+  }).notNull(),
+  previousStatus: text('previous_status'),
+  newStatus: text('new_status'),
+  reason: text('reason'),
+  notes: text('notes'),
+  metadata: text('metadata'),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+}, (table) => ({
+  contentIdIdx: { name: 'moderation_content_id_idx', columns: [table.contentId] },
+  moderatorIdIdx: { name: 'moderation_moderator_id_idx', columns: [table.moderatorId] },
+  createdAtIdx: { name: 'moderation_created_at_idx', columns: [table.createdAt] },
 }));
 // Force rebuild

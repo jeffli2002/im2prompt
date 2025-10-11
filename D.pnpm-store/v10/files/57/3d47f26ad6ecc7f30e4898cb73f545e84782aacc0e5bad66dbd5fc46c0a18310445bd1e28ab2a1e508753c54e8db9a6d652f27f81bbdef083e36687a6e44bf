@@ -1,0 +1,264 @@
+import { ReactElement } from 'react';
+import { I18nConfig } from '../i18n/index.js';
+import { R as Root, I as Item, F as Folder, S as Separator } from '../page-tree-bSt6K__E.js';
+import 'next/dist/server/web/types';
+
+/**
+ * In memory file system.
+ */
+declare class FileSystem<File> {
+    files: Map<string, File>;
+    folders: Map<string, string[]>;
+    constructor();
+    read(path: string): File | undefined;
+    /**
+     * get the direct children of folder (in virtual file path)
+     */
+    readDir(path: string): string[] | undefined;
+    write(path: string, file: File): void;
+    getFiles(): string[];
+    makeDir(path: string): void;
+}
+
+interface LoadOptions {
+    transformers?: Transformer[];
+    buildFiles: (files: VirtualFile[]) => (MetaFile | PageFile)[];
+}
+type ContentStorage = FileSystem<MetaFile | PageFile>;
+interface MetaFile<Data extends MetaData = MetaData> {
+    path: string;
+    absolutePath: string;
+    format: 'meta';
+    data: Data;
+}
+interface PageFile<Data extends PageData = PageData> {
+    path: string;
+    absolutePath: string;
+    format: 'page';
+    slugs: string[];
+    data: Data;
+}
+type Transformer = (context: {
+    storage: ContentStorage;
+    options: LoadOptions;
+}) => void;
+declare function loadFiles(files: VirtualFile[], options: LoadOptions): ContentStorage;
+
+interface FileInfo {
+    /**
+     * File path without extension
+     *
+     * @deprecated obtain it with `join(dirname, name)`
+     */
+    flattenedPath: string;
+    /**
+     * path of file (unparsed)
+     */
+    path: string;
+    /**
+     * File name without extension
+     */
+    name: string;
+    /**
+     * file extension from the last `.`, like `.md`
+     *
+     * empty string if no file extension
+     */
+    ext: string;
+    dirname: string;
+}
+interface FolderInfo {
+    /**
+     * Original path of folder
+     */
+    path: string;
+    /**
+     * folder name
+     */
+    name: string;
+    dirname: string;
+}
+declare function parseFilePath(path: string): FileInfo;
+/**
+ * @deprecated use `dirname` and `basename` directly.
+ */
+declare function parseFolderPath(path: string): FolderInfo;
+
+interface LoaderConfig {
+    source: SourceConfig;
+    i18n: boolean;
+}
+interface SourceConfig {
+    pageData: PageData;
+    metaData: MetaData;
+}
+interface LoaderOptions<T extends SourceConfig = SourceConfig, I18n extends I18nConfig | undefined = I18nConfig | undefined> {
+    baseUrl: string;
+    icon?: NonNullable<BuildPageTreeOptions['resolveIcon']>;
+    slugs?: (info: FileInfo) => string[];
+    url?: UrlFn;
+    source: Source<T>;
+    transformers?: Transformer[];
+    /**
+     * Additional options for page tree builder
+     */
+    pageTree?: Partial<Omit<BuildPageTreeOptions<T['pageData'], T['metaData']>, 'storage'>>;
+    /**
+     * Configure i18n
+     */
+    i18n?: I18n;
+}
+interface Source<Config extends SourceConfig> {
+    /**
+     * @internal
+     */
+    _config?: Config;
+    files: VirtualFile[] | (() => VirtualFile[]);
+}
+interface SharedFileInfo {
+    /**
+     * Virtualized file path (parsed)
+     *
+     * @deprecated Use `path` instead.
+     */
+    file: FileInfo;
+    /**
+     * Virtualized file path (relative to content directory)
+     *
+     * @example `docs/page.mdx`
+     */
+    path: string;
+    /**
+     * Absolute path of the file
+     */
+    absolutePath: string;
+}
+interface VirtualFile {
+    /**
+     * Virtualized path (relative to content directory)
+     *
+     * @example `docs/page.mdx`
+     */
+    path: string;
+    /**
+     * Absolute path of the file
+     */
+    absolutePath?: string;
+    type: 'page' | 'meta';
+    /**
+     * Specified Slugs for page
+     */
+    slugs?: string[];
+    data: unknown;
+}
+interface Page<Data = PageData> extends SharedFileInfo {
+    slugs: string[];
+    url: string;
+    data: Data;
+    locale?: string | undefined;
+}
+interface Meta<Data = MetaData> extends SharedFileInfo {
+    data: Data;
+}
+interface LanguageEntry<Data = PageData> {
+    language: string;
+    pages: Page<Data>[];
+}
+interface LoaderOutput<Config extends LoaderConfig> {
+    pageTree: Config['i18n'] extends true ? Record<string, Root> : Root;
+    getPageTree: (locale?: string) => Root;
+    getPageByHref: (href: string, options?: {
+        language?: string;
+        /**
+         * resolve relative file paths in `href` from specified dirname, must be a virtual path.
+         */
+        dir?: string;
+    }) => {
+        page: Page<Config['source']['pageData']>;
+        hash?: string;
+    } | undefined;
+    _i18n?: I18nConfig;
+    /**
+     * Get list of pages from language
+     *
+     * @param language - If empty, the default language will be used
+     */
+    getPages: (language?: string) => Page<Config['source']['pageData']>[];
+    getLanguages: () => LanguageEntry<Config['source']['pageData']>[];
+    /**
+     * Get page with slugs
+     *
+     * @param language - If empty, the default language will be used
+     */
+    getPage: (slugs: string[] | undefined, language?: string) => Page<Config['source']['pageData']> | undefined;
+    getNodePage: (node: Item, language?: string) => Page<Config['source']['pageData']> | undefined;
+    getNodeMeta: (node: Folder, language?: string) => Meta<Config['source']['metaData']> | undefined;
+    /**
+     * generate static params for Next.js SSG
+     *
+     * @param slug - customise parameter name for slugs
+     * @param lang - customise parameter name for lang
+     */
+    generateParams: <TSlug extends string = 'slug', TLang extends string = 'lang'>(slug?: TSlug, lang?: TLang) => (Record<TSlug, string[]> & Record<TLang, string>)[];
+}
+declare function createGetUrl(baseUrl: string, i18n?: I18nConfig): UrlFn;
+declare function loader<Config extends SourceConfig, I18n extends I18nConfig | undefined = undefined>(options: LoaderOptions<Config, I18n>): LoaderOutput<{
+    source: Config;
+    i18n: I18n extends I18nConfig ? true : false;
+}>;
+/**
+ * Convert file path into slugs, also encode non-ASCII characters, so they can work in pathname
+ */
+declare function getSlugs(file: string | FileInfo): string[];
+
+interface MetaData {
+    icon?: string | undefined;
+    title?: string | undefined;
+    root?: boolean | undefined;
+    pages?: string[] | undefined;
+    defaultOpen?: boolean | undefined;
+    description?: string | undefined;
+}
+interface PageData {
+    icon?: string | undefined;
+    title?: string;
+    description?: string | undefined;
+}
+type InferPageType<Utils extends LoaderOutput<any>> = Utils extends LoaderOutput<infer Config> ? Page<Config['source']['pageData']> : never;
+type InferMetaType<Utils extends LoaderOutput<any>> = Utils extends LoaderOutput<infer Config> ? Meta<Config['source']['metaData']> : never;
+/**
+ * @internal
+ */
+type UrlFn = (slugs: string[], locale?: string) => string;
+
+interface BaseOptions<Page extends PageData = PageData, Meta extends MetaData = MetaData> {
+    /**
+     * Remove references to the file path of original nodes (`$ref`)
+     *
+     * @defaultValue false
+     */
+    noRef?: boolean;
+    attachFile?: (node: Item, file?: PageFile<Page>) => Item;
+    attachFolder?: (node: Folder, folder: {
+        children: (PageFile<Page> | MetaFile<Meta>)[];
+    }, meta?: MetaFile<Meta>) => Folder;
+    attachSeparator?: (node: Separator) => Separator;
+    resolveIcon?: (icon: string | undefined) => ReactElement | undefined;
+}
+interface BuildPageTreeOptions<Page extends PageData = PageData, Meta extends MetaData = MetaData> extends BaseOptions<Page, Meta> {
+    storage: ContentStorage;
+}
+interface BuildPageTreeOptionsWithI18n<Page extends PageData = PageData, Meta extends MetaData = MetaData> extends BaseOptions<Page, Meta> {
+    storages: Record<string, ContentStorage>;
+    i18n: I18nConfig;
+}
+interface PageTreeBuilder {
+    build: (options: BuildPageTreeOptions) => Root;
+    /**
+     * Build page tree and fallback to the default language if the localized page doesn't exist
+     */
+    buildI18n: (options: BuildPageTreeOptionsWithI18n) => Record<string, Root>;
+}
+declare function createPageTreeBuilder(getUrl: UrlFn): PageTreeBuilder;
+
+export { type BuildPageTreeOptions, type BuildPageTreeOptionsWithI18n, type ContentStorage, type FileInfo, FileSystem, type FolderInfo, type InferMetaType, type InferPageType, type LanguageEntry, type LoadOptions, type LoaderConfig, type LoaderOptions, type LoaderOutput, type Meta, type MetaData, type MetaFile, type Page, type PageData, type PageFile, type PageTreeBuilder, type Source, type SourceConfig, type Transformer, type UrlFn, type VirtualFile, createGetUrl, createPageTreeBuilder, getSlugs, loadFiles, loader, parseFilePath, parseFolderPath };

@@ -1,0 +1,15 @@
+import { ReactNode, DependencyList } from 'react';
+import { HighlightOptions } from './index.js';
+import 'shiki';
+import 'shiki/themes';
+import 'hast-util-to-jsx-runtime';
+
+declare function useShiki(code: string, { withPrerenderScript, loading, ...options }: HighlightOptions & {
+    withPrerenderScript?: boolean;
+    /**
+     * Displayed before highlighter is loaded.
+     */
+    loading?: ReactNode;
+}, deps?: DependencyList): ReactNode;
+
+export { useShiki };

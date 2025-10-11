@@ -1,12 +1,11 @@
 'use server';
 
-import { auth } from '@/lib/auth/auth';
 import { StripeProvider } from '@/payment/stripe/provider';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import type { ActionResult } from '@/payment/types';
-import { headers } from 'next/headers';
 import { env } from '@/env';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 
 const paymentErrorLogger = new ErrorLogger('payment-subscription');
 
@@ -23,9 +22,7 @@ export async function createSubscription(
   let session: { user?: { id: string; email: string; name?: string } } | null = null;
   
   try {
-    session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    session = await getSessionWithAuthBypass();
     if (!session?.user) {
       return {
         success: false,
@@ -140,9 +137,7 @@ export async function createCheckoutSession(
   let session: { user?: { id: string; email: string; name?: string } } | null = null;
   
   try {
-    session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    session = await getSessionWithAuthBypass();
     if (!session?.user) {
       return {
         success: false,

@@ -196,3 +196,5 @@ export function validateCloudinaryConfig(): boolean {
   
   return true;
 }
+
+

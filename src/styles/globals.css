@@ -5,6 +5,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -45,6 +54,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-bounce-subtle: bounce-subtle 2s ease-in-out infinite;
 
   @keyframes accordion-down {
     from {
@@ -62,6 +72,29 @@
     to {
       height: 0;
     }
+  }
+
+  @keyframes bounce-subtle {
+    0%, 100% {
+      transform: translateX(0) scale(1);
+    }
+    50% {
+      transform: translateX(4px) scale(1.05);
+    }
+  }
+}
+
+/* Hand-drawn arrow animation */
+.hand-drawn-arrow {
+  animation: arrow-float 3s ease-in-out infinite;
+}
+
+@keyframes arrow-float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-3px) translateX(2px);
   }
 }
 

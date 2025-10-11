@@ -1,0 +1,40 @@
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import { useMemo } from 'react';
+import { Languages, Sidebar as SidebarIcon } from '../icons.js';
+import { cn } from '../utils/cn.js';
+import { buttonVariants } from '../components/ui/button.js';
+import { Sidebar, SidebarCollapseTrigger, SidebarFooter, SidebarHeader, SidebarPageTree, SidebarViewport, } from '../components/layout/sidebar.js';
+import { BaseLinkItem } from '../layouts/links.js';
+import { RootToggle } from '../components/layout/root-toggle.js';
+import { getLinks } from './shared.js';
+import { LanguageToggle, LanguageToggleText, } from '../components/layout/language-toggle.js';
+import { CollapsibleControl, LayoutBody, Navbar, NavbarSidebarTrigger, } from '../layouts/docs-client.js';
+import { TreeContextProvider } from '../contexts/tree.js';
+import { ThemeToggle } from '../components/layout/theme-toggle.js';
+import { getSidebarTabsFromOptions, SidebarLinkItem, } from '../layouts/docs/shared.js';
+import { NavProvider } from '../contexts/layout.js';
+import Link from 'fumadocs-core/link';
+import { LargeSearchToggle, SearchToggle, } from '../components/layout/search-toggle.js';
+import { HideIfEmpty } from 'fumadocs-core/hide-if-empty';
+export function DocsLayout({ nav: { transparentMode, ...nav } = {}, sidebar: { tabs: sidebarTabs, footer: sidebarFooter, banner: sidebarBanner, enabled: sidebarEnabled = true, collapsible: sidebarCollapsible = true, component: sidebarComponent, components: sidebarComponents, ...sidebarProps } = {}, searchToggle = {}, disableThemeSwitch = false, themeSwitch = { enabled: !disableThemeSwitch }, i18n = false, children, ...props }) {
+    const tabs = useMemo(() => getSidebarTabsFromOptions(sidebarTabs, props.tree) ?? [], [sidebarTabs, props.tree]);
+    const links = getLinks(props.links ?? [], props.githubUrl);
+    const variables = cn('md:[--fd-sidebar-width:268px] lg:[--fd-sidebar-width:286px] xl:[--fd-toc-width:286px]', !nav.component && nav.enabled !== false
+        ? '[--fd-nav-height:56px] md:[--fd-nav-height:0px]'
+        : undefined);
+    const sidebar = sidebarComponent ?? (_jsxs(_Fragment, { children: [sidebarCollapsible ? _jsx(CollapsibleControl, {}) : null, _jsxs(Sidebar, { ...sidebarProps, collapsible: sidebarCollapsible, children: [_jsx(HideIfEmpty, { children: _jsxs(SidebarHeader, { className: "data-[empty=true]:hidden", children: [_jsxs("div", { className: "flex max-md:hidden", children: [_jsx(Link, { href: nav.url ?? '/', className: "inline-flex text-[15px] items-center gap-2.5 font-medium me-auto", children: nav.title }), nav.children, sidebarCollapsible && (_jsx(SidebarCollapseTrigger, { className: cn(buttonVariants({
+                                                color: 'ghost',
+                                                size: 'icon-sm',
+                                                className: 'mb-auto text-fd-muted-foreground max-md:hidden',
+                                            })), children: _jsx(SidebarIcon, {}) }))] }), searchToggle.enabled !== false &&
+                                    (searchToggle.components?.lg ?? (_jsx(LargeSearchToggle, { hideIfDisabled: true, className: "max-md:hidden" }))), tabs.length > 0 && _jsx(RootToggle, { options: tabs }), sidebarBanner] }) }), _jsxs(SidebarViewport, { children: [links
+                                .filter((v) => v.type !== 'icon')
+                                .map((item, i, list) => (_jsx(SidebarLinkItem, { item: item, className: cn(i === list.length - 1 && 'mb-4') }, i))), _jsx(SidebarPageTree, { components: sidebarComponents })] }), _jsx(HideIfEmpty, { children: _jsxs(SidebarFooter, { className: "data-[empty=true]:hidden", children: [_jsxs("div", { className: "flex items-center justify-end empty:hidden", children: [links
+                                            .filter((item) => item.type === 'icon')
+                                            .map((item, i, arr) => (_jsx(BaseLinkItem, { item: item, className: cn(buttonVariants({ size: 'icon', color: 'ghost' }), 'text-fd-muted-foreground md:[&_svg]:size-4.5', i === arr.length - 1 && 'me-auto'), "aria-label": item.label, children: item.icon }, i))), i18n ? (_jsxs(LanguageToggle, { className: "me-1.5", children: [_jsx(Languages, { className: "size-4.5" }), _jsx(LanguageToggleText, { className: "md:hidden" })] })) : null, themeSwitch.enabled !== false &&
+                                            (themeSwitch.component ?? (_jsx(ThemeToggle, { className: "p-0", mode: themeSwitch.mode })))] }), sidebarFooter] }) })] })] }));
+    return (_jsx(TreeContextProvider, { tree: props.tree, children: _jsxs(NavProvider, { transparentMode: transparentMode, children: [nav.enabled !== false &&
+                    (nav.component ?? (_jsxs(Navbar, { className: "h-14 md:hidden", children: [_jsx(Link, { href: nav.url ?? '/', className: "inline-flex items-center gap-2.5 font-semibold", children: nav.title }), _jsx("div", { className: "flex-1", children: nav.children }), searchToggle?.enabled !== false &&
+                                (searchToggle.components?.sm ?? (_jsx(SearchToggle, { className: "p-2", hideIfDisabled: true }))), _jsx(NavbarSidebarTrigger, { className: "p-2 -me-1.5 md:hidden" })] }))), _jsxs(LayoutBody, { ...props.containerProps, className: cn(variables, props.containerProps?.className), children: [sidebarEnabled && sidebar, children] })] }) }));
+}
+export { CollapsibleControl, Navbar, NavbarSidebarTrigger };

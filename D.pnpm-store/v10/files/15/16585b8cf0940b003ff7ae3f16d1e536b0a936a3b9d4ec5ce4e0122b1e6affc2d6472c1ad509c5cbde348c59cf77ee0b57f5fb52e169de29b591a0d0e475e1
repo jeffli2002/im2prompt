@@ -1,0 +1,26 @@
+import { PageData, MetaData, Source, VirtualFile } from 'fumadocs-core/source';
+import { B as BaseCollectionEntry } from './types-DvTNxAvo.js';
+import { R as Runtime } from './types-Dk7DhSKZ.js';
+import 'mdx/types';
+import 'fumadocs-core/mdx-plugins';
+import 'fumadocs-core/server';
+import '@mdx-js/mdx';
+import 'unified';
+import 'react';
+import 'zod';
+import '@standard-schema/spec';
+import '@fumadocs/mdx-remote';
+
+declare const _runtime: Runtime;
+declare function createMDXSource<Doc extends PageData & BaseCollectionEntry, Meta extends MetaData & BaseCollectionEntry>(docs: Doc[], meta?: Meta[]): Source<{
+    pageData: Doc;
+    metaData: Meta;
+}>;
+interface ResolveOptions {
+    docs: BaseCollectionEntry[];
+    meta: BaseCollectionEntry[];
+    rootDir?: string;
+}
+declare function resolveFiles({ docs, meta }: ResolveOptions): VirtualFile[];
+
+export { _runtime, createMDXSource, resolveFiles };

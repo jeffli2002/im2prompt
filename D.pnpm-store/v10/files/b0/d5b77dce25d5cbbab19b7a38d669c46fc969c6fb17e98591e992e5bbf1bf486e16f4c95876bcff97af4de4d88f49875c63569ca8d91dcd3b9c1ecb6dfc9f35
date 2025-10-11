@@ -1,0 +1,8 @@
+import { Plugin } from 'vite';
+
+interface CreateMDXOptions {
+    configPath?: string;
+}
+declare function unstable_mdx(config: Record<string, unknown>, _options?: CreateMDXOptions): Plugin;
+
+export { type CreateMDXOptions, unstable_mdx as default };

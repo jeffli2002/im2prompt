@@ -1,0 +1,217 @@
+import { MDXProps } from 'mdx/types';
+import * as plugins from 'fumadocs-core/mdx-plugins';
+import { StructuredData } from 'fumadocs-core/mdx-plugins';
+import { TableOfContents } from 'fumadocs-core/server';
+import { ProcessorOptions } from '@mdx-js/mdx';
+import { Pluggable } from 'unified';
+import { FC } from 'react';
+import { z } from 'zod';
+import { StandardSchemaV1 } from '@standard-schema/spec';
+import { MDXOptions as MDXOptions$1 } from '@fumadocs/mdx-remote';
+
+interface MDXOptions extends ProcessorOptions {
+    /**
+     * Name of collection
+     */
+    collection?: string;
+    /**
+     * Specify a file path for source
+     */
+    filePath?: string;
+    frontmatter?: Record<string, unknown>;
+    /**
+     * Custom Vfile data
+     */
+    data?: Record<string, unknown>;
+    _compiler?: CompilerOptions;
+}
+interface CompilerOptions {
+    addDependency: (file: string) => void;
+}
+declare module 'vfile' {
+    interface DataMap {
+        /**
+         * The compiler object from loader
+         */
+        _compiler?: CompilerOptions;
+    }
+}
+
+declare const metaSchema: z.ZodObject<{
+    title: z.ZodOptional<z.ZodString>;
+    pages: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    description: z.ZodOptional<z.ZodString>;
+    root: z.ZodOptional<z.ZodBoolean>;
+    defaultOpen: z.ZodOptional<z.ZodBoolean>;
+    icon: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    root?: boolean | undefined;
+    title?: string | undefined;
+    pages?: string[] | undefined;
+    description?: string | undefined;
+    defaultOpen?: boolean | undefined;
+    icon?: string | undefined;
+}, {
+    root?: boolean | undefined;
+    title?: string | undefined;
+    pages?: string[] | undefined;
+    description?: string | undefined;
+    defaultOpen?: boolean | undefined;
+    icon?: string | undefined;
+}>;
+declare const frontmatterSchema: z.ZodObject<{
+    title: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    icon: z.ZodOptional<z.ZodString>;
+    full: z.ZodOptional<z.ZodBoolean>;
+    _openapi: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+}, "strip", z.ZodTypeAny, {
+    title: string;
+    description?: string | undefined;
+    icon?: string | undefined;
+    full?: boolean | undefined;
+    _openapi?: z.objectOutputType<{}, z.ZodTypeAny, "passthrough"> | undefined;
+}, {
+    title: string;
+    description?: string | undefined;
+    icon?: string | undefined;
+    full?: boolean | undefined;
+    _openapi?: z.objectInputType<{}, z.ZodTypeAny, "passthrough"> | undefined;
+}>;
+
+type CollectionSchema<Schema extends StandardSchemaV1, Context> = Schema | ((ctx: Context) => Schema);
+interface BaseCollection {
+    /**
+     * Directories to scan
+     */
+    dir: string | string[];
+    /**
+     * what files to include/exclude (glob patterns)
+     *
+     * Include all files if not specified
+     */
+    files?: string[];
+}
+interface MetaCollection<Schema extends StandardSchemaV1 = StandardSchemaV1> extends BaseCollection {
+    type: 'meta';
+    schema?: CollectionSchema<Schema, {
+        path: string;
+        source: string;
+    }>;
+}
+interface DocCollection<Schema extends StandardSchemaV1 = StandardSchemaV1, Async extends boolean = boolean> extends BaseCollection {
+    type: 'doc';
+    mdxOptions?: MDXOptions;
+    /**
+     * Load files with async
+     */
+    async?: Async;
+    schema?: CollectionSchema<Schema, {
+        path: string;
+        source: string;
+    }>;
+}
+interface DocsCollection<DocSchema extends StandardSchemaV1 = StandardSchemaV1, MetaSchema extends StandardSchemaV1 = StandardSchemaV1, Async extends boolean = boolean> {
+    type: 'docs';
+    dir: string | string[];
+    docs: DocCollection<DocSchema, Async>;
+    meta: MetaCollection<MetaSchema>;
+}
+declare function defineCollections<T extends 'doc' | 'meta', Schema extends StandardSchemaV1 = StandardSchemaV1<unknown, any>, Async extends boolean = false>(options: {
+    type: T;
+} & (T extends 'doc' ? DocCollection<Schema, Async> : MetaCollection<Schema>)): {
+    type: T;
+    _type: {
+        async: Async;
+        schema: Schema;
+    };
+};
+declare function defineDocs<DocSchema extends StandardSchemaV1 = typeof frontmatterSchema, MetaSchema extends StandardSchemaV1 = typeof metaSchema, Async extends boolean = false>(options?: {
+    /**
+     * The directory to scan files
+     *
+     *  @defaultValue 'content/docs'
+     */
+    dir?: string | string[];
+    docs?: Omit<DocCollection<DocSchema, Async>, 'dir' | 'type'>;
+    meta?: Omit<MetaCollection<MetaSchema>, 'dir' | 'type'>;
+}): {
+    type: 'docs';
+    docs: {
+        type: 'doc';
+        _type: {
+            schema: DocSchema;
+            async: Async;
+        };
+    };
+    meta: {
+        type: 'meta';
+        _type: {
+            schema: MetaSchema;
+            async: false;
+        };
+    };
+};
+declare function defineConfig(config?: GlobalConfig): GlobalConfig;
+
+interface LoadedConfig {
+    collections: Map<string, DocCollection | MetaCollection | DocsCollection>;
+    global?: GlobalConfig;
+    _mdx_loader?: {
+        cachedOptions?: ProcessorOptions;
+    };
+    _mdx_async?: {
+        cachedMdxOptions?: MDXOptions$1;
+    };
+}
+
+type ResolvePlugins = Pluggable[] | ((v: Pluggable[]) => Pluggable[]);
+type DefaultMDXOptions = Omit<NonNullable<ProcessorOptions>, 'rehypePlugins' | 'remarkPlugins' | '_ctx'> & {
+    rehypePlugins?: ResolvePlugins;
+    remarkPlugins?: ResolvePlugins;
+    /**
+     * Properties to export from `vfile.data`
+     */
+    valueToExport?: string[];
+    remarkStructureOptions?: plugins.StructureOptions | false;
+    remarkHeadingOptions?: plugins.RemarkHeadingOptions;
+    remarkImageOptions?: plugins.RemarkImageOptions | false;
+    remarkCodeTabOptions?: plugins.RemarkCodeTabOptions | false;
+    remarkNpmOptions?: plugins.RemarkNpmOptions | false;
+    rehypeCodeOptions?: plugins.RehypeCodeOptions | false;
+};
+declare function loadDefaultOptions(config: LoadedConfig): Promise<ProcessorOptions>;
+
+interface GlobalConfig {
+    /**
+     * Configure global MDX options
+     */
+    mdxOptions?: DefaultMDXOptions | (() => DefaultMDXOptions | Promise<DefaultMDXOptions>);
+    /**
+     * Fetch last modified time with specified version control
+     * @defaultValue 'none'
+     */
+    lastModifiedTime?: 'git' | 'none';
+}
+interface FileInfo {
+    path: string;
+    absolutePath: string;
+}
+interface MarkdownProps {
+    body: FC<MDXProps>;
+    structuredData: StructuredData;
+    toc: TableOfContents;
+    _exports: Record<string, unknown>;
+    /**
+     * Only available when `lastModifiedTime` is enabled on MDX loader
+     */
+    lastModified?: Date;
+}
+interface BaseCollectionEntry {
+    /**
+     * Raw file path of collection entry, including absolute path (not normalized).
+     */
+    _file: FileInfo;
+}
+
+export { type BaseCollectionEntry as B, type CollectionSchema as C, type DefaultMDXOptions as D, type FileInfo as F, type GlobalConfig as G, type LoadedConfig as L, type MarkdownProps as M, type BaseCollection as a, type MetaCollection as b, type DocCollection as c, type DocsCollection as d, defineCollections as e, frontmatterSchema as f, defineDocs as g, defineConfig as h, loadDefaultOptions as l, metaSchema as m };

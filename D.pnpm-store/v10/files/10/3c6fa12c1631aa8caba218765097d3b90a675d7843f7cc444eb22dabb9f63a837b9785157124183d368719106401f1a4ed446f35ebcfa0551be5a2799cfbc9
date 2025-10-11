@@ -1,0 +1,28 @@
+'use client';
+import { jsx as _jsx } from "react/jsx-runtime";
+import { CodeBlock, Pre } from '../components/codeblock.js';
+import { useShiki } from 'fumadocs-core/highlight/client';
+import { cn } from '../utils/cn.js';
+import { useMemo } from 'react';
+function pre(props) {
+    return (_jsx(CodeBlock, { ...props, className: cn('my-0', props.className), children: _jsx(Pre, { children: props.children }) }));
+}
+export function DynamicCodeBlock({ lang, code, options, }) {
+    const components = {
+        pre,
+        ...options?.components,
+    };
+    const loading = useMemo(() => {
+        const Pre = (components.pre ?? 'pre');
+        const Code = (components.code ?? 'code');
+        return (_jsx(Pre, { children: _jsx(Code, { children: code.split('\n').map((line, i) => (_jsx("span", { className: "line", children: line }, i))) }) }));
+        // eslint-disable-next-line -- initial value only
+    }, []);
+    return useShiki(code, {
+        lang,
+        loading,
+        withPrerenderScript: true,
+        ...options,
+        components,
+    });
+}

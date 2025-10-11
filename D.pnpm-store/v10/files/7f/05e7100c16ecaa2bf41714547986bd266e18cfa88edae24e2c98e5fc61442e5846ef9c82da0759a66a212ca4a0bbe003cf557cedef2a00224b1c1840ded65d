@@ -1,0 +1,20 @@
+import type { PageTree } from 'fumadocs-core/server';
+import { type HTMLAttributes, type ReactNode } from 'react';
+import { type LinkItemType } from '../layouts/links.js';
+import { type BaseLayoutProps } from './shared.js';
+import { CollapsibleControl, Navbar, NavbarSidebarTrigger } from '../layouts/docs-client.js';
+import { type SidebarOptions } from '../layouts/docs/shared.js';
+export interface DocsLayoutProps extends BaseLayoutProps {
+    tree: PageTree.Root;
+    sidebar?: Partial<SidebarOptions> & {
+        enabled?: boolean;
+        component?: ReactNode;
+    };
+    /**
+     * Props for the `div` container
+     */
+    containerProps?: HTMLAttributes<HTMLDivElement>;
+}
+export declare function DocsLayout({ nav: { transparentMode, ...nav }, sidebar: { tabs: sidebarTabs, footer: sidebarFooter, banner: sidebarBanner, enabled: sidebarEnabled, collapsible: sidebarCollapsible, component: sidebarComponent, components: sidebarComponents, ...sidebarProps }, searchToggle, disableThemeSwitch, themeSwitch, i18n, children, ...props }: DocsLayoutProps): import("react/jsx-runtime").JSX.Element;
+export { CollapsibleControl, Navbar, NavbarSidebarTrigger, type LinkItemType };
+//# sourceMappingURL=docs.d.ts.map

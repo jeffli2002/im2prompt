@@ -1,0 +1,15 @@
+export { a as BaseCollection, B as BaseCollectionEntry, C as CollectionSchema, D as DefaultMDXOptions, c as DocCollection, d as DocsCollection, F as FileInfo, G as GlobalConfig, M as MarkdownProps, b as MetaCollection, e as defineCollections, h as defineConfig, g as defineDocs, f as frontmatterSchema, l as loadDefaultOptions, m as metaSchema } from '../types-DvTNxAvo.js';
+import { Processor, Transformer } from 'unified';
+import { Root } from 'mdast';
+import 'mdx/types';
+import 'fumadocs-core/mdx-plugins';
+import 'fumadocs-core/server';
+import '@mdx-js/mdx';
+import 'react';
+import 'zod';
+import '@standard-schema/spec';
+import '@fumadocs/mdx-remote';
+
+declare function remarkInclude(this: Processor): Transformer<Root, Root>;
+
+export { remarkInclude };

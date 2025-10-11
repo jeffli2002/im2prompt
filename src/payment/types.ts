@@ -113,6 +113,7 @@ export interface PaymentRecord {
   trialEnd?: Date;
   createdAt: Date;
   updatedAt: Date;
+  provider?: 'stripe' | 'creem';
 }
 
 // 支付提供商接口
@@ -124,7 +125,7 @@ export interface PaymentProvider {
   getSubscription(subscriptionId: string): Promise<SubscriptionResult | null>;
   getPaymentStatus(paymentId: string): Promise<PaymentStatus>;
   verifyWebhook(payload: string, signature: string): Promise<boolean>;
-  createCustomer(userId: string, email: string, name?: string): Promise<string>;
+  createCustomer?(userId: string, email: string, name?: string): Promise<string>; // Optional - only for Stripe
 }
 
 // Webhook 事件
@@ -133,6 +134,54 @@ export interface WebhookEvent {
   type: PaymentEventType;
   data: StripeTypes.Event.Data;
   created: number;
+}
+
+// Creem-specific types
+export type CreemWebhookEventType = 
+  | 'checkout.completed'
+  | 'subscription.active'
+  | 'subscription.trialing'
+  | 'subscription.canceled'
+  | 'subscription.expired'
+  | 'subscription.updated'
+  | 'payment.succeeded'
+  | 'payment.failed';
+
+export interface CreemWebhookEvent {
+  id: string;
+  type: CreemWebhookEventType;
+  data: {
+    id: string;
+    object: 'checkout' | 'subscription' | 'payment';
+    customerId?: string;
+    productId?: string;
+    priceId?: string;
+    status?: string;
+    amount?: number;
+    currency?: string;
+    interval?: 'month' | 'year';
+    currentPeriodStart?: number;
+    currentPeriodEnd?: number;
+    cancelAtPeriodEnd?: boolean;
+    metadata?: Record<string, string>;
+  };
+  created: number;
+}
+
+export interface CreemCheckoutParams {
+  productId: string;
+  customerId?: string;
+  successUrl?: string;
+  cancelUrl?: string;
+  metadata?: Record<string, string>;
+}
+
+export interface CreemSubscriptionParams {
+  productId: string;
+  customerId: string;
+  priceId: string;
+  trialPeriodDays?: number;
+  metadata?: Record<string, string>;
 }
 
 // 价格信息
