@@ -6,7 +6,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 export interface CreatePaymentData {
   id?: string;
+  provider?: 'stripe' | 'creem';
   priceId: string;
+  productId?: string;
   type: PaymentType;
   interval?: PaymentInterval;
   userId: string;
@@ -35,6 +37,7 @@ export interface CreatePaymentEventData {
   paymentId: string;
   eventType: string;
   stripeEventId?: string;
+  creemEventId?: string;
   eventData?: string;
 }
 
@@ -49,7 +52,9 @@ export class PaymentRepository {
       .insert(payment)
       .values({
         id: data.id || uuidv4(),
+        provider: data.provider || 'stripe',
         priceId: data.priceId,
+        productId: data.productId || null,
         type: data.type,
         interval: data.interval || null,
         userId: data.userId,
@@ -125,9 +130,10 @@ export class PaymentRepository {
 
   /**
    * 获取用户的活跃订阅
+   * Excludes subscriptions that are set to cancel at period end
    */
   async findActiveSubscriptionByUserId(userId: string): Promise<PaymentRecord | null> {
-    const result = await db
+    const results = await db
       .select()
       .from(payment)
       .where(
@@ -137,10 +143,13 @@ export class PaymentRepository {
           inArray(payment.status, ['active', 'trialing', 'past_due'])
         )
       )
-      .orderBy(desc(payment.createdAt))
-      .limit(1);
+      .orderBy(desc(payment.createdAt));
 
-    return result[0] ? this.mapToPaymentRecord(result[0]) : null;
+    // Filter out subscriptions that are set to cancel at period end
+    // and return the most recent truly active subscription
+    const activeSubscription = results.find(sub => !sub.cancelAtPeriodEnd);
+    
+    return activeSubscription ? this.mapToPaymentRecord(activeSubscription) : null;
   }
 
   /**
@@ -189,6 +198,7 @@ export class PaymentRepository {
       paymentId: data.paymentId,
       eventType: data.eventType,
       stripeEventId: data.stripeEventId || null,
+      creemEventId: data.creemEventId || null,
       eventData: data.eventData || null,
     });
   }
@@ -206,6 +216,140 @@ export class PaymentRepository {
     return result.length > 0;
   }
 
+  /**
+   * 检查 Creem 事件是否已处理
+   */
+  async isCreemEventProcessed(creemEventId: string): Promise<boolean> {
+    const result = await db
+      .select()
+      .from(paymentEvent)
+      .where(eq(paymentEvent.creemEventId, creemEventId))
+      .limit(1);
+
+    return result.length > 0;
+  }
+  
+  /**
+   * Cancel all active subscriptions for a user
+   */
+  async cancelUserSubscriptions(userId: string): Promise<number> {
+    const result = await db
+      .update(payment)
+      .set({
+        status: 'canceled',
+        cancelAtPeriodEnd: false,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(payment.userId, userId),
+          inArray(payment.status, ['active', 'trialing', 'past_due'])
+        )
+      );
+    
+    return result.rowCount;
+  }
+  
+  /**
+   * Find subscription by user and status
+   */
+  async findSubscriptionByUserAndStatus(
+    userId: string, 
+    statuses: PaymentStatus[]
+  ): Promise<PaymentRecord[]> {
+    const results = await db
+      .select()
+      .from(payment)
+      .where(
+        and(
+          eq(payment.userId, userId),
+          eq(payment.type, 'subscription'),
+          inArray(payment.status, statuses)
+        )
+      )
+      .orderBy(desc(payment.createdAt));
+    
+    return results.map(this.mapToPaymentRecord);
+  }
+  
+  /**
+   * Get subscription count by plan
+   */
+  async getSubscriptionCountByPlan(planId: string): Promise<number> {
+    const result = await db
+      .select()
+      .from(payment)
+      .where(
+        and(
+          eq(payment.priceId, planId),
+          eq(payment.type, 'subscription'),
+          inArray(payment.status, ['active', 'trialing'])
+        )
+      );
+    
+    return result.length;
+  }
+
+  /**
+   * Check if user has any active subscription
+   */
+  async hasActiveSubscription(userId: string): Promise<boolean> {
+    const result = await db
+      .select()
+      .from(payment)
+      .where(
+        and(
+          eq(payment.userId, userId),
+          eq(payment.type, 'subscription'),
+          inArray(payment.status, ['active', 'trialing', 'past_due'])
+        )
+      )
+      .limit(1);
+    
+    return result.length > 0;
+  }
+  
+  /**
+   * Update subscription status with state validation
+   */
+  async updateSubscriptionStatus(
+    subscriptionId: string,
+    newStatus: PaymentStatus,
+    metadata?: Record<string, any>
+  ): Promise<PaymentRecord | null> {
+    const current = await this.findBySubscriptionId(subscriptionId);
+    
+    if (!current) {
+      console.error(`[PaymentRepository] Subscription ${subscriptionId} not found`);
+      return null;
+    }
+    
+    // Validate state transition
+    const validTransitions: Record<PaymentStatus, PaymentStatus[]> = {
+      'incomplete': ['active', 'canceled', 'incomplete_expired'],
+      'incomplete_expired': ['active', 'canceled'],
+      'trialing': ['active', 'canceled', 'past_due'],
+      'active': ['canceled', 'past_due', 'unpaid', 'paused'],
+      'past_due': ['active', 'canceled', 'unpaid'],
+      'canceled': [], // Terminal state
+      'unpaid': ['active', 'canceled'],
+      'paused': ['active', 'canceled'],
+    };
+    
+    const allowedTransitions = validTransitions[current.status] || [];
+    
+    if (!allowedTransitions.includes(newStatus) && current.status !== newStatus) {
+      console.warn(
+        `[PaymentRepository] Invalid status transition: ${current.status} → ${newStatus} for subscription ${subscriptionId}`
+      );
+    }
+    
+    return this.update(subscriptionId, {
+      status: newStatus,
+      ...metadata,
+    });
+  }
+  
   /**
    * 映射数据库记录到 PaymentRecord
    */

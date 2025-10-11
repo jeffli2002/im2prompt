@@ -122,10 +122,28 @@ export async function POST(request: NextRequest) {
       
       console.log(`[Creem Sync] User already has active subscription: ${currentPlan}`);
       
-      // If subscription is set to cancel at period end, allow the new subscription
+      // If subscription is set to cancel at period end, immediately cancel it and create new one
       if (existingSubscription.cancelAtPeriodEnd) {
-        console.log(`[Creem Sync] Existing subscription is set to cancel, allowing new subscription`);
-        // Continue with creating new subscription
+        console.log(`[Creem Sync] Existing subscription is set to cancel, immediately canceling it`);
+        
+        // Immediately cancel the old subscription
+        await paymentRepository.update(existingSubscription.id, {
+          status: 'canceled',
+          cancelAtPeriodEnd: false,
+        });
+        
+        await paymentRepository.createEvent({
+          paymentId: existingSubscription.id,
+          eventType: 'canceled',
+          eventData: JSON.stringify({
+            subscriptionId: existingSubscription.subscriptionId,
+            canceledAt: new Date().toISOString(),
+            reason: 'plan_upgraded',
+            newPlan: planId,
+          }),
+        });
+        
+        console.log(`[Creem Sync] Old subscription canceled, proceeding with new subscription`);
       } else if (currentPlan === planId) {
         // If trying to subscribe to the same plan without cancellation, reject
         return NextResponse.json({
