@@ -111,6 +111,9 @@ export async function POST(request: NextRequest) {
     // In production, this would fetch from Creem API
     const planId = body.planId || 'pro'; // Default to pro if not specified
     const isYearly = body.isYearly || false;
+    const newInterval = isYearly ? 'year' : 'month';
+    
+    console.log(`[Creem Sync] Requested plan: ${planId} ${newInterval}`);
 
     // Check if subscription already exists
     const existingSubscription = await paymentRepository.findActiveSubscriptionByUserId(
@@ -118,12 +121,32 @@ export async function POST(request: NextRequest) {
     );
 
     if (existingSubscription) {
-      const currentPlan = existingSubscription.priceId.includes('proplus') ? 'proplus' : 'pro';
+      const currentPlan = existingSubscription.priceId;
       const currentInterval = existingSubscription.interval;
-      const newInterval = isYearly ? 'year' : 'month';
       
       console.log(`[Creem Sync] User already has active subscription: ${currentPlan} ${currentInterval}`);
       console.log(`[Creem Sync] Attempting to create: ${planId} ${newInterval}`);
+      
+      // Check if this is the exact same subscription (idempotency check)
+      // If subscription was created within the last 30 seconds with same plan/interval, it's likely a duplicate request
+      const subscriptionAge = Date.now() - new Date(existingSubscription.createdAt).getTime();
+      const isRecentDuplicate = 
+        currentPlan === planId && 
+        currentInterval === newInterval && 
+        subscriptionAge < 30000; // 30 seconds
+      
+      if (isRecentDuplicate) {
+        console.log(`[Creem Sync] Duplicate request detected - subscription created ${subscriptionAge}ms ago`);
+        return NextResponse.json({
+          success: true,
+          message: 'Subscription already exists (duplicate request ignored)',
+          subscription: {
+            id: existingSubscription.id,
+            planId: existingSubscription.priceId,
+            status: existingSubscription.status,
+          },
+        });
+      }
       
       // If subscription is set to cancel at period end, immediately cancel it and create new one
       if (existingSubscription.cancelAtPeriodEnd) {
@@ -155,11 +178,30 @@ export async function POST(request: NextRequest) {
           error: `You already have an active ${planId.toUpperCase()} ${newInterval === 'year' ? 'yearly' : 'monthly'} subscription`,
         }, { status: 400 });
       } else {
-        // For different plans or intervals without cancellation, reject
-        return NextResponse.json({
-          success: false,
-          error: `You already have an active ${currentPlan.toUpperCase()} ${currentInterval === 'year' ? 'yearly' : 'monthly'} subscription. Please cancel it before subscribing to a different plan.`,
-        }, { status: 400 });
+        // For different plans or intervals, automatically cancel the old subscription and create the new one
+        console.log(`[Creem Sync] Automatically canceling old subscription to allow plan/interval change`);
+        
+        // Immediately cancel the old subscription
+        await paymentRepository.update(existingSubscription.id, {
+          status: 'canceled',
+          cancelAtPeriodEnd: false,
+        });
+        
+        await paymentRepository.createEvent({
+          paymentId: existingSubscription.id,
+          eventType: 'canceled',
+          eventData: JSON.stringify({
+            subscriptionId: existingSubscription.subscriptionId,
+            canceledAt: new Date().toISOString(),
+            reason: 'plan_changed',
+            oldPlan: currentPlan,
+            oldInterval: currentInterval,
+            newPlan: planId,
+            newInterval: newInterval,
+          }),
+        });
+        
+        console.log(`[Creem Sync] Old subscription canceled, proceeding with new subscription`);
       }
     }
 

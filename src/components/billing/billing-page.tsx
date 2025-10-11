@@ -23,6 +23,7 @@ export function BillingPage() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [syncCompleted, setSyncCompleted] = useState(false);
   const searchParams = useSearchParams();
 
   const loadBillingInfo = useCallback(async () => {
@@ -77,11 +78,19 @@ export function BillingPage() {
 
   // Handle URL parameters to show payment result notifications
   useEffect(() => {
+    // Prevent duplicate syncs
+    if (syncCompleted) {
+      return;
+    }
+
     const success = searchParams.get('success');
     const canceled = searchParams.get('canceled');
     const planId = searchParams.get('planId');
 
     if (success === 'true') {
+      // Mark as completed immediately to prevent duplicate calls
+      setSyncCompleted(true);
+      
       // In dev mode, manually sync the subscription
       const syncSubscription = async () => {
         try {
@@ -110,27 +119,30 @@ export function BillingPage() {
           if (response.ok) {
             toast.success(t('toast.paymentSuccess'), { duration: 5000 });
             await loadBillingInfo(); // Reload billing info
-            // Also reload page after 2 seconds to ensure UI is fresh
-            setTimeout(() => window.location.reload(), 2000);
+            // Clean URL without reloading page
+            window.history.replaceState({}, '', window.location.pathname);
           } else {
             console.error('[Billing] Sync failed:', data);
             toast.warning(`Payment succeeded but sync failed: ${data.error}. Please refresh the page.`, { duration: 7000 });
+            // Clean URL
+            window.history.replaceState({}, '', window.location.pathname);
           }
         } catch (error) {
           console.error('[Billing] Sync error:', error);
           toast.warning('Payment succeeded but sync failed. Please refresh the page.', { duration: 5000 });
+          // Clean URL
+          window.history.replaceState({}, '', window.location.pathname);
         }
       };
 
       syncSubscription();
-      window.history.replaceState({}, '', window.location.pathname);
     } else if (canceled === 'true') {
       toast.info(t('toast.paymentCanceled'), {
         duration: 5000,
       });
       window.history.replaceState({}, '', window.location.pathname);
     }
-  }, [searchParams, loadBillingInfo, t]);
+  }, [searchParams, loadBillingInfo, t, syncCompleted]);
 
   const formatDate = (date: Date | null | undefined) => {
     if (!date) return t('unknown');
