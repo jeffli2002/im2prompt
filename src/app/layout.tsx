@@ -71,6 +71,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <meta name="google-site-verification" content="n43QebBEBeyBsRUaZ4yd5VksyiYaeKzwOAinwhgVSeo" />
         {gaId && <GoogleAnalytics gaId={gaId} />}
       </head>
       <body>
