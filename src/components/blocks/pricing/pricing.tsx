@@ -65,10 +65,12 @@ const Pricing = ({
   const finalHeading = heading || t('heading');
   const finalDescription = description || t('description');
   const [isYearly, setIsYearly] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
   const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
+  const [currentInterval, setCurrentInterval] = useState<'month' | 'year' | null>(null);
+  const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(false);
+  const [processingPlanId, setProcessingPlanId] = useState<string | null>(null);
   const isAuthenticated = useIsAuthenticated();
   const router = useRouter();
   const paymentPlans = usePaymentPlans();
@@ -88,12 +90,18 @@ const Pricing = ({
         });
         if (response.ok) {
           const data = await response.json();
+          console.log('[Pricing] Subscription data:', data);
           if (data.subscription) {
             // Extract plan ID from priceId (e.g., "pro" or "proplus")
             const planId = data.subscription.priceId?.includes('proplus') ? 'proplus' : 'pro';
             setCurrentPlanId(planId);
+            setCurrentInterval(data.subscription.interval);
+            setCancelAtPeriodEnd(data.subscription.cancelAtPeriodEnd || false);
+            console.log('[Pricing] Set state:', { planId, interval: data.subscription.interval, cancelAtPeriodEnd: data.subscription.cancelAtPeriodEnd });
           } else {
             setCurrentPlanId(null);
+            setCurrentInterval(null);
+            setCancelAtPeriodEnd(false);
           }
         }
       } catch (error) {
@@ -131,18 +139,16 @@ const Pricing = ({
       return;
     }
 
-    // Check if user already has this plan
-    if (currentPlanId === plan.id) {
+    const selectedInterval = isYearly ? 'year' : 'month';
+
+    // Check if user already has this exact plan with same interval
+    if (currentPlanId === plan.id && currentInterval === selectedInterval && !cancelAtPeriodEnd) {
       toast.info(`You already have an active ${plan.name} subscription`);
       return;
     }
 
-    // Check if user has a different plan
-    if (currentPlanId && currentPlanId !== plan.id) {
-      toast.error('Please cancel your current subscription before switching plans');
-      router.push('/settings/billing');
-      return;
-    }
+    // Allow plan changes - the backend will handle cancellation and scheduling
+    console.log('[Pricing] Plan change detected:', { currentPlanId, targetPlanId: plan.id, cancelAtPeriodEnd });
 
     // Free plan redirects to image-to-prompt page
     if (plan.id === 'free') {
@@ -155,7 +161,7 @@ const Pricing = ({
     setShowPurchaseDialog(true);
   };
 
-  const handleConfirmPurchase = () => {
+  const handleConfirmPurchase = async () => {
     if (!selectedPlan) return;
 
     // Validate plan ID
@@ -166,23 +172,24 @@ const Pricing = ({
       return;
     }
 
-    // Create Creem checkout session
-    startTransition(async () => {
-      try {
-        await createCreemCheckout({ 
-          planId,
-          interval: isYearly ? 'year' : 'month',
-        });
-        // The hook automatically redirects to checkout URL on success
-      } catch (error) {
-        toast.error('创建支付会话失败');
-        pricingErrorLogger.logError(error as Error, {
-          operation: 'createCheckoutSession',
-          planId: selectedPlan.id,
-        });
-        setShowPurchaseDialog(false);
-      }
-    });
+    // Set processing state for this specific plan
+    setProcessingPlanId(planId);
+    
+    try {
+      await createCreemCheckout({ 
+        planId,
+        interval: isYearly ? 'year' : 'month',
+      });
+      // The hook automatically redirects to checkout URL on success
+    } catch (error) {
+      toast.error('创建支付会话失败');
+      pricingErrorLogger.logError(error as Error, {
+        operation: 'createCheckoutSession',
+        planId: selectedPlan.id,
+      });
+      setShowPurchaseDialog(false);
+      setProcessingPlanId(null);
+    }
   };
 
   const handleCancelPurchase = () => {
@@ -238,7 +245,7 @@ const Pricing = ({
               >
                 {/* Current Plan or Popular badge */}
                 <div className="absolute top-4 right-4">
-                  {currentPlanId === plan.id ? (
+                  {currentPlanId === plan.id && currentInterval === (isYearly ? 'year' : 'month') && !cancelAtPeriodEnd ? (
                     <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
                       Current Plan
                     </Badge>
@@ -315,12 +322,12 @@ const Pricing = ({
                   <Button 
                     className="w-full py-6 text-lg font-semibold rounded-2xl transition-all duration-300 hover:shadow-xl"
                     onClick={() => handlePurchaseClick(plan)}
-                    disabled={isPending || currentPlanId === plan.id}
-                    variant={currentPlanId === plan.id ? 'outline' : 'default'}
+                    disabled={processingPlanId !== null || (currentPlanId === plan.id && currentInterval === (isYearly ? 'year' : 'month') && !cancelAtPeriodEnd)}
+                    variant={(currentPlanId === plan.id && currentInterval === (isYearly ? 'year' : 'month') && !cancelAtPeriodEnd) ? 'outline' : 'default'}
                   >
-                    {currentPlanId === plan.id ? (
+                    {(currentPlanId === plan.id && currentInterval === (isYearly ? 'year' : 'month') && !cancelAtPeriodEnd) ? (
                       'Active Subscription'
-                    ) : isPending ? (
+                    ) : processingPlanId === plan.id ? (
                       t('processingText')
                     ) : (
                       <>
