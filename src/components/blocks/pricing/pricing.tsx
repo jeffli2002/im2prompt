@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowRight, CircleCheck } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
@@ -10,11 +10,11 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { useIsAuthenticated } from '@/store/auth-store';
 import { useRouter } from '@/i18n/navigation';
-import { createCheckoutSession } from '@/server/actions/payment/create-subscription';
 import { toast } from 'sonner';
 import { useTransition } from 'react';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
 import { usePaymentPlans } from '@/hooks/use-config';
+import { useCreemPayment } from '@/hooks/useCreemPayment';
 import { Badge } from '@/components/ui/badge';
 import { PurchaseConfirmationDialog } from '@/components/payment/purchase-confirmation-dialog';
 
@@ -68,9 +68,41 @@ const Pricing = ({
   const [isPending, startTransition] = useTransition();
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
+  const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
   const isAuthenticated = useIsAuthenticated();
   const router = useRouter();
   const paymentPlans = usePaymentPlans();
+  const { createCheckoutSession: createCreemCheckout, isLoading: creemLoading } = useCreemPayment();
+
+  // Fetch current subscription when authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setCurrentPlanId(null);
+      return;
+    }
+
+    const fetchSubscription = async () => {
+      try {
+        const response = await fetch('/api/payment/get-subscription', {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.subscription) {
+            // Extract plan ID from priceId (e.g., "pro" or "proplus")
+            const planId = data.subscription.priceId?.includes('proplus') ? 'proplus' : 'pro';
+            setCurrentPlanId(planId);
+          } else {
+            setCurrentPlanId(null);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch subscription:', error);
+      }
+    };
+
+    fetchSubscription();
+  }, [isAuthenticated]);
   
   // Use configured plans if not provided as props
   // Convert payment plans to pricing plans format if needed
@@ -99,6 +131,19 @@ const Pricing = ({
       return;
     }
 
+    // Check if user already has this plan
+    if (currentPlanId === plan.id) {
+      toast.info(`You already have an active ${plan.name} subscription`);
+      return;
+    }
+
+    // Check if user has a different plan
+    if (currentPlanId && currentPlanId !== plan.id) {
+      toast.error('Please cancel your current subscription before switching plans');
+      router.push('/settings/billing');
+      return;
+    }
+
     // Free plan redirects to image-to-prompt page
     if (plan.id === 'free') {
       router.push('/image-to-prompt');
@@ -113,38 +158,26 @@ const Pricing = ({
   const handleConfirmPurchase = () => {
     if (!selectedPlan) return;
 
-    // Get corresponding price ID
-    const priceId = isYearly 
-      ? selectedPlan.stripePriceIds?.yearly 
-      : selectedPlan.stripePriceIds?.monthly;
-
-    if (!priceId) {
-      toast.error('价格配置错误，请联系客服');
+    // Validate plan ID
+    const planId = selectedPlan.id;
+    if (planId !== 'pro' && planId !== 'proplus') {
+      toast.error('Invalid plan selected');
       setShowPurchaseDialog(false);
       return;
     }
 
-    // Create payment session
+    // Create Creem checkout session
     startTransition(async () => {
       try {
-        const result = await createCheckoutSession({
-          priceId,
-          successUrl: `${window.location.origin}/settings/billing?success=true`,
-          // Redirect to billing page when user cancels payment, showing cancellation notice
-          cancelUrl: `${window.location.origin}/settings/billing?canceled=true`,
+        await createCreemCheckout({ 
+          planId,
+          interval: isYearly ? 'year' : 'month',
         });
-
-        if (result.success && result.data?.url) {
-          window.location.href = result.data.url;
-        } else {
-          toast.error(result.error || '创建支付会话失败');
-          setShowPurchaseDialog(false);
-        }
+        // The hook automatically redirects to checkout URL on success
       } catch (error) {
         toast.error('创建支付会话失败');
         pricingErrorLogger.logError(error as Error, {
           operation: 'createCheckoutSession',
-          priceId,
           planId: selectedPlan.id,
         });
         setShowPurchaseDialog(false);
@@ -203,23 +236,18 @@ const Pricing = ({
                   animationDelay: `${index * 100}ms`,
                 }}
               >
-                {/* Popular badge */}
-                {plan.id === 'pro' && (
-                  <div className="absolute top-4 right-4">
+                {/* Current Plan or Popular badge */}
+                <div className="absolute top-4 right-4">
+                  {currentPlanId === plan.id ? (
+                    <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      Current Plan
+                    </Badge>
+                  ) : plan.id === 'pro' ? (
                     <Badge className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
                       Most Popular
                     </Badge>
-                  </div>
-                )}
-                
-                {/* Coming Soon badge for paid plans */}
-                {plan.id !== 'free' && (
-                  <div className="absolute top-4 left-4">
-                    <Badge variant="secondary" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 px-3 py-1 rounded-full text-xs font-semibold">
-                      Coming Soon
-                    </Badge>
-                  </div>
-                )}
+                  ) : null}
+                </div>
                 
                 <CardHeader className="p-8">
                   <CardTitle className="text-2xl font-bold mb-2">
@@ -284,23 +312,23 @@ const Pricing = ({
                   </ul>
                 </CardContent>
                 <CardFooter className="mt-auto p-8 pt-0">
-                  {plan.id === 'free' ? (
-                    <Button 
-                      className="w-full py-6 text-lg font-semibold rounded-2xl transition-all duration-300 hover:shadow-xl"
-                      onClick={() => handlePurchaseClick(plan)}
-                      disabled={isPending}
-                    >
-                      {isPending ? t('processingText') : plan.button.text}
-                      <ArrowRight className="ml-2 size-5" />
-                    </Button>
-                  ) : (
-                    <Button 
-                      className="w-full py-6 text-lg font-semibold rounded-2xl transition-all duration-300 bg-muted text-muted-foreground cursor-not-allowed"
-                      disabled={true}
-                    >
-                      Coming Soon
-                    </Button>
-                  )}
+                  <Button 
+                    className="w-full py-6 text-lg font-semibold rounded-2xl transition-all duration-300 hover:shadow-xl"
+                    onClick={() => handlePurchaseClick(plan)}
+                    disabled={isPending || currentPlanId === plan.id}
+                    variant={currentPlanId === plan.id ? 'outline' : 'default'}
+                  >
+                    {currentPlanId === plan.id ? (
+                      'Active Subscription'
+                    ) : isPending ? (
+                      t('processingText')
+                    ) : (
+                      <>
+                        {plan.button.text}
+                        <ArrowRight className="ml-2 size-5" />
+                      </>
+                    )}
+                  </Button>
                 </CardFooter>
               </Card>
             ))}

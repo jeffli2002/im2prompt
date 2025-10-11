@@ -15,8 +15,10 @@ export const paymentConfig: PaymentConfig = {
   creem: {
     apiKey: process.env.CREEM_API_KEY || '',
     webhookSecret: process.env.CREEM_WEBHOOK_SECRET || '',
-    proProductKey: process.env.CREEM_PRO_PLAN_PRODUCT_KEY || '',
-    proplusProductKey: process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY || '',
+    proProductKeyMonthly: process.env.CREEM_PRO_PLAN_PRODUCT_KEY_MONTHLY || '',
+    proplusProductKeyMonthly: process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY_MONTHLY || '',
+    proProductKeyYearly: process.env.CREEM_PRO_PLAN_PRODUCT_KEY_YEARLY || '',
+    proplusProductKeyYearly: process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY_YEARLY || '',
   },
 
   plans: [

@@ -9,6 +9,7 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    DISABLE_AUTH: z.string().optional().default('false'),
     BETTER_AUTH_SECRET: z.string(),
     GITHUB_CLIENT_ID: z.string().optional().default(''),
     GITHUB_CLIENT_SECRET: z.string().optional().default(''),
@@ -22,10 +23,21 @@ export const env = createEnv({
     // Stripe
     STRIPE_SECRET_KEY: z.string().optional().default('sk_test_dummy'),
     STRIPE_WEBHOOK_SECRET: z.string().optional().default('whsec_dummy'),
+    // Creem
+    CREEM_API_KEY: z.string().optional().default(''),
+    CREEM_WEBHOOK_SECRET: z.string().optional().default(''),
+    CREEM_PRO_PLAN_PRODUCT_KEY_MONTHLY: z.string().optional().default(''),
+    CREEM_PROPLUS_PLAN_PRODUCT_KEY_MONTHLY: z.string().optional().default(''),
+    CREEM_PRO_PLAN_PRODUCT_KEY_YEARLY: z.string().optional().default(''),
+    CREEM_PROPLUS_PLAN_PRODUCT_KEY_YEARLY: z.string().optional().default(''),
     // Admin Configuration
     ADMIN_EMAILS: z.string().optional().default(''),
     // Cron Security
     CRON_SECRET: z.string().optional().default('dummy'),
+    // Content Sharing & History
+    CLOUDINARY_CLOUD_NAME: z.string().optional().default(''),
+    CLOUDINARY_UPLOAD_PRESET: z.string().optional().default(''),
+    CLOUDINARY_URL: z.string().optional().default(''),
   },
 
   /**
@@ -34,8 +46,11 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
     NEXT_PUBLIC_APP_URL: z.string().url(),
+    NEXT_PUBLIC_DISABLE_AUTH: z.string().optional().default('false'),
+    NEXT_PUBLIC_CREEM_TEST_MODE: z.string().optional().default('true'),
+    NEXT_PUBLIC_CREEM_PRO_PAYMENT_URL: z.string().optional().default(''),
+    NEXT_PUBLIC_CREEM_PROPLUS_PAYMENT_URL: z.string().optional().default(''),
   },
 
   /**
@@ -45,6 +60,7 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+    DISABLE_AUTH: process.env.DISABLE_AUTH,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
@@ -58,11 +74,26 @@ export const env = createEnv({
     // Stripe
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    // Creem
+    CREEM_API_KEY: process.env.CREEM_API_KEY,
+    CREEM_WEBHOOK_SECRET: process.env.CREEM_WEBHOOK_SECRET,
+    CREEM_PRO_PLAN_PRODUCT_KEY_MONTHLY: process.env.CREEM_PRO_PLAN_PRODUCT_KEY_MONTHLY,
+    CREEM_PROPLUS_PLAN_PRODUCT_KEY_MONTHLY: process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY_MONTHLY,
+    CREEM_PRO_PLAN_PRODUCT_KEY_YEARLY: process.env.CREEM_PRO_PLAN_PRODUCT_KEY_YEARLY,
+    CREEM_PROPLUS_PLAN_PRODUCT_KEY_YEARLY: process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY_YEARLY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_DISABLE_AUTH: process.env.NEXT_PUBLIC_DISABLE_AUTH,
+    NEXT_PUBLIC_CREEM_TEST_MODE: process.env.NEXT_PUBLIC_CREEM_TEST_MODE,
+    NEXT_PUBLIC_CREEM_PRO_PAYMENT_URL: process.env.NEXT_PUBLIC_CREEM_PRO_PAYMENT_URL,
+    NEXT_PUBLIC_CREEM_PROPLUS_PAYMENT_URL: process.env.NEXT_PUBLIC_CREEM_PROPLUS_PAYMENT_URL,
     // Admin Configuration
     ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     // Cron Security
     CRON_SECRET: process.env.CRON_SECRET,
+    // Content Sharing & History
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_UPLOAD_PRESET: process.env.CLOUDINARY_UPLOAD_PRESET,
+    CLOUDINARY_URL: process.env.CLOUDINARY_URL,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
