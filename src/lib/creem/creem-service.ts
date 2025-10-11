@@ -8,6 +8,17 @@ import type {
   PaymentStatus,
 } from '@/payment/types';
 
+// Dynamic import for Creem to handle potential module resolution issues
+const loadCreem = async () => {
+  try {
+    const creemModule = await import('creem');
+    return creemModule.Creem;
+  } catch (error) {
+    console.error('[Creem] Failed to import Creem SDK:', error);
+    return null;
+  }
+};
+
 const getCreemTestMode = () => {
   const testModeEnv = env.NEXT_PUBLIC_CREEM_TEST_MODE;
   return testModeEnv === 'true';
@@ -30,15 +41,17 @@ export const CREEM_PRODUCTS = {
 
 let creemClient: any = null;
 
-const getCreemClient = () => {
+const getCreemClient = async () => {
   if (!creemClient) {
     const testMode = getCreemTestMode();
     
     try {
-      const { Creem } = require('creem');
-      creemClient = new Creem({
-        serverIdx: testMode ? 1 : 0,
-      });
+      const Creem = await loadCreem();
+      if (Creem) {
+        creemClient = new Creem({
+          serverIdx: testMode ? 1 : 0,
+        });
+      }
     } catch (error) {
       console.error('[Creem] Failed to initialize Creem SDK:', error);
       throw new Error('Creem SDK not available');
@@ -105,7 +118,11 @@ class CreemPaymentService {
         },
       };
 
-      const checkout = await getCreemClient().createCheckout({
+      const creem = await getCreemClient();
+      if (!creem) {
+        throw new Error('Creem client not available');
+      }
+      const checkout = await creem.createCheckout({
         xApiKey: CREEM_API_KEY,
         createCheckoutRequest: checkoutRequest,
       });
@@ -135,22 +152,33 @@ class CreemPaymentService {
 
   async cancelSubscription(subscriptionId: string) {
     try {
+      console.log('[Creem] Cancelling subscription:', subscriptionId);
       const CREEM_API_KEY = getCreemApiKey();
       if (!CREEM_API_KEY) {
         throw new Error('Creem API key not configured');
       }
 
-      const result = await getCreemClient().cancelSubscription({
+      const creem = await getCreemClient();
+      if (!creem) {
+        throw new Error('Creem client not available');
+      }
+      const result = await creem.cancelSubscription({
         id: subscriptionId,
         xApiKey: CREEM_API_KEY,
       });
+      console.log('[Creem] Cancel result:', result);
 
       return {
         success: true,
         subscription: result,
       };
     } catch (error: any) {
-      console.error('[Creem] Cancel subscription error:', error);
+      console.error('[Creem] Cancel subscription error:', {
+        subscriptionId,
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
 
       if (
         error.message?.includes('Subscription already canceled') ||
@@ -171,7 +199,7 @@ class CreemPaymentService {
       ) {
         return {
           success: false,
-          error: '订阅不存在或已被删除。请刷新页面查看最新状态。',
+          error: 'Subscription does not exist or has been deleted. Please refresh the page.',
         };
       }
 
@@ -189,7 +217,11 @@ class CreemPaymentService {
         throw new Error('Creem API key not configured');
       }
 
-      const result = await getCreemClient().retrieveSubscription({
+      const creem = await getCreemClient();
+      if (!creem) {
+        throw new Error('Creem client not available');
+      }
+      const result = await creem.retrieveSubscription({
         subscriptionId: subscriptionId,
         xApiKey: CREEM_API_KEY,
       });

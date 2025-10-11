@@ -239,7 +239,6 @@ function ToolRow({ tool, index }: ToolRowProps) {
                   src={tool.demoImage}
                   alt={tool.demoImageAlt}
                   fill
-                  unoptimized
                   className={cn(
                     'object-cover',
                     'transition-all duration-700 ease-out',

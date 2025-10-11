@@ -45,15 +45,15 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
   const getStatusText = (status: string) => {
     switch (status) {
       case 'active':
-        return '活跃';
+        return 'Active';
       case 'trialing':
-        return '试用中';
+        return 'Trialing';
       case 'past_due':
-        return '逾期';
+        return 'Past Due';
       case 'canceled':
-        return '已取消';
+        return 'Canceled';
       case 'incomplete':
-        return '未完成';
+        return 'Incomplete';
       default:
         return status;
     }
@@ -72,6 +72,9 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
           onUpdate?.();
         } else {
           toast.error(result.error || 'Subscription cancellation failed');
+          if (result.error?.includes('already canceled') || result.error?.includes('already cancelled')) {
+            onUpdate?.();
+          }
         }
       } catch (error) {
         toast.error('Subscription cancellation failed');

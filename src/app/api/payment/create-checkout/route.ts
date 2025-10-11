@@ -49,6 +49,14 @@ export async function POST(request: NextRequest) {
         console.log(`[Create Checkout] Auto-canceling existing ${currentPlan} subscription for plan change`);
         
         try {
+          if (!activeSubscription.subscriptionId) {
+            console.log(`[Create Checkout] No subscription ID found for subscription ${activeSubscription.id}`);
+            return NextResponse.json(
+              { error: 'Invalid subscription data' },
+              { status: 400 }
+            );
+          }
+          
           const cancelResult = await creemService.cancelSubscription(activeSubscription.subscriptionId);
           
           if (cancelResult.success) {

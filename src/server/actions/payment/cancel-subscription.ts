@@ -18,7 +18,7 @@ export async function cancelSubscription(
     if (!session?.user) {
       return {
         success: false,
-        error: '请先登录',
+        error: 'Please login first',
       };
     }
 
@@ -26,27 +26,27 @@ export async function cancelSubscription(
     if (!paymentRecord || paymentRecord.userId !== session.user.id) {
       return {
         success: false,
-        error: '订阅不存在或无权操作',
+        error: 'Subscription not found or unauthorized',
       };
     }
 
     if (paymentRecord.status === 'canceled') {
       return {
         success: false,
-        error: '订阅已经被取消',
+        error: 'Subscription already canceled',
       };
     }
 
     const result = await creemService.cancelSubscription(subscriptionId);
     if (!result.success) {
-      if (result.error?.includes('订阅不存在')) {
+      if (result.error?.includes('does not exist') || result.error?.includes('not found')) {
         await paymentRepository.update(paymentRecord.id, {
           status: 'canceled',
         });
       }
       return {
         success: false,
-        error: result.error || '取消订阅失败',
+        error: result.error || 'Failed to cancel subscription',
       };
     }
 
@@ -69,7 +69,7 @@ export async function cancelSubscription(
       data: {
         canceled: true,
       },
-      message: '订阅已设置为在当前周期结束后取消',
+      message: 'Subscription will be canceled at the end of current period',
     };
 
   } catch (error) {
@@ -80,7 +80,7 @@ export async function cancelSubscription(
     });
     return {
       success: false,
-      error: error instanceof Error ? error.message : '取消订阅失败',
+      error: error instanceof Error ? error.message : 'Failed to cancel subscription',
     };
   }
 } 
