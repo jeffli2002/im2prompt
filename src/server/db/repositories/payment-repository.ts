@@ -145,9 +145,20 @@ export class PaymentRepository {
       )
       .orderBy(desc(payment.createdAt));
 
+    console.log(`[PaymentRepository] Found ${results.length} active subscriptions for user ${userId}`);
+    results.forEach((sub, i) => {
+      console.log(`[PaymentRepository] ${i + 1}. ${sub.priceId} ${sub.interval} status=${sub.status} cancelAtPeriodEnd=${sub.cancelAtPeriodEnd} created=${sub.createdAt}`);
+    });
+
     // Filter out subscriptions that are set to cancel at period end
     // and return the most recent truly active subscription
     const activeSubscription = results.find(sub => !sub.cancelAtPeriodEnd);
+    
+    if (activeSubscription) {
+      console.log(`[PaymentRepository] Returning active subscription: ${activeSubscription.priceId} ${activeSubscription.interval}`);
+    } else {
+      console.log(`[PaymentRepository] No active subscription found (all have cancelAtPeriodEnd=true)`);
+    }
     
     return activeSubscription ? this.mapToPaymentRecord(activeSubscription) : null;
   }
