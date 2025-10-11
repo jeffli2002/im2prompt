@@ -1,11 +1,10 @@
 'use server';
 
-import { auth } from '@/lib/auth/auth';
-import { StripeProvider } from '@/payment/stripe/provider';
+import { creemService } from '@/lib/creem/creem-service';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import type { ActionResult } from '@/payment/types';
-import { headers } from 'next/headers';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 
 const cancelErrorLogger = new ErrorLogger('cancel-subscription');
 
@@ -15,9 +14,7 @@ export async function cancelSubscription(
   let session: { user?: { id: string } } | null = null;
   
   try {
-    session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    session = await getSessionWithAuthBypass();
     if (!session?.user) {
       return {
         success: false,
@@ -25,7 +22,6 @@ export async function cancelSubscription(
       };
     }
 
-    // Verify subscription belongs to current user
     const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
     if (!paymentRecord || paymentRecord.userId !== session.user.id) {
       return {
@@ -34,23 +30,18 @@ export async function cancelSubscription(
       };
     }
 
-    const stripeProvider = new StripeProvider();
-
-    // Cancel Stripe subscription
-    const canceled = await stripeProvider.cancelSubscription(subscriptionId);
-    if (!canceled) {
+    const result = await creemService.cancelSubscription(subscriptionId);
+    if (!result.success) {
       return {
         success: false,
-        error: '取消订阅失败',
+        error: result.error || '取消订阅失败',
       };
     }
 
-    // Update database record
     await paymentRepository.update(paymentRecord.id, {
       cancelAtPeriodEnd: true,
     });
 
-    // Record event
     await paymentRepository.createEvent({
       paymentId: paymentRecord.id,
       eventType: 'canceled',
