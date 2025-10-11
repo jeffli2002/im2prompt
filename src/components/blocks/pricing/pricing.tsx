@@ -119,7 +119,7 @@ const Pricing = ({
   
   // Use configured plans if not provided as props
   // Convert payment plans to pricing plans format if needed
-  const pricingPlans = plans || paymentPlans.map((plan) => ({
+  const pricingPlans = plans || paymentPlans.map((plan: any) => ({
     ...plan,
     monthlyPrice: plan.price === 0 ? 'Free' : `$${plan.price}`,
     yearlyPrice: plan.price === 0 ? 'Free' : `$${Math.round((plan.yearlyPrice || plan.price * 10) / 12)}`,

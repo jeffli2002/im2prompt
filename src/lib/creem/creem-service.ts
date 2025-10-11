@@ -1,4 +1,5 @@
 import { env } from '@/env';
+import crypto from 'crypto';
 import type {
   CreatePaymentParams,
   CreateSubscriptionParams,
@@ -8,16 +9,8 @@ import type {
   PaymentStatus,
 } from '@/payment/types';
 
-// Dynamic import for Creem to handle potential module resolution issues
-const loadCreem = async () => {
-  try {
-    const creemModule = await import('creem');
-    return creemModule.Creem;
-  } catch (error) {
-    console.error('[Creem] Failed to import Creem SDK:', error);
-    return null;
-  }
-};
+// Import Creem SDK
+import { Creem } from 'creem';
 
 const getCreemTestMode = () => {
   const testModeEnv = env.NEXT_PUBLIC_CREEM_TEST_MODE;
@@ -41,22 +34,20 @@ export const CREEM_PRODUCTS = {
 
 let creemClient: any = null;
 
-const getCreemClient = async () => {
+const getCreemClient = () => {
   if (!creemClient) {
     const testMode = getCreemTestMode();
     
     try {
-      const Creem = await loadCreem();
-      if (Creem) {
-        creemClient = new Creem({
-          serverIdx: testMode ? 1 : 0,
-        });
-      }
+      creemClient = new Creem({
+        serverIdx: testMode ? 1 : 0,
+      });
     } catch (error) {
       console.error('[Creem] Failed to initialize Creem SDK:', error);
       throw new Error('Creem SDK not available');
     }
   }
+  
   return creemClient;
 };
 
@@ -118,10 +109,7 @@ class CreemPaymentService {
         },
       };
 
-      const creem = await getCreemClient();
-      if (!creem) {
-        throw new Error('Creem client not available');
-      }
+      const creem = getCreemClient();
       const checkout = await creem.createCheckout({
         xApiKey: CREEM_API_KEY,
         createCheckoutRequest: checkoutRequest,
@@ -158,10 +146,7 @@ class CreemPaymentService {
         throw new Error('Creem API key not configured');
       }
 
-      const creem = await getCreemClient();
-      if (!creem) {
-        throw new Error('Creem client not available');
-      }
+      const creem = getCreemClient();
       const result = await creem.cancelSubscription({
         id: subscriptionId,
         xApiKey: CREEM_API_KEY,
@@ -217,10 +202,7 @@ class CreemPaymentService {
         throw new Error('Creem API key not configured');
       }
 
-      const creem = await getCreemClient();
-      if (!creem) {
-        throw new Error('Creem client not available');
-      }
+      const creem = getCreemClient();
       const result = await creem.retrieveSubscription({
         subscriptionId: subscriptionId,
         xApiKey: CREEM_API_KEY,
@@ -248,7 +230,6 @@ class CreemPaymentService {
     }
 
     try {
-      const crypto = require('crypto');
       const hmac = crypto.createHmac('sha256', CREEM_WEBHOOK_SECRET);
       const digest = hmac.update(payload).digest('hex');
       const isValid = digest === signature;
