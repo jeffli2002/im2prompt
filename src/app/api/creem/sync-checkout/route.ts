@@ -171,19 +171,25 @@ export async function POST(request: NextRequest) {
     const periodEnd = new Date();
     periodEnd.setMonth(periodEnd.getMonth() + (isYearly ? 12 : 1));
 
-    await paymentRepository.create({
+    const newSubscriptionData = {
       id: subscriptionId,
-      provider: 'creem',
+      provider: 'creem' as const,
       priceId: planId,
-      type: 'subscription',
-      interval: isYearly ? 'year' : 'month',
+      type: 'subscription' as const,
+      interval: isYearly ? 'year' as const : 'month' as const,
       userId: session.user.id,
       customerId,
       subscriptionId,
-      status: 'active',
+      status: 'active' as const,
       periodStart: now,
       periodEnd,
-    });
+    };
+
+    console.log(`[Creem Sync] Creating new subscription:`, newSubscriptionData);
+
+    await paymentRepository.create(newSubscriptionData);
+
+    console.log(`[Creem Sync] Subscription created successfully in database`);
 
     // Grant subscription credits
     await grantSubscriptionCredits(session.user.id, planId, subscriptionId, isYearly);
