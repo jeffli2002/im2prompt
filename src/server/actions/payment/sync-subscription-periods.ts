@@ -1,10 +1,9 @@
 'use server';
 
-import { auth } from '@/lib/auth/auth';
+import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 import { creemService } from '@/lib/creem/creem-service';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import type { ActionResult } from '@/payment/types';
-import { headers } from 'next/headers';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
 
 const syncErrorLogger = new ErrorLogger('sync-subscription-periods');
@@ -13,9 +12,7 @@ export async function syncSubscriptionPeriods(): Promise<ActionResult<{ updated:
   let session: { user?: { id: string } } | null = null;
   
   try {
-    session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    session = await getSessionWithAuthBypass();
     if (!session?.user) {
       return {
         success: false,
@@ -82,9 +79,7 @@ export async function syncSingleSubscription(subscriptionId: string): Promise<Ac
   let session: { user?: { id: string } } | null = null;
   
   try {
-    session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    session = await getSessionWithAuthBypass();
     if (!session?.user) {
       return {
         success: false,
