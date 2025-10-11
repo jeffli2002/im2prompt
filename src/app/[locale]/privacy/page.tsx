@@ -200,8 +200,18 @@ function PrivacyPageContent() {
                   <li>• Protect against fraud, abuse, and security threats</li>
                   <li>• Enforce our terms of service and usage policies</li>
                   <li>• Prevent misuse of AI-generated content</li>
+                  <li>• Monitor and remove prohibited content (adult, violence, hate speech, copyright violations)</li>
                 </ul>
               </div>
+            </div>
+
+            <div className="mt-6 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
+                <span className="text-red-600 dark:text-red-400">⚠️</span> Content Moderation
+              </h3>
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                We reserve the right to review, monitor, and remove content that violates our content policies. This includes content containing adult/sexual material, violence, hate speech, racism, copyright infringement, or other prohibited material. Content moderation is performed to ensure a safe, user-friendly platform for all users.
+              </p>
             </div>
           </section>
 

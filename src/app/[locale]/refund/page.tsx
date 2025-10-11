@@ -77,7 +77,7 @@ We will investigate legitimate billing errors and issue corrections or refunds w
 • Monthly subscription credits reset at the start of each billing cycle
 • Unused credits do not roll over to the next month
 • No refunds for expired or unused credits
-• Free plan credits reset daily (3 images + 1 video per day)`
+• Free plan users receive 30 credits on signup (one-time only, no daily/monthly resets)`
     },
     {
       title: '6. Account Termination',
@@ -86,7 +86,12 @@ We will investigate legitimate billing errors and issue corrections or refunds w
 
 • No refunds will be issued for remaining credits or subscription time
 • Termination is at our sole discretion
-• Appeals can be submitted to support@im2prompt.com`
+• Appeals can be submitted to support@im2prompt.com
+
+Violations include but are not limited to:
+• Uploading or generating prohibited content (adult, violence, hate speech, copyright infringement)
+• Creating content that violates our content safety policies
+• Abuse of service, fraud, or repeated policy violations`
     },
     {
       title: '7. Payment Processor',
@@ -100,14 +105,14 @@ We will investigate legitimate billing errors and issue corrections or refunds w
 Chargebacks may result in immediate account suspension.`
     },
     {
-      title: '8. Free Trial Policy',
+      title: '8. Free Plan Policy',
       icon: CheckCircle,
-      content: `If we offer promotional free trials:
+      content: `Our free plan offers:
 
-• No payment required during trial period
-• Cancel before trial ends to avoid charges
-• Trials are limited to one per user/email
-• Trial abuse may result in account termination`
+• 30 credits on signup (one-time)
+• 3 Image-to-Prompt conversions per day (10/month)
+• Unlimited Text-to-Prompt generation
+• Credits can be used for generation (5 credits/Nano Banana image, 15 credits/Sora 2 video)`
     },
     {
       title: '9. Exceptional Circumstances',

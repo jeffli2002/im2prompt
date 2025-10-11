@@ -17,8 +17,13 @@ import { usePaymentPlans } from '@/hooks/use-config';
 import { useCreemPayment } from '@/hooks/useCreemPayment';
 import { Badge } from '@/components/ui/badge';
 import { PurchaseConfirmationDialog } from '@/components/payment/purchase-confirmation-dialog';
+import { creditsConfig } from '@/config/credits.config';
 
 const pricingErrorLogger = new ErrorLogger('pricing');
+
+// Get credit costs from config
+const IMAGE_CREDIT_COST = creditsConfig.consumption.imageGeneration['nano-banana'];
+const VIDEO_CREDIT_COST = creditsConfig.consumption.videoGeneration['sora-2'];
 
 interface PricingFeature {
   text: string;
@@ -197,6 +202,26 @@ const Pricing = ({
     setSelectedPlan(null);
   };
 
+  // Helper function to adjust feature text based on yearly/monthly
+  const adjustFeatureText = (featureText: string, plan: PricingPlan, isYearly: boolean): string => {
+    if (!isYearly || plan.price === 0) return featureText;
+    
+    // Match patterns like "300 Image-to-Text per month" or "500 credits/month"
+    const imageToTextMatch = featureText.match(/^(\d+)\s+Image-to-Text per month$/);
+    if (imageToTextMatch) {
+      const monthlyAmount = parseInt(imageToTextMatch[1]);
+      return `${monthlyAmount * 12} Image-to-Text per year`;
+    }
+    
+    const creditsMatch = featureText.match(/^(\d+)\s+credits\/month for generation$/);
+    if (creditsMatch) {
+      const monthlyAmount = parseInt(creditsMatch[1]);
+      return `${monthlyAmount * 12} credits/year for generation`;
+    }
+    
+    return featureText;
+  };
+
   return (
     <section id="pricing" className="py-32 relative">
       {/* Subtle background gradient */}
@@ -265,20 +290,20 @@ const Pricing = ({
                   {/* Enhanced Credits Badge */}
                   {plan.credits && (
                     <div className="flex flex-wrap gap-2 mb-6">
-                      {plan.credits.monthly && (
+                      {plan.credits.monthly && plan.credits.monthly > 0 && (
                         <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-2 rounded-xl font-semibold">
-                          💎 {isYearly ? plan.credits.yearly || plan.credits.monthly * 12 : plan.credits.monthly} Credits
-                          {isYearly ? '/year' : '/month'}
+                          {isYearly ? plan.credits.yearly || plan.credits.monthly * 12 : plan.credits.monthly} Credits
+                          {isYearly ? '/year' : '/mo'}
                         </Badge>
                       )}
-                      {plan.credits.onSubscribe && (
+                      {plan.credits.onSubscribe && plan.credits.onSubscribe > 0 && (
                         <Badge variant="outline" className="border-green-200 text-green-700 dark:border-green-800 dark:text-green-300 px-3 py-2 rounded-xl">
-                          🎁 +{plan.credits.onSubscribe} Bonus
+                          +{plan.credits.onSubscribe} Bonus
                         </Badge>
                       )}
-                      {plan.credits.onSignup && (
+                      {plan.credits.onSignup && plan.credits.onSignup > 0 && (
                         <Badge variant="outline" className="border-purple-200 text-purple-700 dark:border-purple-800 dark:text-purple-300 px-3 py-2 rounded-xl">
-                          ✨ {plan.credits.onSignup} Free Credits
+                          {plan.credits.onSignup} Free Credits
                         </Badge>
                       )}
                     </div>
@@ -313,10 +338,23 @@ const Pricing = ({
                         <div className="p-1 rounded-full bg-green-100 dark:bg-green-900 mt-0.5">
                           <CircleCheck className="size-3 text-green-600 dark:text-green-400" />
                         </div>
-                        <span className="text-sm leading-relaxed">{feature.text}</span>
+                        <span className="text-sm leading-relaxed">{adjustFeatureText(feature.text, plan, isYearly)}</span>
                       </li>
                     ))}
                   </ul>
+                  
+                  {/* Credit Cost Information */}
+                  <div className="mt-6 p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground">
+                    <p className="mb-1">• 1 Nano Banana image costs {IMAGE_CREDIT_COST} credits</p>
+                    <p>• 1 Sora 2 video costs {VIDEO_CREDIT_COST} credits</p>
+                    {plan.credits?.monthly && plan.credits.monthly > 0 && (
+                      <div className="mt-2 pt-2 border-t border-border/50">
+                        <p className="font-medium text-foreground">Maximum generation capacity:</p>
+                        <p className="mt-1">→ Up to {Math.floor((isYearly ? (plan.credits.yearly || plan.credits.monthly * 12) : plan.credits.monthly) / IMAGE_CREDIT_COST)} Nano Banana images{isYearly ? '/year' : '/mo'}</p>
+                        <p>→ Up to {Math.floor((isYearly ? (plan.credits.yearly || plan.credits.monthly * 12) : plan.credits.monthly) / VIDEO_CREDIT_COST)} Sora 2 videos{isYearly ? '/year' : '/mo'}</p>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
                 <CardFooter className="mt-auto p-8 pt-0">
                   <Button 

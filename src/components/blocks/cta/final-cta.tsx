@@ -24,12 +24,12 @@ const FinalCTA = () => {
 
           {/* Heading */}
           <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-6">
-            🚀 Create Smarter with AI Image/Text ⇄ Prompt ⇄ Image/Video
+            Explore the Power of AI Generation from Prompt, Image to Video
           </h2>
 
           {/* Description */}
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Join thousands of creators using our platform to generate AI visuals, cinematic videos, and professional prompts. With Sora 2 and Veo3 integration, you can turn simple ideas into stunning, production-ready content.
+            Join thousands of creators using our platform to generate AI visuals, cinematic videos, and professional prompts.
           </p>
 
           {/* CTA Buttons */}

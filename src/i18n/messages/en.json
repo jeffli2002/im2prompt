@@ -173,7 +173,7 @@
       },
       {
         "question": "What are the monthly generation limits for each plan?",
-        "answer": "Each plan has specific monthly and daily limits for image and video generation. Free plan includes daily rate limits, while paid plans offer higher monthly allocations without daily restrictions. Check the pricing section for detailed limits for each tier. All plans include both Nano Banana image generation and Sora 2 video generation."
+        "answer": "Free users receive 30 credits on signup and can generate images and videos using credits. Paid plans (Pro and Pro+) offer monthly credit allocations without daily restrictions. Check the pricing section for detailed limits for each tier. All plans include Nano Banana image generation and Sora 2 video generation."
       },
       {
         "question": "What quality options are available for videos?",
@@ -201,7 +201,7 @@
       },
       {
         "question": "Can I download videos without watermarks?",
-        "answer": "Yes! All paid plans (Starter, Pro, and Pro+) include watermark-free downloads for both images and videos. Free plan videos include a small watermark in the corner."
+        "answer": "Yes! All paid plans (Pro and Pro+) include watermark-free downloads for both images and Sora 2 videos. Free plan users receive no watermark for images but must use credits for video generation."
       },
       {
         "question": "Is my data secure and private?",

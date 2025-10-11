@@ -95,12 +95,12 @@ export const creditsConfig: CreditsConfig = {
       unlimited: true,         // Free users get unlimited Text-to-Prompt generation
     },
     imageGeneration: {
-      freeQuotaPerDay: 1,      // Free users get 1 image generation per day
-      freeQuotaPerMonth: 3,    // Free users get 3 image generations per month
+      freeQuotaPerDay: 0,      // Free users can only use credits for image generation
+      freeQuotaPerMonth: 0,    // Free users can only use credits for image generation
     },
     videoGeneration: {
-      freeQuotaPerDay: 1,      // Free users get 1 video generation per day
-      freeQuotaPerMonth: 3,    // Free users get 3 video generations per month
+      freeQuotaPerDay: 0,      // Free users can only use credits for video generation
+      freeQuotaPerMonth: 0,    // Free users can only use credits for video generation
     },
     storage: {
       freeQuotaGB: 1,

@@ -144,6 +144,11 @@ export const Footer = ({
             ))}
           </ul>
         </div>
+        <div className="mt-4 border-t pt-6">
+          <p className="text-muted-foreground text-xs text-center md:text-left leading-relaxed">
+            * This platform is an independent product and is not affiliated with, endorsed by, or sponsored by Google or OpenAI or other AI model companies. We provide access to the AI models through our custom interface.
+          </p>
+        </div>
       </div>
     </section>
   );

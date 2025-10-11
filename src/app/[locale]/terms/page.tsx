@@ -139,19 +139,18 @@ function TermsPageContent() {
                 <ul className="space-y-1 text-muted-foreground text-sm">
                   <li>• Image to Prompt generation</li>
                   <li>• Text to Prompt conversion</li>
-                  <li>• Text to Image (Flux, Stable Diffusion)</li>
+                  <li>• Text to Image (Nano Banana, Flux, etc.)</li>
                   <li>• Text to Video (Sora 2)</li>
                   <li>• Image to Video (Sora 2)</li>
+                  <li>• Free users: Credit-based generation only</li>
                 </ul>
               </div>
               <div className="bg-muted/50 rounded-lg p-4">
                 <h4 className="text-lg font-medium text-foreground mb-2">AI Models</h4>
                 <ul className="space-y-1 text-muted-foreground text-sm">
                   <li>• OpenAI Sora 2</li>
-                  <li>• Google Veo3</li>
-                  <li>• Stable Diffusion</li>
-                  <li>• Flux</li>
-                  <li>• Nano Banana (via KIE.AI)</li>
+                  <li>• Nano Banana</li>
+                  <li>• etc.</li>
                 </ul>
               </div>
             </div>
@@ -236,7 +235,9 @@ function TermsPageContent() {
               <div>
                 <h3 className="text-xl font-medium text-foreground mb-3">4.2 Billing & Payment Terms</h3>
                 <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                  <p className="text-muted-foreground">• <strong>Billing Cycles:</strong> Subscriptions are billed monthly in advance</p>
+                  <p className="text-muted-foreground">• <strong>Billing Cycles:</strong> Monthly subscriptions are billed monthly in advance; Yearly subscriptions are billed annually in advance</p>
+                  <p className="text-muted-foreground">• <strong>Yearly Plans:</strong> Save 20% with annual billing. Pro: $143.04/year ($11.92/mo), Pro+: $239.04/year ($19.92/mo)</p>
+                  <p className="text-muted-foreground">• <strong>Yearly Credits:</strong> Annual plans receive 12x monthly credits allocation (Pro: 6,000 credits/year, Pro+: 10,800 credits/year)</p>
                   <p className="text-muted-foreground">• <strong>Payment Methods:</strong> We accept credit cards via Creem payment service</p>
                   <p className="text-muted-foreground">• <strong>Currency:</strong> Prices displayed in USD</p>
                   <p className="text-muted-foreground">• <strong>Failed Payments:</strong> Service may be suspended if payment fails</p>
@@ -302,15 +303,47 @@ function TermsPageContent() {
             <h2 className="text-2xl font-semibold text-foreground mb-6">6. Acceptable Use Policy</h2>
             
             <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg p-6 mb-6">
-              <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-3">Prohibited Uses</h3>
-              <p className="text-muted-foreground mb-3">You may NOT use our Service to:</p>
+              <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-3">Prohibited Content</h3>
+              <p className="text-muted-foreground mb-3">You may NOT create, upload, or generate content that contains:</p>
               <ul className="space-y-2 text-muted-foreground">
-                <li>❌ Generate illegal, harmful, or abusive content</li>
-                <li>❌ Create misleading or deceptive materials</li>
-                <li>❌ Violate third-party intellectual property rights</li>
+                <li>❌ <strong>Adult/Sexual Content:</strong> Pornography, nudity, or sexually explicit material</li>
+                <li>❌ <strong>Violence:</strong> Graphic violence, gore, or content promoting harm to others</li>
+                <li>❌ <strong>Hate Speech:</strong> Racism, discrimination, or content targeting protected groups</li>
+                <li>❌ <strong>Copyright Infringement:</strong> Unauthorized use of copyrighted images, characters, or trademarks</li>
+                <li>❌ <strong>Illegal Activities:</strong> Content promoting illegal activities or substances</li>
+                <li>❌ <strong>Harmful Content:</strong> Self-harm, dangerous activities, or abuse</li>
+                <li>❌ <strong>Misleading Content:</strong> Deepfakes, misinformation, or deceptive materials</li>
+              </ul>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-200 mb-3">Content Safety Requirements</h3>
+              <p className="text-muted-foreground mb-3">All content must be:</p>
+              <ul className="space-y-2 text-muted-foreground">
+                <li>✓ <strong>Safe for Work (SFW):</strong> Appropriate for general audiences</li>
+                <li>✓ <strong>User-Friendly:</strong> Respectful and non-offensive</li>
+                <li>✓ <strong>Legal:</strong> Compliant with applicable laws and regulations</li>
+                <li>✓ <strong>Original or Licensed:</strong> You must own rights or have permission to use uploaded content</li>
+                <li>✓ <strong>Non-Harmful:</strong> Does not promote violence, hate, or dangerous activities</li>
+              </ul>
+            </div>
+
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-200 mb-3">Prohibited Actions</h3>
+              <p className="text-muted-foreground mb-3">You may NOT:</p>
+              <ul className="space-y-2 text-muted-foreground">
                 <li>❌ Bypass service limitations or security measures</li>
                 <li>❌ Use automated systems without permission</li>
+                <li>❌ Attempt to reverse-engineer our AI models</li>
+                <li>❌ Share or resell your account access</li>
+                <li>❌ Create multiple free accounts to abuse free credits</li>
               </ul>
+            </div>
+
+            <div className="mt-6 p-4 bg-red-100 dark:bg-red-900/40 rounded-lg">
+              <p className="text-sm text-red-900 dark:text-red-200 font-medium">
+                ⚠️ Violation of this policy may result in immediate account suspension or termination without refund. We reserve the right to monitor content and remove materials that violate these guidelines.
+              </p>
             </div>
           </section>
 
