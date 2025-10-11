@@ -25,7 +25,7 @@ export function useCreemPayment() {
         body: JSON.stringify({
           planId,
           interval,
-          successUrl: `${baseUrl}/settings/billing?success=true&planId=${planId}`,
+          successUrl: `${baseUrl}/settings/billing?success=true&planId=${planId}&interval=${interval}`,
           cancelUrl: `${baseUrl}/settings/billing?canceled=true`,
         }),
       });

@@ -79,20 +79,58 @@ export function BillingPage() {
   useEffect(() => {
     const success = searchParams.get('success');
     const canceled = searchParams.get('canceled');
+    const planId = searchParams.get('planId');
 
     if (success === 'true') {
-      toast.success(t('toast.paymentSuccess'), {
-        duration: 5000,
-      });
+      // In dev mode, manually sync the subscription
+      const syncSubscription = async () => {
+        try {
+          console.log('[Billing] Starting subscription sync...');
+          
+          // Get interval from URL params
+          const interval = searchParams.get('interval') || 'month';
+          const isYearly = interval === 'year';
+          
+          console.log('[Billing] Sync params:', { planId, interval, isYearly });
+          
+          const response = await fetch('/api/creem/sync-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include', // Important for auth cookies
+            body: JSON.stringify({
+              checkoutId: `checkout_${Date.now()}`,
+              planId: planId || 'pro',
+              isYearly,
+            }),
+          });
+
+          const data = await response.json();
+          console.log('[Billing] Sync response:', data);
+
+          if (response.ok) {
+            toast.success(t('toast.paymentSuccess'), { duration: 5000 });
+            await loadBillingInfo(); // Reload billing info
+            // Also reload page after 2 seconds to ensure UI is fresh
+            setTimeout(() => window.location.reload(), 2000);
+          } else {
+            console.error('[Billing] Sync failed:', data);
+            toast.warning(`Payment succeeded but sync failed: ${data.error}. Please refresh the page.`, { duration: 7000 });
+          }
+        } catch (error) {
+          console.error('[Billing] Sync error:', error);
+          toast.warning('Payment succeeded but sync failed. Please refresh the page.', { duration: 5000 });
+        }
+      };
+
+      syncSubscription();
       window.history.replaceState({}, '', window.location.pathname);
     } else if (canceled === 'true') {
       toast.info(t('toast.paymentCanceled'), {
         duration: 5000,
       });
-      // Clean up URL parameters
       window.history.replaceState({}, '', window.location.pathname);
     }
-  }, [searchParams]);
+  }, [searchParams, loadBillingInfo, t]);
 
   const formatDate = (date: Date | null | undefined) => {
     if (!date) return t('unknown');
