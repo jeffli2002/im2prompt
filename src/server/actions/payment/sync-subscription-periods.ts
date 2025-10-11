@@ -1,12 +1,11 @@
 'use server';
 
 import { auth } from '@/lib/auth/auth';
-import { StripeProvider } from '@/payment/stripe/provider';
+import { creemService } from '@/lib/creem/creem-service';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import type { ActionResult } from '@/payment/types';
 import { headers } from 'next/headers';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
-import type { SubscriptionWithPeriod } from '@/types/stripe-extended';
 
 const syncErrorLogger = new ErrorLogger('sync-subscription-periods');
 
@@ -24,9 +23,6 @@ export async function syncSubscriptionPeriods(): Promise<ActionResult<{ updated:
       };
     }
 
-    const stripeProvider = new StripeProvider();
-    
-    // Get all active subscriptions for the user that have null period dates
     const subscriptions = await paymentRepository.findByUserId(session.user.id);
     const activeSubscriptions = subscriptions.filter(sub => 
       sub.type === 'subscription' && 
@@ -39,18 +35,18 @@ export async function syncSubscriptionPeriods(): Promise<ActionResult<{ updated:
 
     for (const subscription of activeSubscriptions) {
       try {
-        // Get fresh subscription data from Stripe
         if (!subscription.subscriptionId) continue;
         
-        const stripeSubscription = await stripeProvider.getSubscription(subscription.subscriptionId);
+        const result = await creemService.getSubscription(subscription.subscriptionId);
         
-        if (stripeSubscription && (stripeSubscription.periodStart || stripeSubscription.periodEnd)) {
-          // Update the database with the correct period information
+        if (result.success && result.subscription) {
+          const creemSub = result.subscription;
+          
           await paymentRepository.update(subscription.id, {
-            periodStart: stripeSubscription.periodStart,
-            periodEnd: stripeSubscription.periodEnd,
-            status: stripeSubscription.status,
-            cancelAtPeriodEnd: stripeSubscription.cancelAtPeriodEnd,
+            periodStart: creemSub.current_period_start_date ? new Date(creemSub.current_period_start_date) : undefined,
+            periodEnd: creemSub.current_period_end_date ? new Date(creemSub.current_period_end_date) : undefined,
+            status: creemSub.status as any,
+            cancelAtPeriodEnd: creemSub.cancel_at_period_end || false,
           });
           
           updatedCount++;
@@ -61,7 +57,6 @@ export async function syncSubscriptionPeriods(): Promise<ActionResult<{ updated:
           subscriptionId: subscription.subscriptionId,
           userId: session.user.id,
         });
-        // Continue with other subscriptions even if one fails
       }
     }
 
@@ -106,39 +101,34 @@ export async function syncSingleSubscription(subscriptionId: string): Promise<Ac
       };
     }
 
-    const stripeProvider = new StripeProvider();
+    const result = await creemService.getSubscription(subscriptionId);
     
-    // Get fresh subscription data directly from Stripe API with expanded data
-    const { stripe } = await import('@/payment/stripe/client');
-    const rawStripeSubscriptionResponse = await stripe.subscriptions.retrieve(subscriptionId, {
-      expand: ['latest_invoice', 'items.data.price']
-    });
-    const rawStripeSubscription = rawStripeSubscriptionResponse as unknown as SubscriptionWithPeriod;
-
-    // Get period information from subscription items (this is where Stripe stores the actual period info)
-    const subscriptionItem = rawStripeSubscription.items?.data?.[0];
-    
-
-
-    if (!subscriptionItem?.current_period_start || !subscriptionItem?.current_period_end) {
+    if (!result.success || !result.subscription) {
       return {
         success: false,
-        error: `Stripe 订阅项目缺少期间信息 - status: ${rawStripeSubscription.status}, created: ${new Date(rawStripeSubscription.created * 1000).toISOString()}`,
+        error: result.error || '获取订阅信息失败',
       };
     }
 
-    // Convert timestamps to dates (use subscription item period info)
-    const periodStart = new Date(subscriptionItem.current_period_start * 1000);
-    const periodEnd = new Date(subscriptionItem.current_period_end * 1000);
-    const trialStart = rawStripeSubscription.trial_start ? new Date(rawStripeSubscription.trial_start * 1000) : undefined;
-    const trialEnd = rawStripeSubscription.trial_end ? new Date(rawStripeSubscription.trial_end * 1000) : undefined;
+    const creemSub = result.subscription;
 
-    // Update the database with the correct information
+    if (!creemSub.current_period_start_date || !creemSub.current_period_end_date) {
+      return {
+        success: false,
+        error: `订阅缺少期间信息 - status: ${creemSub.status}`,
+      };
+    }
+
+    const periodStart = new Date(creemSub.current_period_start_date);
+    const periodEnd = new Date(creemSub.current_period_end_date);
+    const trialStart = creemSub.trial_start_date ? new Date(creemSub.trial_start_date) : undefined;
+    const trialEnd = creemSub.trial_end_date ? new Date(creemSub.trial_end_date) : undefined;
+
     await paymentRepository.update(paymentRecord.id, {
       periodStart,
       periodEnd,
-      status: rawStripeSubscription.status as 'active' | 'canceled' | 'past_due' | 'trialing' | 'incomplete' | 'incomplete_expired' | 'unpaid',
-      cancelAtPeriodEnd: rawStripeSubscription.cancel_at_period_end,
+      status: creemSub.status as any,
+      cancelAtPeriodEnd: creemSub.cancel_at_period_end || false,
       trialStart,
       trialEnd,
     });
