@@ -119,8 +119,11 @@ export async function POST(request: NextRequest) {
 
     if (existingSubscription) {
       const currentPlan = existingSubscription.priceId.includes('proplus') ? 'proplus' : 'pro';
+      const currentInterval = existingSubscription.interval;
+      const newInterval = isYearly ? 'year' : 'month';
       
-      console.log(`[Creem Sync] User already has active subscription: ${currentPlan}`);
+      console.log(`[Creem Sync] User already has active subscription: ${currentPlan} ${currentInterval}`);
+      console.log(`[Creem Sync] Attempting to create: ${planId} ${newInterval}`);
       
       // If subscription is set to cancel at period end, immediately cancel it and create new one
       if (existingSubscription.cancelAtPeriodEnd) {
@@ -140,21 +143,22 @@ export async function POST(request: NextRequest) {
             canceledAt: new Date().toISOString(),
             reason: 'plan_upgraded',
             newPlan: planId,
+            newInterval: newInterval,
           }),
         });
         
         console.log(`[Creem Sync] Old subscription canceled, proceeding with new subscription`);
-      } else if (currentPlan === planId) {
-        // If trying to subscribe to the same plan without cancellation, reject
+      } else if (currentPlan === planId && currentInterval === newInterval) {
+        // If trying to subscribe to the exact same plan AND interval without cancellation, reject
         return NextResponse.json({
           success: false,
-          error: `You already have an active ${planId.toUpperCase()} subscription`,
+          error: `You already have an active ${planId.toUpperCase()} ${newInterval === 'year' ? 'yearly' : 'monthly'} subscription`,
         }, { status: 400 });
       } else {
-        // For different plans without cancellation, reject
+        // For different plans or intervals without cancellation, reject
         return NextResponse.json({
           success: false,
-          error: `You already have an active ${currentPlan.toUpperCase()} subscription. Please cancel it before subscribing to a different plan.`,
+          error: `You already have an active ${currentPlan.toUpperCase()} ${currentInterval === 'year' ? 'yearly' : 'monthly'} subscription. Please cancel it before subscribing to a different plan.`,
         }, { status: 400 });
       }
     }
