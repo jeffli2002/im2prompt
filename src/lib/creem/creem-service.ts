@@ -154,11 +154,24 @@ class CreemPaymentService {
 
       if (
         error.message?.includes('Subscription already canceled') ||
-        error.response?.data?.message?.includes('Subscription already canceled')
+        error.response?.data?.message?.includes('Subscription already canceled') ||
+        error.message?.includes('already canceled')
       ) {
         return {
           success: true,
           alreadyCancelled: true,
+        };
+      }
+
+      if (
+        error.message?.includes('Subscription does not exist') ||
+        error.response?.data?.message?.includes('Subscription does not exist') ||
+        error.message?.includes('does not exist') ||
+        (error.response?.status === 404)
+      ) {
+        return {
+          success: false,
+          error: '订阅不存在或已被删除。请刷新页面查看最新状态。',
         };
       }
 

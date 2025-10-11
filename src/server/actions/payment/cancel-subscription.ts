@@ -30,8 +30,20 @@ export async function cancelSubscription(
       };
     }
 
+    if (paymentRecord.status === 'canceled') {
+      return {
+        success: false,
+        error: '订阅已经被取消',
+      };
+    }
+
     const result = await creemService.cancelSubscription(subscriptionId);
     if (!result.success) {
+      if (result.error?.includes('订阅不存在')) {
+        await paymentRepository.update(paymentRecord.id, {
+          status: 'canceled',
+        });
+      }
       return {
         success: false,
         error: result.error || '取消订阅失败',
