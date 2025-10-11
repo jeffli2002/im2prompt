@@ -25,34 +25,67 @@ export async function POST(request: NextRequest) {
       session.user.id
     );
 
-    // Check if user already has an active subscription
+    // Handle existing active subscription
     if (activeSubscription) {
-      const currentPlan = activeSubscription.priceId.includes('proplus') ? 'proplus' : 'pro';
+      const currentPlan: 'pro' | 'proplus' = activeSubscription.priceId.includes('proplus') ? 'proplus' : 'pro';
+      const currentInterval = activeSubscription.interval;
       
-      console.log(`[Create Checkout] User ${session.user.id} has active ${currentPlan} subscription`);
+      console.log(`[Create Checkout] User ${session.user.id} has active ${currentPlan} ${currentInterval} subscription`);
       
-      // Prevent subscribing to the same plan
-      if (currentPlan === planId) {
+      // Prevent subscribing to the exact same plan and interval
+      if (currentPlan === planId && currentInterval === interval) {
         return NextResponse.json(
           { 
-            error: `You already have an active ${planId.toUpperCase()} subscription`,
+            error: `You already have an active ${planId.toUpperCase()} ${interval === 'year' ? 'yearly' : 'monthly'} subscription`,
             code: 'DUPLICATE_SUBSCRIPTION'
           },
           { status: 400 }
         );
       }
 
-      // For plan changes, require cancellation first to avoid complexity
-      // In the future, we can implement seamless plan changes via updateSubscription API
-      return NextResponse.json(
-        { 
-          error: `You already have an active ${currentPlan.toUpperCase()} subscription. Please cancel it first before subscribing to a different plan.`,
-          code: 'PLAN_CHANGE_REQUIRES_CANCELLATION',
-          currentPlan,
-          requestedPlan: planId
-        },
-        { status: 400 }
-      );
+      // Auto-cancel existing subscription when switching plans
+      // The new subscription will be scheduled to start at the end of current period
+      if (!activeSubscription.cancelAtPeriodEnd) {
+        console.log(`[Create Checkout] Auto-canceling existing ${currentPlan} subscription for plan change`);
+        
+        try {
+          const cancelResult = await creemService.cancelSubscription(activeSubscription.subscriptionId);
+          
+          if (cancelResult.success) {
+            await paymentRepository.update(activeSubscription.id, {
+              cancelAtPeriodEnd: true,
+            });
+            
+            await paymentRepository.createEvent({
+              paymentId: activeSubscription.id,
+              eventType: 'canceled',
+              eventData: JSON.stringify({
+                subscriptionId: activeSubscription.subscriptionId,
+                canceledAt: new Date().toISOString(),
+                cancelAtPeriodEnd: true,
+                reason: 'plan_change',
+                newPlan: planId,
+                newInterval: interval,
+              }),
+            });
+            
+            console.log(`[Create Checkout] Successfully canceled ${currentPlan} subscription, proceeding with ${planId} checkout`);
+          } else {
+            console.warn(`[Create Checkout] Failed to cancel subscription: ${cancelResult.error}`);
+            // Continue anyway - user might need to manually cancel
+          }
+        } catch (error) {
+          console.error('[Create Checkout] Error canceling existing subscription:', error);
+          // Continue with checkout - better to let user proceed than block them
+        }
+      } else {
+        console.log(`[Create Checkout] Existing subscription already set to cancel, proceeding with new checkout`);
+      }
+    }
+
+    let currentPlanForCheckout: 'free' | 'pro' | 'proplus' = 'free';
+    if (activeSubscription) {
+      currentPlanForCheckout = activeSubscription.priceId.includes('proplus') ? 'proplus' : 'pro';
     }
 
     const result = await creemService.createCheckoutSession({
@@ -62,7 +95,7 @@ export async function POST(request: NextRequest) {
       interval: interval as 'month' | 'year',
       successUrl,
       cancelUrl,
-      currentPlan: activeSubscription ? (activeSubscription.priceId.includes('proplus') ? 'proplus' : 'pro') : 'free',
+      currentPlan: currentPlanForCheckout,
     });
 
     if (!result.success) {
