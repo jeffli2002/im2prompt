@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import Image from 'next/image';
 import {
   Github as IconBrandGithub,
   Instagram as IconBrandInstagram,
@@ -83,7 +85,22 @@ export const Footer = ({
             {/* Logo */}
             <div className="flex items-center gap-2 lg:justify-start">
               <a href={logo.url} className="flex items-center gap-2">
-                <img src={logo.src} alt={logo.alt} title={logo.title} className="h-8 w-8 rounded-lg" />
+                <div className="relative w-8 h-8">
+                  <Image 
+                    src={logo.src} 
+                    alt={logo.alt}
+                    title={logo.title}
+                    width={32}
+                    height={32}
+                    className="rounded-lg object-contain"
+                    priority
+                    unoptimized
+                    onError={(e) => {
+                      console.error('[Footer] Logo failed to load:', logo.src);
+                      (e.currentTarget as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 32 32\'%3E%3Crect width=\'32\' height=\'32\' rx=\'8\' fill=\'%234f46e5\'/%3E%3Ctext x=\'16\' y=\'20\' text-anchor=\'middle\' fill=\'white\' font-family=\'Arial\' font-size=\'16\' font-weight=\'bold\'%3EI2P%3C/text%3E%3C/svg%3E';
+                    }}
+                  />
+                </div>
                 <h2 className="font-semibold text-xl">{logo.title}</h2>
               </a>
             </div>

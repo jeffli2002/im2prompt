@@ -69,7 +69,7 @@ const Pricing = ({
   // 使用i18n翻译或传入的props
   const finalHeading = heading || t('heading');
   const finalDescription = description || t('description');
-  const [isYearly, setIsYearly] = useState(false);
+  const [isYearly, setIsYearly] = useState(true);
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
   const [currentPlanId, setCurrentPlanId] = useState<string | null>(null);
@@ -309,9 +309,16 @@ const Pricing = ({
                   )}
                   
                   <div className="mb-4">
-                    <span className="font-bold text-5xl bg-gradient-to-b from-foreground to-foreground/80 bg-clip-text text-transparent">
-                      {isYearly ? plan.yearlyPrice : plan.monthlyPrice}
-                    </span>
+                    <div className="flex items-baseline gap-3">
+                      <span className="font-bold text-5xl bg-gradient-to-b from-foreground to-foreground/80 bg-clip-text text-transparent">
+                        {isYearly ? plan.yearlyPrice : plan.monthlyPrice}
+                      </span>
+                      {isYearly && plan.monthlyPrice !== 'Free' && (
+                        <span className="text-xl text-muted-foreground line-through">
+                          {plan.monthlyPrice}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-muted-foreground text-sm mt-2">
                       {plan.monthlyPrice === 'Free' ? (
                         'Forever free'
@@ -346,7 +353,7 @@ const Pricing = ({
                   <div className="mt-6 p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground">
                     <p className="mb-1">• 1 Nano Banana image costs {IMAGE_CREDIT_COST} credits</p>
                     <p>• 1 Sora 2 video costs {VIDEO_CREDIT_COST} credits</p>
-                    {plan.credits?.monthly && typeof plan.credits.monthly === 'number' && plan.credits.monthly > 0 && (
+                    {plan.credits?.monthly !== undefined && typeof plan.credits.monthly === 'number' && plan.credits.monthly > 0 && (
                       <div className="mt-2 pt-2 border-t border-border/50">
                         <p className="font-medium text-foreground">Maximum generation capacity:</p>
                         <p className="mt-1">→ Up to {Math.floor((isYearly ? (plan.credits.yearly || plan.credits.monthly * 12) : plan.credits.monthly) / IMAGE_CREDIT_COST)} Nano Banana images{isYearly ? '/year' : '/mo'}</p>

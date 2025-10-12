@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -81,10 +83,38 @@ export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: Protect
       {/* Header */}
       <div className="flex h-16 items-center justify-between border-b px-4">
         {collapsed ? (
-          <img src={navbarConfig.logo.src} alt={navbarConfig.logo.alt} className="h-8 w-8 rounded-lg" />
+          <div className="relative w-8 h-8">
+            <Image 
+              src={navbarConfig.logo.src} 
+              alt={navbarConfig.logo.alt}
+              width={32}
+              height={32}
+              className="rounded-lg object-contain"
+              priority
+              unoptimized
+              onError={(e) => {
+                console.error('[Sidebar] Logo failed to load:', navbarConfig.logo.src);
+                (e.currentTarget as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 32 32\'%3E%3Crect width=\'32\' height=\'32\' rx=\'8\' fill=\'%234f46e5\'/%3E%3Ctext x=\'16\' y=\'20\' text-anchor=\'middle\' fill=\'white\' font-family=\'Arial\' font-size=\'16\' font-weight=\'bold\'%3EI2P%3C/text%3E%3C/svg%3E';
+              }}
+            />
+          </div>
         ) : (
           <div className="flex items-center space-x-2">
-            <img src={navbarConfig.logo.src} alt={navbarConfig.logo.alt} className="h-8 w-8 rounded-lg" />
+            <div className="relative w-8 h-8">
+            <Image 
+              src={navbarConfig.logo.src} 
+              alt={navbarConfig.logo.alt}
+              width={32}
+              height={32}
+              className="rounded-lg object-contain"
+              priority
+              unoptimized
+              onError={(e) => {
+                console.error('[Sidebar] Logo failed to load:', navbarConfig.logo.src);
+                (e.currentTarget as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 32 32\'%3E%3Crect width=\'32\' height=\'32\' rx=\'8\' fill=\'%234f46e5\'/%3E%3Ctext x=\'16\' y=\'20\' text-anchor=\'middle\' fill=\'white\' font-family=\'Arial\' font-size=\'16\' font-weight=\'bold\'%3EI2P%3C/text%3E%3C/svg%3E';
+              }}
+            />
+          </div>
             <Link href="/">
               <span className="font-semibold text-lg">im2Prompt</span>
             </Link>
