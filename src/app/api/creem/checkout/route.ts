@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       metadata: {
         ...validatedData.metadata,
         email: session.user.email,
-        name: session.user.name,
+        name: session.user.name || session.user.email || 'Unknown User',
       },
     });
 
