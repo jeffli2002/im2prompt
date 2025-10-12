@@ -22,6 +22,7 @@ import { UserAvatarMenu } from '@/components/widget/user-avatar-menu';
 import { Book, Menu, Sunset, Trees, Zap, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { JSX } from 'react';
 import type { NavbarProps, MenuItem } from '@/types/navbar';
 
@@ -124,6 +125,9 @@ const Navbar = ({
   const menuWithIcons: MenuItem[] = menu;
 
   const menuItems = menuWithIcons;
+
+  // Fallback logo SVG
+  const fallbackLogo = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Ctext x='16' y='20' text-anchor='middle' fill='white' font-family='Arial' font-size='16' font-weight='bold'%3EI2P%3C/text%3E%3C/svg%3E`;
 
       // Render desktop menu items
   const renderMenuItem = (item: MenuItem) => {
@@ -300,7 +304,21 @@ const Navbar = ({
         <nav className="hidden justify-between lg:flex">
           <div className="flex items-center gap-6">
             <Link href={logo.url} className="flex items-center gap-2">
-              <img src={logo.src} className="w-8 h-8 rounded-lg" alt={logo.alt} />
+              <div className="relative w-8 h-8">
+                <Image 
+                  src={logo.src} 
+                  alt={logo.alt}
+                  width={32}
+                  height={32}
+                  className="rounded-lg object-contain"
+                  priority
+                  unoptimized
+                  onError={(e) => {
+                    console.error('[Navbar] Logo failed to load:', logo.src);
+                    (e.currentTarget as HTMLImageElement).src = fallbackLogo;
+                  }}
+                />
+              </div>
               <span className="font-semibold text-lg">{logo.title}</span>
             </Link>
             <div className="flex items-center">
@@ -328,7 +346,21 @@ const Navbar = ({
         <div className="block lg:hidden">
           <div className="flex items-center justify-between">
             <Link href={logo.url} className="flex items-center gap-2">
-              <img src={logo.src} className="w-8 h-8 rounded-lg" alt={logo.alt} />
+              <div className="relative w-8 h-8">
+                <Image 
+                  src={logo.src} 
+                  alt={logo.alt}
+                  width={32}
+                  height={32}
+                  className="rounded-lg object-contain"
+                  priority
+                  unoptimized
+                  onError={(e) => {
+                    console.error('[Navbar] Logo failed to load:', logo.src);
+                    (e.currentTarget as HTMLImageElement).src = fallbackLogo;
+                  }}
+                />
+              </div>
               <span className="font-semibold text-lg">{logo.title}</span>
             </Link>
             <Sheet>
@@ -341,7 +373,21 @@ const Navbar = ({
                 <SheetHeader>
                   <SheetTitle>
                     <Link href={logo.url} className="flex items-center gap-2">
-                      <img src={logo.src} className="w-8 h-8 rounded-lg" alt={logo.alt} />
+                      <div className="relative w-8 h-8">
+                        <Image 
+                          src={logo.src} 
+                          alt={logo.alt}
+                          width={32}
+                          height={32}
+                          className="rounded-lg object-contain"
+                          priority
+                          unoptimized
+                          onError={(e) => {
+                            console.error('[Navbar Mobile] Logo failed to load:', logo.src);
+                            (e.currentTarget as HTMLImageElement).src = fallbackLogo;
+                          }}
+                        />
+                      </div>
                       <span className="font-semibold text-lg">{logo.title}</span>
                     </Link>
                   </SheetTitle>

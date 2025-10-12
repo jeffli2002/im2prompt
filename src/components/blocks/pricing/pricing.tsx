@@ -290,17 +290,17 @@ const Pricing = ({
                   {/* Enhanced Credits Badge */}
                   {plan.credits && (
                     <div className="flex flex-wrap gap-2 mb-6">
-                      {plan.credits.monthly && plan.credits.monthly > 0 && (
+                      {typeof plan.credits.monthly === 'number' && plan.credits.monthly > 0 && (
                         <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-2 rounded-xl font-semibold">
                           {isYearly ? plan.credits.yearly || plan.credits.monthly * 12 : plan.credits.monthly} Credits{isYearly ? '/year' : '/mo'}
                         </Badge>
                       )}
-                      {plan.credits.onSubscribe && plan.credits.onSubscribe > 0 && (
+                      {typeof plan.credits.onSubscribe === 'number' && plan.credits.onSubscribe > 0 && (
                         <Badge variant="outline" className="border-green-200 text-green-700 dark:border-green-800 dark:text-green-300 px-3 py-2 rounded-xl">
                           +{plan.credits.onSubscribe} Bonus
                         </Badge>
                       )}
-                      {plan.credits.onSignup && plan.credits.onSignup > 0 && (
+                      {typeof plan.credits.onSignup === 'number' && plan.credits.onSignup > 0 && (
                         <Badge variant="outline" className="border-purple-200 text-purple-700 dark:border-purple-800 dark:text-purple-300 px-3 py-2 rounded-xl">
                           {plan.credits.onSignup} Free Credits
                         </Badge>
@@ -346,7 +346,7 @@ const Pricing = ({
                   <div className="mt-6 p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground">
                     <p className="mb-1">• 1 Nano Banana image costs {IMAGE_CREDIT_COST} credits</p>
                     <p>• 1 Sora 2 video costs {VIDEO_CREDIT_COST} credits</p>
-                    {plan.credits?.monthly && plan.credits.monthly > 0 && (
+                    {plan.credits?.monthly && typeof plan.credits.monthly === 'number' && plan.credits.monthly > 0 && (
                       <div className="mt-2 pt-2 border-t border-border/50">
                         <p className="font-medium text-foreground">Maximum generation capacity:</p>
                         <p className="mt-1">→ Up to {Math.floor((isYearly ? (plan.credits.yearly || plan.credits.monthly * 12) : plan.credits.monthly) / IMAGE_CREDIT_COST)} Nano Banana images{isYearly ? '/year' : '/mo'}</p>
