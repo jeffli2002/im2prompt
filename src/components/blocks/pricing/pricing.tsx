@@ -208,13 +208,13 @@ const Pricing = ({
     
     // Match patterns like "300 Image-to-Text per month" or "500 credits/month"
     const imageToTextMatch = featureText.match(/^(\d+)\s+Image-to-Text per month$/);
-    if (imageToTextMatch) {
+    if (imageToTextMatch && imageToTextMatch[1]) {
       const monthlyAmount = parseInt(imageToTextMatch[1]);
       return `${monthlyAmount * 12} Image-to-Text per year`;
     }
     
     const creditsMatch = featureText.match(/^(\d+)\s+credits\/month for generation$/);
-    if (creditsMatch) {
+    if (creditsMatch && creditsMatch[1]) {
       const monthlyAmount = parseInt(creditsMatch[1]);
       return `${monthlyAmount * 12} credits/year for generation`;
     }

@@ -468,7 +468,7 @@ async function handleSubscriptionUpdate(data: any) {
     // Fallback to finding by customer ID
     if (!actualUserId && customerId) {
       const subscription = await paymentRepository.findByCustomerId(customerId);
-      if (subscription && subscription.length > 0) {
+      if (subscription && subscription.length > 0 && subscription[0]) {
         actualUserId = subscription[0].userId;
         targetSubscription = subscription[0];
       }
