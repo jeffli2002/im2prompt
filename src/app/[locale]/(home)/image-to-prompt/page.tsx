@@ -333,7 +333,6 @@ export default function ImageToPromptPage() {
                       alt="Preview" 
                       className="w-full h-full object-contain"
                       style={{ maxHeight: '350px' }}
-                      onError={() => toast.error("Failed to load image from URL")}
                     />
                   </div>
                 )}
