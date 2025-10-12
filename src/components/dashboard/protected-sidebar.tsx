@@ -26,6 +26,7 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { navbarConfig } from '@/config/navbar.config';
 
 // Icon mapping
 const iconMap = {
@@ -80,10 +81,10 @@ export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: Protect
       {/* Header */}
       <div className="flex h-16 items-center justify-between border-b px-4">
         {collapsed ? (
-          <img src="/images/logo3.png" alt="im2Prompt logo" className="h-8 w-8 rounded-lg" />
+          <img src={navbarConfig.logo.src} alt={navbarConfig.logo.alt} className="h-8 w-8 rounded-lg" />
         ) : (
           <div className="flex items-center space-x-2">
-            <img src="/images/logo3.png" alt="im2Prompt logo" className="h-8 w-8 rounded-lg" />
+            <img src={navbarConfig.logo.src} alt={navbarConfig.logo.alt} className="h-8 w-8 rounded-lg" />
             <Link href="/">
               <span className="font-semibold text-lg">im2Prompt</span>
             </Link>
