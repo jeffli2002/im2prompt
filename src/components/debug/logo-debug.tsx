@@ -48,7 +48,6 @@ export function LogoDebug() {
             width={32} 
             height={32}
             onLoad={() => setImageStatus(prev => ({ ...prev, imgTag: 'loaded' }))}
-            onError={() => setImageStatus(prev => ({ ...prev, imgTag: 'error' }))}
           />
           <p>Status: {imageStatus.imgTag}</p>
         </div>
@@ -62,7 +61,6 @@ export function LogoDebug() {
             height={32}
             unoptimized
             onLoad={() => setImageStatus(prev => ({ ...prev, nextImage: 'loaded' }))}
-            onError={() => setImageStatus(prev => ({ ...prev, nextImage: 'error' }))}
           />
           <p>Status: {imageStatus.nextImage}</p>
         </div>

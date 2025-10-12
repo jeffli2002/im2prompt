@@ -125,7 +125,6 @@ export function FileGrid({
                   alt={file.originalName}
                   fill
                   className="object-cover transition-transform group-hover:scale-105"
-                  onError={() => handleImageError(file.id)}
                 />
               )}
 

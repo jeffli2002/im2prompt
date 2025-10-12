@@ -66,7 +66,6 @@ export default function DebugPage() {
                   className="rounded-lg"
                   unoptimized
                   priority
-                  onError={() => setImageError(true)}
                   onLoad={() => console.log('Image loaded successfully')}
                 />
               </div>
@@ -80,10 +79,6 @@ export default function DebugPage() {
                 src="/images/logo3.png" 
                 alt="Logo test 2" 
                 className="w-8 h-8 rounded-lg"
-                onError={(e) => {
-                  console.error('Regular img failed');
-                  (e.target as HTMLImageElement).style.border = '2px solid red';
-                }}
               />
             </div>
 

@@ -158,7 +158,6 @@ export function FileTable({
                       width={64}
                       height={48}
                       className="h-full w-full object-cover"
-                      onError={() => handleImageError(file.id)}
                     />
                   )}
                 </div>
