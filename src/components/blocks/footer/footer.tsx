@@ -26,10 +26,6 @@ interface FooterProps {
     label: string;
   }>;
   copyright?: string;
-  legalLinks?: Array<{
-    name: string;
-    href: string;
-  }>;
 }
 
 const defaultSections = [
@@ -67,11 +63,6 @@ const defaultSocialLinks = [
   { icon: <IconMail strokeWidth={1} className="size-5" />, href: 'mailto:jefflee2002@gmail.com', label: 'Email' },
 ];
 
-const defaultLegalLinks = [
-  { name: 'Terms of Service', href: '/terms' },
-  { name: 'Privacy Policy', href: '/privacy' },
-  { name: 'Refund Policy', href: '/refund' },
-];
 
 export const Footer = ({
   logo = {
@@ -84,7 +75,6 @@ export const Footer = ({
   description = 'Transform images into AI prompts and generate stunning visuals with our powerful AI platform. Support for Sora2, Stable Diffusion, Flux, and more.',
   socialLinks = defaultSocialLinks,
   copyright = '© 2025 im2Prompt. All rights reserved.',
-  legalLinks = defaultLegalLinks,
 }: FooterProps) => {
   return (
     <section className="py-32">
@@ -135,17 +125,11 @@ export const Footer = ({
             ))}
           </div>
         </div>
-        <div className="mt-8 flex flex-col justify-between gap-4 border-t py-8 font-medium text-muted-foreground text-xs md:flex-row md:items-center md:text-left">
-          <p className="order-2 lg:order-1">{copyright}</p>
-          <ul className="order-1 flex flex-col gap-2 md:order-2 md:flex-row">
-            {legalLinks.map((link, idx) => (
-              <li key={link.name} className="hover:text-primary">
-                <a href={link.href}> {link.name}</a>
-              </li>
-            ))}
-          </ul>
+        <div className="mt-8 border-t py-8">
+          <p className="text-muted-foreground font-medium text-xs text-center md:text-left">{copyright}</p>
         </div>
-        <div className="mt-4 border-t pt-6">
+        <div className="mt-4 pt-4">
+          <div className="border-t mb-4"></div>
           <p className="text-muted-foreground text-xs text-center md:text-left leading-relaxed">
             * This platform is an independent product and is not affiliated with, endorsed by, or sponsored by Google or OpenAI or other AI model companies. We provide access to the AI models through our custom interface.
           </p>

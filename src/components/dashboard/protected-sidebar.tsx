@@ -21,7 +21,7 @@ import {
   Home,
   Settings,
   LayoutDashboard,
-  Image,
+  Image as ImageIcon,
   Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
@@ -44,7 +44,7 @@ const iconMap = {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Image,
+  Image: ImageIcon,
   Sparkles,
 };
 
