@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { LogoImage } from '@/components/ui/logo-image';
 import {
   Github as IconBrandGithub,
   Instagram as IconBrandInstagram,
@@ -85,7 +86,7 @@ export const Footer = ({
             <div className="flex items-center gap-2 lg:justify-start">
               <a href={logo.url} className="flex items-center gap-2">
                 <div className="relative w-8 h-8">
-                  <Image 
+                  <LogoImage 
                     src={logo.src} 
                     alt={logo.alt}
                     title={logo.title}

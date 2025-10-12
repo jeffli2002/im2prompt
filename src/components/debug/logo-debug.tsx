@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { LogoImage } from '@/components/ui/logo-image';
 
 export function LogoDebug() {
   const [imageStatus, setImageStatus] = useState<{
@@ -54,13 +55,12 @@ export function LogoDebug() {
         
         <div>
           <p className="font-semibold">2. Next.js Image (unoptimized):</p>
-          <Image 
+          <LogoImage 
             src="/images/logo3.png" 
             alt="Test Next Image" 
             width={32} 
             height={32}
             unoptimized
-            onLoad={() => setImageStatus(prev => ({ ...prev, nextImage: 'loaded' }))}
           />
           <p>Status: {imageStatus.nextImage}</p>
         </div>

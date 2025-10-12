@@ -23,6 +23,7 @@ import { Book, Menu, Sunset, Trees, Zap, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import Image from 'next/image';
+import { LogoImage } from '@/components/ui/logo-image';
 import type { JSX } from 'react';
 import type { NavbarProps, MenuItem } from '@/types/navbar';
 
@@ -305,7 +306,7 @@ const Navbar = ({
           <div className="flex items-center gap-6">
             <Link href={logo.url} className="flex items-center gap-2">
               <div className="relative w-8 h-8">
-                <Image 
+                <LogoImage 
                   src={logo.src} 
                   alt={logo.alt}
                   width={32}
@@ -343,7 +344,7 @@ const Navbar = ({
           <div className="flex items-center justify-between">
             <Link href={logo.url} className="flex items-center gap-2">
               <div className="relative w-8 h-8">
-                <Image 
+                <LogoImage 
                   src={logo.src} 
                   alt={logo.alt}
                   width={32}
@@ -366,7 +367,7 @@ const Navbar = ({
                   <SheetTitle>
                     <Link href={logo.url} className="flex items-center gap-2">
                       <div className="relative w-8 h-8">
-                        <Image 
+                        <LogoImage 
                           src={logo.src} 
                           alt={logo.alt}
                           width={32}

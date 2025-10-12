@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+import { LogoImage } from '@/components/ui/logo-image';
 import { RefreshCw } from 'lucide-react';
 
 export default function DebugPage() {
@@ -57,7 +58,7 @@ export default function DebugPage() {
             <div>
               <h3 className="font-semibold mb-2">Next.js Image (unoptimized)</h3>
               <div className="relative w-32 h-32 border rounded">
-                <Image
+                <LogoImage
                   key={`next-image-${renderKey}`}
                   src="/images/logo3.png"
                   alt="Logo test 1"
@@ -66,7 +67,6 @@ export default function DebugPage() {
                   className="rounded-lg"
                   unoptimized
                   priority
-                  onLoad={() => console.log('Image loaded successfully')}
                 />
               </div>
               <p className="text-sm mt-2">Status: {imageError ? '❌ Failed' : '✅ Success'}</p>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { LogoImage } from '@/components/ui/logo-image';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -83,7 +84,7 @@ export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: Protect
       <div className="flex h-16 items-center justify-between border-b px-4">
         {collapsed ? (
           <div className="relative w-8 h-8">
-            <Image 
+            <LogoImage 
               src={navbarConfig.logo.src} 
               alt={navbarConfig.logo.alt}
               width={32}
@@ -96,7 +97,7 @@ export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: Protect
         ) : (
           <div className="flex items-center space-x-2">
             <div className="relative w-8 h-8">
-            <Image 
+            <LogoImage 
               src={navbarConfig.logo.src} 
               alt={navbarConfig.logo.alt}
               width={32}
