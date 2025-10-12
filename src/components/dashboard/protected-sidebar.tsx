@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -82,10 +81,10 @@ export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: Protect
       {/* Header */}
       <div className="flex h-16 items-center justify-between border-b px-4">
         {collapsed ? (
-          <Image src={navbarConfig.logo.src} width={32} height={32} alt={navbarConfig.logo.alt} className="rounded-lg" />
+          <img src={navbarConfig.logo.src} alt={navbarConfig.logo.alt} className="h-8 w-8 rounded-lg" />
         ) : (
           <div className="flex items-center space-x-2">
-            <Image src={navbarConfig.logo.src} width={32} height={32} alt={navbarConfig.logo.alt} className="rounded-lg" />
+            <img src={navbarConfig.logo.src} alt={navbarConfig.logo.alt} className="h-8 w-8 rounded-lg" />
             <Link href="/">
               <span className="font-semibold text-lg">im2Prompt</span>
             </Link>

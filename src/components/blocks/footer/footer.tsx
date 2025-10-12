@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import {
   Github as IconBrandGithub,
   Instagram as IconBrandInstagram,
@@ -84,7 +83,7 @@ export const Footer = ({
             {/* Logo */}
             <div className="flex items-center gap-2 lg:justify-start">
               <a href={logo.url} className="flex items-center gap-2">
-                <Image src={logo.src} width={32} height={32} alt={logo.alt} title={logo.title} className="rounded-lg" />
+                <img src={logo.src} alt={logo.alt} title={logo.title} className="h-8 w-8 rounded-lg" />
                 <h2 className="font-semibold text-xl">{logo.title}</h2>
               </a>
             </div>

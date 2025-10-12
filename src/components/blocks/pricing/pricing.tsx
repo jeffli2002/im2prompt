@@ -290,17 +290,17 @@ const Pricing = ({
                   {/* Enhanced Credits Badge */}
                   {plan.credits && (
                     <div className="flex flex-wrap gap-2 mb-6">
-                      {plan.credits.monthly && plan.credits.monthly > 0 && (
+                      {plan.credits.monthly > 0 && (
                         <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-2 rounded-xl font-semibold">
                           {isYearly ? plan.credits.yearly || plan.credits.monthly * 12 : plan.credits.monthly} Credits{isYearly ? '/year' : '/mo'}
                         </Badge>
                       )}
-                      {plan.credits.onSubscribe && plan.credits.onSubscribe > 0 && (
+                      {plan.credits.onSubscribe > 0 && (
                         <Badge variant="outline" className="border-green-200 text-green-700 dark:border-green-800 dark:text-green-300 px-3 py-2 rounded-xl">
                           +{plan.credits.onSubscribe} Bonus
                         </Badge>
                       )}
-                      {plan.credits.onSignup && plan.credits.onSignup > 0 && (
+                      {plan.credits.onSignup > 0 && (
                         <Badge variant="outline" className="border-purple-200 text-purple-700 dark:border-purple-800 dark:text-purple-300 px-3 py-2 rounded-xl">
                           {plan.credits.onSignup} Free Credits
                         </Badge>
