@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, CircleCheck } from 'lucide-react';
+import { CircleCheck } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -292,8 +292,7 @@ const Pricing = ({
                     <div className="flex flex-wrap gap-2 mb-6">
                       {plan.credits.monthly && plan.credits.monthly > 0 && (
                         <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-3 py-2 rounded-xl font-semibold">
-                          {isYearly ? plan.credits.yearly || plan.credits.monthly * 12 : plan.credits.monthly} Credits
-                          {isYearly ? '/year' : '/mo'}
+                          {isYearly ? plan.credits.yearly || plan.credits.monthly * 12 : plan.credits.monthly} Credits{isYearly ? '/year' : '/mo'}
                         </Badge>
                       )}
                       {plan.credits.onSubscribe && plan.credits.onSubscribe > 0 && (
@@ -330,7 +329,7 @@ const Pricing = ({
                 <CardContent className="px-8 pb-6">
                   <Separator className="mb-6" />
                   {plan.id === 'pro' && (
-                    <p className="mb-4 font-semibold text-primary">Everything in Plus, and:</p>
+                    <p className="mb-4 font-semibold text-primary">Everything in Free, and:</p>
                   )}
                   <ul className="space-y-3">
                     {plan.features.map((feature: PricingFeature, index: number) => (
@@ -370,7 +369,6 @@ const Pricing = ({
                     ) : (
                       <>
                         {plan.button.text}
-                        <ArrowRight className="ml-2 size-5" />
                       </>
                     )}
                   </Button>
