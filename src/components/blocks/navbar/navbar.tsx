@@ -313,10 +313,6 @@ const Navbar = ({
                   className="rounded-lg object-contain"
                   priority
                   unoptimized
-                  onError={(e) => {
-                    console.error('[Navbar] Logo failed to load:', logo.src);
-                    (e.currentTarget as HTMLImageElement).src = fallbackLogo;
-                  }}
                 />
               </div>
               <span className="font-semibold text-lg">{logo.title}</span>
@@ -355,10 +351,6 @@ const Navbar = ({
                   className="rounded-lg object-contain"
                   priority
                   unoptimized
-                  onError={(e) => {
-                    console.error('[Navbar] Logo failed to load:', logo.src);
-                    (e.currentTarget as HTMLImageElement).src = fallbackLogo;
-                  }}
                 />
               </div>
               <span className="font-semibold text-lg">{logo.title}</span>
@@ -382,10 +374,6 @@ const Navbar = ({
                           className="rounded-lg object-contain"
                           priority
                           unoptimized
-                          onError={(e) => {
-                            console.error('[Navbar Mobile] Logo failed to load:', logo.src);
-                            (e.currentTarget as HTMLImageElement).src = fallbackLogo;
-                          }}
                         />
                       </div>
                       <span className="font-semibold text-lg">{logo.title}</span>
