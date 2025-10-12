@@ -25,9 +25,9 @@ export function CreditsDebug({ plan }: { plan: any }) {
         </div>
         <div className="space-y-1">
           <p>Condition results:</p>
-          <p>monthly > 0: {String(plan.credits.monthly > 0)} ({String(plan.credits.monthly && plan.credits.monthly > 0)})</p>
-          <p>onSubscribe > 0: {String(plan.credits.onSubscribe > 0)} ({String(plan.credits.onSubscribe && plan.credits.onSubscribe > 0)})</p>
-          <p>onSignup > 0: {String(plan.credits.onSignup > 0)} ({String(plan.credits.onSignup && plan.credits.onSignup > 0)})</p>
+          <p>monthly {'>'}  0: {String(plan.credits.monthly > 0)} ({String(plan.credits.monthly && plan.credits.monthly > 0)})</p>
+          <p>onSubscribe {'>'} 0: {String(plan.credits.onSubscribe > 0)} ({String(plan.credits.onSubscribe && plan.credits.onSubscribe > 0)})</p>
+          <p>onSignup {'>'} 0: {String(plan.credits.onSignup > 0)} ({String(plan.credits.onSignup && plan.credits.onSignup > 0)})</p>
         </div>
         
         <div className="mt-2 pt-2 border-t">
