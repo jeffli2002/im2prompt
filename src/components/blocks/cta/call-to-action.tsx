@@ -49,7 +49,6 @@ export function CallToAction() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
             <Button size="lg" className="px-8 py-6 text-base shadow-lg hover:shadow-xl transition-all">
               Start Free Trial
-              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <Button size="lg" variant="outline" className="px-8 py-6 text-base">
               View Pricing

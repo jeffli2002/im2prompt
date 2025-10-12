@@ -40,7 +40,6 @@ export default async function BlocksPage() {
                 <Button asChild className="w-full gap-2 transition-all group-hover:gap-3">
                   <Link href={`/blocks/${category.id}`}>
                     {t('viewComponents')}
-                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
               </CardContent>

@@ -29,7 +29,6 @@ export default async function BlocksCategoryPage({ params }: BlocksCategoryPageP
         <div className="mb-6">
           <Button variant="ghost" asChild>
             <Link href="/blocks" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
               返回组件库
             </Link>
           </Button>
@@ -50,7 +49,6 @@ export default async function BlocksCategoryPage({ params }: BlocksCategoryPageP
       <div className="mb-6">
         <Button variant="ghost" asChild>
           <Link href="/blocks" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
             返回组件库
           </Link>
         </Button>

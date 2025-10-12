@@ -41,7 +41,6 @@ const FinalCTA = () => {
             >
               <a href="/text-to-prompt">
                 Start Free Today
-                <ArrowRight className="ml-2 h-5 w-5" />
               </a>
             </Button>
             <Button

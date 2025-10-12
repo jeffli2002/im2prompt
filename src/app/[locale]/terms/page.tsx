@@ -63,7 +63,6 @@ function TermsPageContent() {
           <div className="flex items-center justify-between">
             <Link href="/">
               <Button variant="ghost" size="sm" className="gap-2 text-foreground hover:bg-muted/50">
-                <ArrowLeft className="h-4 w-4" />
                 Back to Home
               </Button>
             </Link>

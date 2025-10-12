@@ -44,7 +44,6 @@ function PrivacyPageContent() {
           <div className="flex items-center justify-between">
             <Link href="/">
               <Button variant="ghost" size="sm" className="gap-2 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800">
-                <ArrowLeft className="h-4 w-4" />
                 Back to Home
               </Button>
             </Link>
@@ -479,7 +478,6 @@ function PrivacyPageContent() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/">
                 <Button variant="outline" className="gap-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
-                  <ArrowLeft className="h-4 w-4" />
                   Back to Home
                 </Button>
               </Link>

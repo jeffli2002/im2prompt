@@ -214,7 +214,6 @@ photorealistic, highly detailed, 8k resolution, cinematic lighting`;
                             <TabsContent value="midjourney" className="mt-6">
                               <Button className="w-full py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
                                 Generate with Midjourney
-                                <ArrowRight className="ml-2 h-5 w-5" />
                               </Button>
                             </TabsContent>
                           </Tabs>
@@ -233,7 +232,6 @@ photorealistic, highly detailed, 8k resolution, cinematic lighting`;
           <p className="text-xl text-muted-foreground/80 mb-6 font-medium">Ready to extract prompts from your images?</p>
           <Button size="lg" className="px-10 py-6 text-lg font-semibold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300">
             Try Image to Prompt
-            <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <p className="text-sm text-muted-foreground/60 mt-4">No credit card required • Start immediately</p>
         </div>

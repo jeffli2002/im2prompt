@@ -40,7 +40,6 @@ export function CreditsPage() {
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
             <Button onClick={() => router.push('/#pricing')} className="gap-2">
               View Plans
-              <ArrowRight className="h-4 w-4" />
             </Button>
             <Button variant="outline" onClick={() => router.push('/credits/history')}>
               View History

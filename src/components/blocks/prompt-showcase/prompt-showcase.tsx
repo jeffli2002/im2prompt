@@ -104,7 +104,6 @@ export function PromptShowcase() {
             >
               <Link href="/image-to-prompt">
                 Try Image to Prompt
-                <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </div>

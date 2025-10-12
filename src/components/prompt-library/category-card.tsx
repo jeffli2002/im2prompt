@@ -53,7 +53,6 @@ export function CategoryCard({ category, promptCount = 0 }: CategoryCardProps) {
 
           <div className="flex items-center text-sm font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300">
             {t('actions.exploreCategory')}
-            <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
           </div>
         </CardContent>
       </Card>

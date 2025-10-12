@@ -153,7 +153,6 @@ We aim to respond within 48-72 business hours.`
           <div className="flex items-center justify-between">
             <Link href="/">
               <Button variant="ghost" size="sm" className="gap-2 text-foreground hover:bg-muted/50">
-                <ArrowLeft className="h-4 w-4" />
                 Back to Home
               </Button>
             </Link>
@@ -231,7 +230,6 @@ We aim to respond within 48-72 business hours.`
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/">
                 <Button variant="outline" className="gap-2">
-                  <ArrowLeft className="h-4 w-4" />
                   Back to Home
                 </Button>
               </Link>

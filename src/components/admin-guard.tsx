@@ -78,7 +78,6 @@ export function AdminGuard({
               className="w-full"
               variant="default"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
               返回设置
             </Button>
             <Button
