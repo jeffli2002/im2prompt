@@ -23,7 +23,6 @@ export async function generateMetadata({ params }: PromptLibraryPageProps): Prom
       'AI image generation',
       'prompt engineering',
       'Sora prompts',
-      'Veo3 prompts',
     ],
     openGraph: {
       title: t('title'),

@@ -6,7 +6,7 @@ const HowItWorks = () => {
     {
       number: "1",
       title: "Image/Text → Prompt",
-      description: "Upload any image or write an idea — instantly extract structured, AI-ready prompts for models like Sora 2, Veo3, Stable Diffusion, Flux, and Midjourney.",
+      description: "Upload any image or write an idea — instantly extract structured, AI-ready prompts for models like Sora 2, Stable Diffusion, Flux, and Midjourney.",
       features: ["Image to prompt AI", "Text to prompt AI", "Prompt extractor"],
       icon: <Upload className="h-6 w-6" />,
       gradient: "from-blue-500/20 to-blue-600/20",
@@ -28,7 +28,7 @@ const HowItWorks = () => {
       features: [
         "HD visuals via Stable Diffusion, Flux, Midjourney",
         "Sora 2 – Long-form, cinematic-quality video with motion",
-        "Veo3 – Short-form, Canva-integrated AI video"
+        "Advanced video generation with multiple AI models"
       ],
       icon: <Video className="h-6 w-6" />,
       gradient: "from-green-500/20 to-green-600/20",
@@ -124,7 +124,7 @@ const HowItWorks = () => {
                             <Video className="h-5 w-5 text-pink-600 transition-transform duration-300 group-hover:scale-110" />
                             <span className="font-semibold transition-colors duration-300 group-hover:text-pink-600">Video Creation</span>
                           </div>
-                          <p className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Cinematic videos with Sora 2 & Veo3</p>
+                          <p className="text-sm text-muted-foreground transition-colors duration-300 group-hover:text-foreground/80">Cinematic videos with Sora 2</p>
                         </div>
                       </div>
                     )}

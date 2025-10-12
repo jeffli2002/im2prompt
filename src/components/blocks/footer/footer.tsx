@@ -80,7 +80,7 @@ export const Footer = ({
     title: 'im2prompt',
   },
   sections = defaultSections,
-  description = 'Transform images into AI prompts and generate stunning visuals with our powerful AI platform. Support for Sora2, Veo3, Stable Diffusion, Flux, and more.',
+  description = 'Transform images into AI prompts and generate stunning visuals with our powerful AI platform. Support for Sora2, Stable Diffusion, Flux, and more.',
   socialLinks = defaultSocialLinks,
   copyright = '© 2025 im2Prompt. All rights reserved.',
   legalLinks = defaultLegalLinks,
@@ -93,7 +93,7 @@ export const Footer = ({
             {/* Logo */}
             <div className="flex items-center gap-2 lg:justify-start">
               <a href={logo.url} className="flex items-center gap-2">
-                <img src="/images/logo3.png" alt={logo.alt} title={logo.title} className="h-8 rounded-lg" />
+                <img src={logo.src} alt={logo.alt} title={logo.title} className="h-8 rounded-lg" />
                 <h2 className="font-semibold text-xl">{logo.title}</h2>
               </a>
             </div>

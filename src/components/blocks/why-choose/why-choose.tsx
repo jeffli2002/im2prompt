@@ -21,7 +21,7 @@ const WhyChoose = () => {
     {
       icon: <Palette className="h-6 w-6" />,
       title: "🖌️ Multi-Model Support",
-      description: "Stable Diffusion, Flux, Midjourney, Veo3, Sora 2",
+      description: "Stable Diffusion, Flux, Midjourney, Sora 2",
       gradient: "from-pink-500/20 to-pink-600/20",
       iconColor: "text-pink-600"
     },

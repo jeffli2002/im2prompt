@@ -167,7 +167,7 @@ function PrivacyPageContent() {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Service Delivery</h3>
                 <ul className="space-y-1 text-gray-700 dark:text-gray-300 text-sm">
                   <li>• Provide AI-powered prompt generation from images and text</li>
-                  <li>• Generate images and videos using Sora 2, Veo3, Nano Banana, Flux, and Stable Diffusion</li>
+                  <li>• Generate images and videos using Sora 2, Nano Banana, Flux, and Stable Diffusion</li>
                   <li>• Process face detection and image analysis</li>
                   <li>• Manage your account, credits, and subscriptions</li>
                 </ul>
@@ -232,7 +232,7 @@ function PrivacyPageContent() {
                 <Zap className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">AI Service Providers</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">We share necessary data with AI providers (OpenAI Sora 2, Google Veo3, Stable Diffusion, Flux, Nano Banana via KIE.AI, Google Vision API) to process your prompts and generate outputs</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">We share necessary data with AI providers (OpenAI Sora 2, Stable Diffusion, Flux, Nano Banana via KIE.AI, Google Vision API) to process your prompts and generate outputs</p>
                 </div>
               </div>
 
