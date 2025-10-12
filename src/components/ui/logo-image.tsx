@@ -13,12 +13,21 @@ interface LogoImageProps {
   title?: string;
 }
 
-export function LogoImage({ src, alt, width, height, className, priority, unoptimized, title }: LogoImageProps) {
+export function LogoImage({
+  src,
+  alt,
+  width,
+  height,
+  className,
+  priority,
+  unoptimized,
+  title,
+}: LogoImageProps) {
   // For now, let's just trust Next.js Image to handle the image loading
   // and remove the complex fallback logic that might be causing issues
-  
+
   console.log('[LogoImage] Rendering with src:', src);
-  
+
   return (
     <Image
       src={src}
