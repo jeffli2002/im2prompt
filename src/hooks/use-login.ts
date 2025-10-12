@@ -36,7 +36,7 @@ export function useLogin(): UseLoginReturn {
   // Get callback URL
   const getRedirectUrl = useCallback(() => {
     const callbackUrl = searchParams.get('callbackUrl');
-    return callbackUrl || '/settings/profile';
+    return callbackUrl || '/';
   }, [searchParams]);
 
   // Auto redirect after successful login
