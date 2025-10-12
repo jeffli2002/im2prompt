@@ -15,40 +15,50 @@ interface LogoImageProps {
 }
 
 export function LogoImage({ src, alt, width, height, className, priority, unoptimized, title }: LogoImageProps) {
-  const [imageSrc, setImageSrc] = useState(src);
-  const [imageError, setImageError] = useState(false);
+  const [shouldUseFallback, setShouldUseFallback] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Fallback SVG logo
   const fallbackLogo = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Ctext x='16' y='20' text-anchor='middle' fill='white' font-family='Arial' font-size='16' font-weight='bold'%3EI2P%3C/text%3E%3C/svg%3E`;
 
-  // Reset error state when src changes
+  // Reset states when src changes
   useEffect(() => {
-    setImageError(false);
-    setImageSrc(src);
+    setShouldUseFallback(false);
+    setIsLoading(true);
+    
+    // Pre-validate image exists by attempting to load it
+    const img = new window.Image();
+    
+    img.onload = () => {
+      // Image loaded successfully - use the real image
+      setIsLoading(false);
+      setShouldUseFallback(false);
+      console.log('[LogoImage] Successfully loaded:', src);
+    };
+    
+    img.onerror = () => {
+      // Image failed to load - use fallback
+      setIsLoading(false);
+      setShouldUseFallback(true);
+      console.warn('[LogoImage] Failed to load, using fallback:', src);
+    };
+    
+    // Start loading the image
+    img.src = src;
+    
+    // Cleanup function
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
   }, [src]);
 
-  // Handle image load error by using a different approach
-  // We'll pre-check if the image exists
-  useEffect(() => {
-    if (src && !imageError) {
-      const img = new window.Image();
-      img.onload = () => {
-        // Image loaded successfully, keep using original src
-        setImageSrc(src);
-      };
-      img.onerror = () => {
-        // Image failed to load, switch to fallback
-        console.warn('[LogoImage] Failed to load:', src);
-        setImageError(true);
-        setImageSrc(fallbackLogo);
-      };
-      img.src = src;
-    }
-  }, [src, imageError, fallbackLogo]);
+  // Always try to use the real image first, only fallback if it actually failed
+  const imageSrc = shouldUseFallback ? fallbackLogo : src;
 
   return (
     <Image
-      src={imageError ? fallbackLogo : imageSrc}
+      src={imageSrc}
       alt={alt}
       width={width}
       height={height}
