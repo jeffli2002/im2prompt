@@ -508,5 +508,34 @@
       "title": "No prompts found",
       "description": "Try adjusting your filters or search terms"
     }
+  },
+  "support": {
+    "title": "Customer Support",
+    "subtitle": "Get help from our team",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "subject": "Subject",
+      "category": "Category",
+      "priority": "Priority",
+      "message": "Message",
+      "submit": "Submit Ticket"
+    },
+    "categories": {
+      "technical": "Technical Issue",
+      "billing": "Billing",
+      "account": "Account",
+      "feature": "Feature Request",
+      "api": "API",
+      "general": "General",
+      "bug": "Bug Report",
+      "other": "Other"
+    },
+    "priorities": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High",
+      "urgent": "Urgent"
+    }
   }
 }
