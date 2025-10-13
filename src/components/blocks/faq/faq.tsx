@@ -7,6 +7,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useTranslations, useMessages } from 'next-intl';
+import Image from 'next/image';
 
 interface TranslationFaqItem {
   question: string;
@@ -31,7 +32,7 @@ const Faq = () => {
   const supportHeading = faqData('supportHeading');
   const supportDescription = faqData('supportDescription');
   const supportButtonText = faqData('supportButtonText');
-  const supportButtonUrl = 'https://www.shadcnblocks.com';
+  const supportButtonUrl = '/support';
 
   // Get FAQ items from i18n
   const faqMessages = messages as { faq?: { items?: TranslationFaqItem[] } };
@@ -59,25 +60,22 @@ const Faq = () => {
           ))}
         </Accordion>
         <div className="mx-auto flex max-w-4xl flex-col items-center rounded-lg bg-accent p-4 text-center md:rounded-xl md:p-6 lg:p-8">
-          <div className="relative">
-            <Avatar className="-translate-x-[60%] absolute mb-4 size-16 origin-bottom scale-[80%] border bg-white md:mb-5">
-              <AvatarImage src="/avatar/2.png" />
-              <AvatarFallback>SU</AvatarFallback>
-            </Avatar>
-            <Avatar className="absolute mb-4 size-16 origin-bottom translate-x-[60%] scale-[80%] border bg-white md:mb-5">
-              <AvatarImage src="/avatar/4.png" />
-              <AvatarFallback>SU</AvatarFallback>
-            </Avatar>
-            <Avatar className="mb-4 size-16 border bg-white md:mb-5">
-              <AvatarImage src="/avatar/5.png" />
-              <AvatarFallback>SU</AvatarFallback>
-            </Avatar>
+          <div className="relative mb-4 md:mb-5">
+            <div className="-translate-x-[60%] absolute size-16 origin-bottom scale-[80%] rounded-full border bg-white overflow-hidden">
+              <Image src="/avatar/2.png" alt="Support" width={64} height={64} className="object-cover" />
+            </div>
+            <div className="absolute size-16 origin-bottom translate-x-[60%] scale-[80%] rounded-full border bg-white overflow-hidden">
+              <Image src="/avatar/4.png" alt="Support" width={64} height={64} className="object-cover" />
+            </div>
+            <div className="size-16 rounded-full border bg-white overflow-hidden">
+              <Image src="/avatar/5.png" alt="Support" width={64} height={64} className="object-cover" />
+            </div>
           </div>
           <h3 className="mb-2 max-w-3xl font-semibold lg:text-lg">{supportHeading}</h3>
           <p className="mb-8 max-w-3xl text-muted-foreground lg:text-lg">{supportDescription}</p>
           <div className="flex w-full flex-col justify-center gap-2 sm:flex-row">
             <Button className="w-full sm:w-auto" asChild>
-              <a href={supportButtonUrl} target="_blank" rel="noreferrer">
+              <a href={supportButtonUrl}>
                 {supportButtonText}
               </a>
             </Button>

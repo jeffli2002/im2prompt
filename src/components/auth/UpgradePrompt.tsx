@@ -74,12 +74,17 @@ export default function UpgradePrompt({
 
   const contentType = getContentType()
   
+  // Calculate approximate images and videos based on credit costs
+  const creditsPerMonth = 500
+  const approxImages = Math.floor(creditsPerMonth / imageCreditCost)
+  const approxVideos = Math.floor(creditsPerMonth / videoCreditCost)
+  
   const features = targetPlanConfig?.features.map((text, index) => ({
     icon: [Zap, Sparkles, Shield, Check, Check, Check][index] || Check,
     text
   })) || [
     { icon: Zap, text: '300 Image-to-Text per month' },
-    { icon: Sparkles, text: '500 credits/month (100 images or 33 videos)' },
+    { icon: Sparkles, text: `${creditsPerMonth} credits/month (~${approxImages} images or ${approxVideos} videos)` },
     { icon: Shield, text: 'No Ads' },
     { icon: Check, text: 'Commercial license' },
     { icon: Check, text: 'HD quality exports' },
@@ -129,7 +134,7 @@ export default function UpgradePrompt({
               Upgrade to {targetPlanName}
             </h3>
             <div className="flex items-center justify-center gap-2">
-              <span className="text-3xl font-bold text-purple-600">${targetPlanPrice}/mo</span>
+              <span className="text-3xl font-bold text-secondary-brand">${targetPlanPrice}/mo</span>
             </div>
             <Badge className="mt-2 bg-purple-500">Save 20% with yearly</Badge>
           </div>
@@ -138,7 +143,7 @@ export default function UpgradePrompt({
             {features.map((feature, index) => (
               <div key={index} className="flex items-center gap-3">
                 <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                  <feature.icon className="w-4 h-4 text-purple-600" />
+                  <feature.icon className="w-4 h-4 text-secondary-brand" />
                 </div>
                 <span className="text-gray-700">{feature.text}</span>
               </div>

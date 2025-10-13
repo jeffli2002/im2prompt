@@ -480,7 +480,7 @@ export default function ImageGenerator() {
 
             <div className="bg-muted/50 border border-border rounded-lg p-3 text-sm">
               <p className="text-foreground">
-                <strong>Credits:</strong> {imageCreditCost} credits per image | 
+                <strong>Credits:</strong> Dynamic based on model | 
                 Free quota: {usage.imageGeneration.dailyLimit}/day, {usage.imageGeneration.monthlyLimit}/month
               </p>
             </div>
@@ -499,7 +499,7 @@ export default function ImageGenerator() {
               ) : (
                 <>
                   <ImageIcon className="w-5 h-5 mr-2" />
-                  Generate Image ({imageCreditCost} credits)
+                  Generate Image
                 </>
               )}
             </Button>

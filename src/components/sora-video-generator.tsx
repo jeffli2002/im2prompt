@@ -685,7 +685,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
 
             <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm">
               <p className="text-blue-800 dark:text-blue-200">
-                <strong>Credits:</strong> {videoCreditCost} credits per video | 
+                <strong>Credits:</strong> Dynamic based on model | 
                 Free quota: {usage.videoGeneration.dailyLimit}/day, {usage.videoGeneration.monthlyLimit}/month
               </p>
             </div>
@@ -709,7 +709,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
               ) : (
                 <>
                   <Video className="w-5 h-5 mr-2" />
-                  Generate Video ({videoCreditCost} credits)
+                  Generate Video
                 </>
               )}
             </Button>

@@ -86,21 +86,21 @@ export function SupportPage() {
 
 
   const categories = [
-    'Technical Issue',
-    'Billing & Payments',
-    'Account Management',
-    'Feature Request',
-    'API Integration',
-    'General Inquiry',
-    'Bug Report',
-    'Other'
+    { value: 'technical', label: t('categories.technical') },
+    { value: 'billing', label: t('categories.billing') },
+    { value: 'account', label: t('categories.account') },
+    { value: 'feature', label: t('categories.feature') },
+    { value: 'api', label: t('categories.api') },
+    { value: 'general', label: t('categories.general') },
+    { value: 'bug', label: t('categories.bug') },
+    { value: 'other', label: t('categories.other') }
   ];
 
   const priorities = [
-    { value: 'low', label: 'Low Priority' },
-    { value: 'normal', label: 'Normal Priority' },
-    { value: 'high', label: 'High Priority' },
-    { value: 'urgent', label: 'Urgent' }
+    { value: 'low', label: t('priorities.low') },
+    { value: 'normal', label: t('priorities.normal') },
+    { value: 'high', label: t('priorities.high') },
+    { value: 'urgent', label: t('priorities.urgent') }
   ];
 
   return (
@@ -109,16 +109,16 @@ export function SupportPage() {
       <div className="text-center mb-16">
         <div className="inline-block px-4 py-2 bg-muted/20 rounded-full mb-6">
           <span className="text-sm font-medium text-gradient-primary">
-            🆘 Customer Support
+            🆘 {t('badge')}
           </span>
         </div>
         
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
-          How Can We Help You?
+          {t('heading')}
         </h1>
         
         <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-          Get the help you need with our comprehensive support resources and dedicated customer service team.
+          {t('description')}
         </p>
       </div>
 
@@ -130,17 +130,17 @@ export function SupportPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Submit a Support Ticket
+                {t('submitTicket')}
               </CardTitle>
               <CardDescription>
-                Fill out the form below and we'll get back to you as soon as possible.
+                {t('submitDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name *</Label>
+                    <Label htmlFor='name'>{t('name')} *</Label>
                     <Input
                       id="name"
                       value={formData.name}
@@ -150,7 +150,7 @@ export function SupportPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address *</Label>
+                    <Label htmlFor='email'>{t('email')} *</Label>
                     <Input
                       id="email"
                       type="email"
@@ -163,7 +163,7 @@ export function SupportPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="subject">Subject *</Label>
+                  <Label htmlFor='subject'>{t('subject')} *</Label>
                   <Input
                     id="subject"
                     value={formData.subject}
@@ -175,22 +175,22 @@ export function SupportPage() {
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Category *</Label>
+                    <Label>{t('category')} *</Label>
                     <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((category) => (
-                          <SelectItem key={category} value={category.toLowerCase().replace(/\s+/g, '-')}>
-                            {category}
+                          <SelectItem key={category.value} value={category.value}>
+                            {category.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Priority</Label>
+                    <Label>{t('priority')}</Label>
                     <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
                       <SelectTrigger>
                         <SelectValue />
@@ -207,7 +207,7 @@ export function SupportPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="message">Message *</Label>
+                  <Label htmlFor='message'>{t('message')} *</Label>
                   <Textarea
                     id="message"
                     value={formData.message}
@@ -222,12 +222,12 @@ export function SupportPage() {
                   {isSubmitting ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      Submitting...
+                      {t('submitting')}
                     </>
                   ) : (
                     <>
                       <Send className="mr-2 h-4 w-4" />
-                      Submit Support Ticket
+                      {t('submitButton')}
                     </>
                   )}
                 </Button>
@@ -243,7 +243,7 @@ export function SupportPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
-                Contact Information
+                {t('contactInfo')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -251,7 +251,7 @@ export function SupportPage() {
                 <div className="flex items-center gap-3">
                   <Mail className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">Email Support</p>
+                    <p className='font-medium'>{t('emailSupport')}</p>
                     <a href="mailto:support@im2prompt.com" className="text-sm text-primary hover:underline">
                       support@im2prompt.com
                     </a>
@@ -263,9 +263,9 @@ export function SupportPage() {
                 <div className="flex items-center gap-3">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">Response Time</p>
-                    <p className="text-sm text-muted-foreground">
-                      Usually within 24 hours
+                    <p className='font-medium'>{t('responseTime')}</p>
+                    <p className='text-sm text-muted-foreground'>
+                      {t('responseTimeValue')}
                     </p>
                   </div>
                 </div>
