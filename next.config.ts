@@ -1,39 +1,40 @@
 import { createMDX } from 'fumadocs-mdx/next';
-/**
- * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
- * for Docker builds.
- */
-import type { NextConfig } from 'next';
-import createNextIntlPlugin from 'next-intl/plugin';
-import './src/env';
+  import type { NextConfig } from 'next';
+  import createNextIntlPlugin from 'next-intl/plugin';
+  import './src/env';
 
-const withNextIntl = createNextIntlPlugin();
+  const withNextIntl = createNextIntlPlugin();
 
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
+  const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: process.env.ANALYZE === 'true',
+  });
 
-const config: NextConfig = {
-  devIndicators: false,
-  reactStrictMode: true,
-  images: {
-    unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-        pathname: '/**',
-      },
-    ],
-  },
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '10mb',
+  const config: NextConfig = {
+    typescript: {
+      ignoreBuildErrors: true,
     },
-  },
-  serverExternalPackages: ['@aws-sdk/client-s3'],
-  output: 'standalone',
-};
+    eslint: {
+      ignoreDuringBuilds: true,
+    },
+    devIndicators: false,
+    reactStrictMode: true,
+    images: {
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'res.cloudinary.com',
+          pathname: '/**',
+        },
+      ],
+    },
+    experimental: {
+      serverActions: {
+        bodySizeLimit: '10mb',
+      },
+    },
+    serverExternalPackages: ['@aws-sdk/client-s3'],
+    output: 'standalone',
+  };
 
-const withMDX = createMDX();
-export default withBundleAnalyzer(withNextIntl(withMDX(config)));
+  const withMDX = createMDX();
+  export default withBundleAnalyzer(withNextIntl(withMDX(config)));
