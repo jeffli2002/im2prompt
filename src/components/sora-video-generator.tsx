@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, Video, Download, AlertCircle, Share2, Upload, ImageIcon as ImageIconLucide, X } from 'lucide-react'
+import { Loader2, Video, Download, AlertCircle, Share2, Upload, ImageIcon as ImageIconLucide, X, Sparkles } from 'lucide-react'
 import UpgradePrompt from '@/components/auth/UpgradePrompt'
 import { useAuth } from '@/contexts/AuthContext'
 import { useQuota } from '@/hooks/useQuota'
@@ -32,6 +32,8 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
   const { setVideo, getLatestVideo } = useVideoStore()
   const [mode, setMode] = useState<GenerationMode>(defaultMode)
   const [prompt, setPrompt] = useState('')
+  const [enhancedPrompt, setEnhancedPrompt] = useState('')
+  const [isEnhancing, setIsEnhancing] = useState(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [aspectRatio, setAspectRatio] = useState<'landscape' | 'portrait'>('landscape')
@@ -116,6 +118,38 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
     reader.readAsDataURL(file)
   }
 
+  const handleEnhancePrompt = async () => {
+    if (!prompt.trim()) {
+      alert('Please enter a prompt first')
+      return
+    }
+
+    setIsEnhancing(true)
+    try {
+      const response = await fetch('/api/v1/enhance-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          prompt: prompt.trim(),
+          context: 'video'
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to enhance prompt')
+      }
+
+      const data = await response.json()
+      setEnhancedPrompt(data.enhancedPrompt || '')
+    } catch (error) {
+      console.error('Enhancement error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to enhance prompt')
+    } finally {
+      setIsEnhancing(false)
+    }
+  }
+
   const handleGenerate = async () => {
     console.log('[Sora] handleGenerate called:', { mode, hasImageFile: !!imageFile, hasPrompt: !!prompt })
     
@@ -150,7 +184,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
         // Text to video mode - use JSON API
         const requestBody = {
           mode: 'text-to-video',
-          prompt: prompt.trim(),
+          prompt: enhancedPrompt || prompt.trim(),
           aspect_ratio: aspectRatio,
           quality
         }
@@ -182,7 +216,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
         }
 
         const formData = new FormData()
-        formData.append('prompt', prompt.trim())
+        formData.append('prompt', enhancedPrompt || prompt.trim())
         formData.append('image', imageFile)
         formData.append('aspect_ratio', aspectRatio)
         formData.append('quality', quality)
@@ -445,16 +479,59 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
             <TabsContent value="text-to-video" className="mt-0 space-y-6">
               <div className="space-y-2">
                 <label className="text-sm font-light text-gray-700 dark:text-gray-300">Video Description</label>
-                <Textarea
-                  placeholder={textDefaultPrompt}
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
-                  rows={8}
-                  className="resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 font-light"
-                />
+                <div className="relative">
+                  <Textarea
+                    placeholder={textDefaultPrompt}
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
+                    rows={8}
+                    className="resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 font-light pr-24 pb-12"
+                  />
+                  <Button
+                    onClick={handleEnhancePrompt}
+                    disabled={isEnhancing || !prompt.trim()}
+                    size="sm"
+                    variant="outline"
+                    className="absolute bottom-2 right-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 border-purple-500 bg-purple-50 hover:bg-purple-100 text-purple-700 text-sm font-medium transition-all duration-300 shadow-sm dark:border-purple-400 dark:bg-purple-950 dark:hover:bg-purple-900 dark:text-purple-200"
+                  >
+                    {isEnhancing ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Sparkles className="w-4 h-4" />
+                    )}
+                    {isEnhancing ? 'Enhancing...' : 'Enhance'}
+                  </Button>
+                </div>
                 <div className="text-xs text-gray-400 dark:text-gray-500 text-right font-light">
                   {prompt.length} / {maxPromptLength}
                 </div>
+                {enhancedPrompt && (
+                  <div className="mt-4 p-4 rounded-xl bg-muted/10 border border-clean shadow-card">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-semibold text-purple-900 dark:text-purple-100 flex items-center gap-2">
+                        <Sparkles className="w-4 h-4" />
+                        Enhanced Video Prompt
+                      </h4>
+                      <Button
+                        onClick={() => setEnhancedPrompt('')}
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 w-6 p-0 text-gray-600 dark:text-gray-400"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <Textarea
+                      value={enhancedPrompt}
+                      onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
+                      className="resize-none bg-background border border-clean text-sm shadow-inner"
+                      rows={6}
+                    />
+                    <p className="text-xs text-purple-600 dark:text-purple-400 text-right mt-1">
+                      {enhancedPrompt.length} / {maxPromptLength}
+                    </p>
+                  </div>
+                )}
               </div>
             </TabsContent>
 
@@ -479,7 +556,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
                     onClick={() => fileInputRef.current?.click()}
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
-                    className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-purple-400 hover:bg-purple-50/50 transition-colors"
+                    className="border border-dashed border-clean rounded-xl p-8 text-center cursor-pointer hover-card transition-colors"
                   >
                     <Upload className="w-12 h-12 mx-auto text-gray-400 mb-3" />
                     <p className="text-sm font-light text-gray-600 dark:text-gray-300 mb-1">
@@ -521,16 +598,59 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
                 <label className="text-sm font-light text-gray-700 dark:text-gray-300">
                   Motion Prompt <span className="text-red-500">*</span>
                 </label>
-                <Textarea
-                  placeholder={imageDefaultPrompt}
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
-                  rows={4}
-                  className="resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 font-light"
-                />
+                <div className="relative">
+                  <Textarea
+                    placeholder={imageDefaultPrompt}
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
+                    rows={4}
+                    className="resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 font-light pr-24 pb-12"
+                  />
+                  <Button
+                    onClick={handleEnhancePrompt}
+                    disabled={isEnhancing || !prompt.trim()}
+                    size="sm"
+                    variant="outline"
+                    className="absolute bottom-2 right-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 border-purple-500 bg-purple-50 hover:bg-purple-100 text-purple-700 text-sm font-medium transition-all duration-300 shadow-sm dark:border-purple-400 dark:bg-purple-950 dark:hover:bg-purple-900 dark:text-purple-200"
+                  >
+                    {isEnhancing ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Sparkles className="w-4 h-4" />
+                    )}
+                    {isEnhancing ? 'Enhancing...' : 'Enhance'}
+                  </Button>
+                </div>
                 <div className="text-xs text-gray-400 dark:text-gray-500 text-right font-light">
                   {prompt.length} / {maxPromptLength}
                 </div>
+                {enhancedPrompt && (
+                  <div className="mt-4 p-4 rounded-xl bg-muted/10 border border-clean shadow-card">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-semibold text-purple-900 dark:text-purple-100 flex items-center gap-2">
+                        <Sparkles className="w-4 h-4" />
+                        Enhanced Video Prompt
+                      </h4>
+                      <Button
+                        onClick={() => setEnhancedPrompt('')}
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 w-6 p-0 text-gray-600 dark:text-gray-400"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <Textarea
+                      value={enhancedPrompt}
+                      onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
+                      className="resize-none bg-background border border-clean text-sm shadow-inner"
+                      rows={6}
+                    />
+                    <p className="text-xs text-purple-600 dark:text-purple-400 text-right mt-1">
+                      {enhancedPrompt.length} / {maxPromptLength}
+                    </p>
+                  </div>
+                )}
               </div>
             </TabsContent>
 
@@ -573,7 +693,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
             <Button
               onClick={handleGenerate}
               disabled={isGenerating || !canGenerate}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 font-light"
+              className="w-full font-bold text-lg bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 hover:from-cyan-700 hover:via-blue-700 hover:to-purple-700 text-white shadow-2xl shadow-blue-500/50 border-0 transform hover:scale-105 transition-all duration-300"
               size="lg"
             >
               {isUploading ? (
@@ -599,7 +719,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
           <div className="lg:sticky lg:top-24 lg:h-fit">
             <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
               {!result && (
-                <div className="aspect-video bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl flex items-center justify-center">
+                <div className="aspect-video bg-muted/20 rounded-xl flex items-center justify-center">
                   <div className="text-center space-y-3">
                     <Video className="w-16 h-16 mx-auto text-purple-300 dark:text-purple-400" />
                     <p className="text-sm font-light text-gray-500 dark:text-gray-400">Your generated video will appear here</p>
@@ -608,7 +728,7 @@ export default function SoraVideoGenerator({ defaultMode = 'text-to-video' }: So
               )}
 
               {result?.status === 'generating' && (
-                <div className="aspect-video bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl flex items-center justify-center">
+                <div className="aspect-video bg-muted/20 rounded-xl flex items-center justify-center">
                   <div className="text-center space-y-4">
                     <Loader2 className="w-12 h-12 animate-spin mx-auto text-purple-600 dark:text-purple-400" />
                     <p className="text-base font-light text-gray-700 dark:text-gray-300">Generating your video...</p>
