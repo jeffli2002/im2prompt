@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/accordion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { useTranslations, useMessages } from 'next-intl';
+import { useTranslations, useMessages, useLocale } from 'next-intl';
 import Image from 'next/image';
 
 interface TranslationFaqItem {
@@ -25,14 +25,14 @@ interface FaqItem {
 const Faq = () => {
   const faqData = useTranslations('faq');
   const messages = useMessages();
-
+  const locale = useLocale();
   // Get data from i18n
   const heading = faqData('heading');
   const description = faqData('description');
   const supportHeading = faqData('supportHeading');
   const supportDescription = faqData('supportDescription');
   const supportButtonText = faqData('supportButtonText');
-  const supportButtonUrl = '/support';
+  const supportButtonUrl = `/${locale}/support`;
 
   // Get FAQ items from i18n
   const faqMessages = messages as { faq?: { items?: TranslationFaqItem[] } };
