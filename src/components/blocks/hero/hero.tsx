@@ -63,7 +63,7 @@ const Hero = ({
     ],
   };
   return (
-    <section className="section-container relative overflow-hidden bg-muted/30">
+    <section className="section-container relative overflow-hidden bg-muted/30 min-h-[85vh] flex items-center">
       {/* Grey background with subtle pattern */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-muted/40 via-muted/30 to-muted/20" />
@@ -74,7 +74,7 @@ const Hero = ({
         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px]" />
       </div>
 
-      <div className="container relative">
+      <div className="container relative py-20 md:py-24">
         {/* Light announcement pill */}
         <div className="flex justify-center mb-12 animate-in fade-in slide-in-from-top-4 duration-400">
           <div className="inline-flex items-center rounded-full px-6 py-3 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 shadow-sm backdrop-blur-sm">

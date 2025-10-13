@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { cn, isWebView, isMobile } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import type { LoginFormProps } from '@/types/login';
+import { useState, useEffect } from 'react';
+import { AlertCircle } from 'lucide-react';
 
 export function LoginForm({ 
   className, 
@@ -20,6 +22,22 @@ export function LoginForm({
   ...props 
 }: LoginFormProps & React.ComponentProps<'div'>) {
   const t = useTranslations('auth');
+  const [isInWebView, setIsInWebView] = useState(false);
+  const [showWebViewWarning, setShowWebViewWarning] = useState(false);
+
+  useEffect(() => {
+    const inWebView = isWebView() && isMobile();
+    setIsInWebView(inWebView);
+  }, []);
+
+  const handleSocialLogin = (provider: 'github' | 'google') => {
+    if (isInWebView) {
+      setShowWebViewWarning(true);
+      setTimeout(() => setShowWebViewWarning(false), 8000);
+      return;
+    }
+    onSocialLogin(provider);
+  };
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, email: e.target.value });
@@ -53,13 +71,40 @@ export function LoginForm({
                 </div>
               )}
 
-                              {/* Social login buttons */}
+              {/* WebView warning */}
+              {showWebViewWarning && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 text-sm flex items-start gap-2">
+                  <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-semibold">Unable to sign in from this browser</p>
+                    <p className="mt-1">Google sign-in is not supported in embedded browsers. Please:</p>
+                    <ul className="list-disc list-inside mt-1 space-y-1">
+                      <li>Use the "Open in Browser" option from your app's menu</li>
+                      <li>Or sign in with email and password below</li>
+                    </ul>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-2 bg-white"
+                      onClick={() => {
+                        navigator.clipboard.writeText(window.location.href);
+                        alert('URL copied! Open it in Safari (iOS) or Chrome (Android)');
+                      }}
+                    >
+                      Copy URL to Open in Browser
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Social login buttons */}
               <div className="flex flex-col gap-4">
                 <Button
                   type="button"
                   variant="outline"
                   className="w-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
-                  onClick={() => onSocialLogin('google')}
+                  onClick={() => handleSocialLogin('google')}
                   disabled={isLoading}
                   data-testid="google-login-button"
                 >
