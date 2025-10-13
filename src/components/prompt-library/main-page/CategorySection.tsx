@@ -73,7 +73,7 @@ export function CategorySection({
       <div className="relative group/scroll">
         {canScrollLeft && (
           <>
-            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white dark:from-gray-950 to-transparent pointer-events-none z-10" />
+            <div className="absolute left-0 top-2 bottom-2 w-20 bg-gradient-to-r from-white dark:from-gray-950 to-transparent pointer-events-none z-10" />
             <button
               onClick={scrollLeft}
               className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-xl backdrop-blur-sm opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"
@@ -86,7 +86,7 @@ export function CategorySection({
 
         {canScrollRight && (
           <>
-            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white dark:from-gray-950 to-transparent pointer-events-none z-10" />
+            <div className="absolute right-0 top-2 bottom-2 w-20 bg-gradient-to-l from-white dark:from-gray-950 to-transparent pointer-events-none z-10" />
             <button
               onClick={scrollRight}
               className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-xl backdrop-blur-sm opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"

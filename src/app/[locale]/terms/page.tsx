@@ -422,7 +422,7 @@ function TermsPageContent() {
             <h2 className="text-2xl font-semibold text-foreground mb-6">11. Contact Us</h2>
             
             <div className="bg-card rounded-lg p-6">
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <Mail className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                   <div>
@@ -430,6 +430,26 @@ function TermsPageContent() {
                     <a href="mailto:support@im2prompt.com" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
                       support@im2prompt.com
                     </a>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Address</p>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-foreground mb-1">English Address</p>
+                        <p className="text-sm text-muted-foreground">im2Prompt, Legal Department</p>
+                        <p className="text-sm text-muted-foreground">Datun Road, Chaoyang District</p>
+                        <p className="text-sm text-muted-foreground">Beijing, China</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground mb-1">Chinese Address</p>
+                        <p className="text-sm text-muted-foreground">im2Prompt 法务部门</p>
+                        <p className="text-sm text-muted-foreground">中国北京市朝阳区大屯路</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

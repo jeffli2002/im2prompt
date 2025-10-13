@@ -7,7 +7,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useTranslations, useMessages, useLocale } from 'next-intl';
-import Image from 'next/image';
 
 interface TranslationFaqItem {
   question: string;
@@ -61,15 +60,18 @@ const Faq = () => {
         </Accordion>
         <div className="mx-auto flex max-w-4xl flex-col items-center rounded-lg bg-accent p-4 text-center md:rounded-xl md:p-6 lg:p-8">
           <div className="relative mb-4 md:mb-5">
-            <div className="-translate-x-[60%] absolute size-16 origin-bottom scale-[80%] rounded-full border bg-white overflow-hidden">
-              <Image src="/avatar/2.png" alt="Support" width={64} height={64} className="object-cover" />
-            </div>
-            <div className="absolute size-16 origin-bottom translate-x-[60%] scale-[80%] rounded-full border bg-white overflow-hidden">
-              <Image src="/avatar/4.png" alt="Support" width={64} height={64} className="object-cover" />
-            </div>
-            <div className="size-16 rounded-full border bg-white overflow-hidden">
-              <Image src="/avatar/5.png" alt="Support" width={64} height={64} className="object-cover" />
-            </div>
+            <Avatar className="-translate-x-[60%] absolute size-16 origin-bottom scale-[80%] border">
+              <AvatarImage src="/avatar/2.png" alt="Support" />
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">S1</AvatarFallback>
+            </Avatar>
+            <Avatar className="absolute size-16 origin-bottom translate-x-[60%] scale-[80%] border">
+              <AvatarImage src="/avatar/4.png" alt="Support" />
+              <AvatarFallback className="bg-gradient-to-br from-purple-500 to-purple-600 text-white font-semibold">S2</AvatarFallback>
+            </Avatar>
+            <Avatar className="size-16 border">
+              <AvatarImage src="/avatar/5.png" alt="Support" />
+              <AvatarFallback className="bg-gradient-to-br from-green-500 to-green-600 text-white font-semibold">S3</AvatarFallback>
+            </Avatar>
           </div>
           <h3 className="mb-2 max-w-3xl font-semibold lg:text-lg">{supportHeading}</h3>
           <p className="mb-8 max-w-3xl text-muted-foreground lg:text-lg">{supportDescription}</p>

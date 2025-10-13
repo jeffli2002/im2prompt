@@ -25,15 +25,32 @@ export function LogoImage({
   title,
 }: LogoImageProps) {
   const [error, setError] = useState(false);
+  const [fallbackError, setFallbackError] = useState(false);
 
-  if (error) {
+  if (error && fallbackError) {
     return (
       <div 
-        className={`${className} flex items-center justify-center bg-primary text-primary-foreground font-bold`}
+        className={`${className} flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold rounded-lg`}
         style={{ width, height }}
       >
         IM
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Image
+        src="/images/logo3.png"
+        alt={alt}
+        width={width}
+        height={height}
+        className={className}
+        priority={priority}
+        unoptimized={unoptimized}
+        title={title}
+        onError={() => setFallbackError(true)}
+      />
     );
   }
 
