@@ -138,6 +138,12 @@ const Pricing = ({
   }));
 
   const handlePurchaseClick = (plan: PricingPlan) => {
+    // Check if plan is disabled (Pro or Pro+ coming soon)
+    if (plan.id === 'pro' || plan.id === 'proplus') {
+      toast.info('This plan is coming soon! Stay tuned for updates.');
+      return;
+    }
+
     if (!isAuthenticated) {
       // If user is not logged in, redirect to login page
       router.push('/login');
@@ -268,11 +274,15 @@ const Pricing = ({
                   animationDelay: `${index * 100}ms`,
                 }}
               >
-                {/* Current Plan or Popular badge */}
+                {/* Current Plan, Coming Soon, or Popular badge */}
                 <div className="absolute top-4 right-4">
                   {currentPlanId === plan.id && currentInterval === (isYearly ? 'year' : 'month') && !cancelAtPeriodEnd ? (
                     <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
                       Current Plan
+                    </Badge>
+                  ) : (plan.id === 'pro' || plan.id === 'proplus') ? (
+                    <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      Coming Soon
                     </Badge>
                   ) : plan.id === 'pro' ? (
                     <Badge className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
@@ -366,11 +376,13 @@ const Pricing = ({
                   <Button 
                     className="w-full py-6 text-lg font-semibold rounded-2xl transition-all duration-300 hover:shadow-xl"
                     onClick={() => handlePurchaseClick(plan)}
-                    disabled={processingPlanId !== null || (currentPlanId === plan.id && currentInterval === (isYearly ? 'year' : 'month') && !cancelAtPeriodEnd)}
-                    variant={(currentPlanId === plan.id && currentInterval === (isYearly ? 'year' : 'month') && !cancelAtPeriodEnd) ? 'outline' : 'default'}
+                    disabled={processingPlanId !== null || (currentPlanId === plan.id && currentInterval === (isYearly ? 'year' : 'month') && !cancelAtPeriodEnd) || plan.id === 'pro' || plan.id === 'proplus'}
+                    variant={(currentPlanId === plan.id && currentInterval === (isYearly ? 'year' : 'month') && !cancelAtPeriodEnd) ? 'outline' : (plan.id === 'pro' || plan.id === 'proplus') ? 'secondary' : 'default'}
                   >
                     {(currentPlanId === plan.id && currentInterval === (isYearly ? 'year' : 'month') && !cancelAtPeriodEnd) ? (
                       'Active Subscription'
+                    ) : (plan.id === 'pro' || plan.id === 'proplus') ? (
+                      'Coming Soon'
                     ) : processingPlanId === plan.id ? (
                       t('processingText')
                     ) : (
