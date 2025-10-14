@@ -152,7 +152,7 @@ function PrivacyPageContent() {
 
             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
               <p className="text-sm text-blue-800 dark:text-blue-300">
-                <strong>Note:</strong> We use privacy-preserving analytics (PostHog) that do not track individual users across websites. Your uploaded content is stored securely in AWS S3 and Cloudinary.
+                <strong>Note:</strong> We use privacy-preserving analytics (PostHog) that do not track individual users across websites. Your uploaded content is stored securely in Cloudinary and Cloudflare R2.
               </p>
             </div>
           </section>
@@ -247,7 +247,7 @@ function PrivacyPageContent() {
                 <Database className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Infrastructure & Analytics</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Trusted partners including AWS S3, Cloudinary, Neon Postgres, PostHog, and Sentry (under strict confidentiality)</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Trusted partners including Cloudinary, Cloudflare R2, Neon Postgres, PostHog, and Sentry (under strict confidentiality)</p>
                 </div>
               </div>
 
@@ -273,7 +273,7 @@ function PrivacyPageContent() {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Technical Safeguards</h3>
                 <ul className="space-y-2 text-gray-700 dark:text-gray-300 text-sm">
                   <li>✓ 256-bit SSL encryption for all data transfers</li>
-                  <li>✓ Encrypted data in AWS S3 and Neon Postgres</li>
+                  <li>✓ Encrypted data in Cloudflare R2 and Neon Postgres</li>
                   <li>✓ Secure authentication via Auth0</li>
                   <li>✓ Regular security audits and monitoring (Sentry)</li>
                   <li>✓ Secure cloud infrastructure with redundancy</li>
@@ -373,7 +373,7 @@ function PrivacyPageContent() {
               <div className="border-l-4 border-purple-500 dark:border-purple-600 pl-6">
                 <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Generated Content</h3>
                 <p className="text-gray-700 dark:text-gray-300 text-sm">
-                  Uploaded images, generated prompts, and AI outputs are stored securely in AWS S3 and Cloudinary. Content is retained according to your subscription plan.
+                  Uploaded images, generated prompts, and AI outputs are stored securely in Cloudinary and Cloudflare R2. We store your content according to your subscription plan.
                 </p>
               </div>
 
@@ -397,7 +397,7 @@ function PrivacyPageContent() {
             </p>
             <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
               <p className="text-sm text-blue-800 dark:text-blue-300">
-                We use standard contractual clauses and other approved mechanisms for international data transfers. Our services use cloud infrastructure providers (AWS, Cloudinary, Neon) with global compliance certifications.
+                We use standard contractual clauses and other approved mechanisms for international data transfers. Our services use cloud infrastructure providers (Cloudinary, Cloudflare R2, Neon) with global compliance certifications.
               </p>
             </div>
           </section>
