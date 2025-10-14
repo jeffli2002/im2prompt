@@ -221,6 +221,198 @@ class CreemPaymentService {
     }
   }
 
+  async upgradeSubscription(
+    subscriptionId: string,
+    newProductKey: 'pro_monthly' | 'pro_yearly' | 'proplus_monthly' | 'proplus_yearly',
+    useProration: boolean = false
+  ) {
+    try {
+      console.log('[Creem] Upgrading subscription:', subscriptionId, 'to', newProductKey);
+      const CREEM_API_KEY = getCreemApiKey();
+      if (!CREEM_API_KEY) {
+        throw new Error('Creem API key not configured');
+      }
+
+      const newProductId = CREEM_PRODUCTS[newProductKey];
+      if (!newProductId) {
+        throw new Error(`Product ID not configured for: ${newProductKey}`);
+      }
+
+      const creem = getCreemClient();
+      const result = await creem.upgradeSubscription({
+        id: subscriptionId,
+        xApiKey: CREEM_API_KEY,
+        UpgradeSubscriptionRequestEntity: {
+          productId: newProductId,
+          updateBehavior: useProration ? 'proration-charge' : 'proration-none',
+        },
+      });
+
+      console.log('[Creem] Upgrade scheduled:', {
+        subscriptionId,
+        newProductKey,
+        updateBehavior: useProration ? 'proration-charge' : 'proration-none',
+      });
+
+      return {
+        success: true,
+        subscription: result,
+      };
+    } catch (error: any) {
+      console.error('[Creem] Upgrade subscription error:', {
+        subscriptionId,
+        newProductKey,
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+
+      return {
+        success: false,
+        error: error.message || 'Failed to upgrade subscription',
+      };
+    }
+  }
+
+  async downgradeSubscription(
+    subscriptionId: string,
+    newProductKey: 'pro_monthly' | 'pro_yearly' | 'proplus_monthly' | 'proplus_yearly',
+    scheduleAtPeriodEnd: boolean = true
+  ) {
+    try {
+      console.log('[Creem] Downgrading subscription:', subscriptionId, 'to', newProductKey, 'scheduleAtPeriodEnd:', scheduleAtPeriodEnd);
+      const CREEM_API_KEY = getCreemApiKey();
+      if (!CREEM_API_KEY) {
+        throw new Error('Creem API key not configured');
+      }
+
+      const newProductId = CREEM_PRODUCTS[newProductKey];
+      if (!newProductId) {
+        throw new Error(`Product ID not configured for: ${newProductKey}`);
+      }
+
+      if (scheduleAtPeriodEnd) {
+        const creem = getCreemClient();
+        const result = await creem.upgradeSubscription({
+          id: subscriptionId,
+          xApiKey: CREEM_API_KEY,
+          UpgradeSubscriptionRequestEntity: {
+            productId: newProductId,
+            updateBehavior: 'proration-none',
+          },
+        });
+
+        console.log('[Creem] Downgrade scheduled at period end:', {
+          subscriptionId,
+          newProductKey,
+        });
+
+        return {
+          success: true,
+          subscription: result,
+          scheduledAtPeriodEnd: true,
+        };
+      } else {
+        await this.cancelSubscription(subscriptionId);
+
+        console.log('[Creem] Old subscription canceled immediately for downgrade');
+
+        return {
+          success: true,
+          canceled: true,
+          scheduledAtPeriodEnd: false,
+        };
+      }
+    } catch (error: any) {
+      console.error('[Creem] Downgrade subscription error:', {
+        subscriptionId,
+        newProductKey,
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+
+      return {
+        success: false,
+        error: error.message || 'Failed to downgrade subscription',
+      };
+    }
+  }
+
+  async reactivateSubscription(subscriptionId: string) {
+    try {
+      console.log('[Creem] Reactivating subscription:', subscriptionId);
+      const CREEM_API_KEY = getCreemApiKey();
+      if (!CREEM_API_KEY) {
+        throw new Error('Creem API key not configured');
+      }
+
+      const creem = getCreemClient();
+      const result = await creem.updateSubscription({
+        id: subscriptionId,
+        xApiKey: CREEM_API_KEY,
+        UpdateSubscriptionRequestEntity: {
+          cancelAtPeriodEnd: false,
+        },
+      });
+
+      console.log('[Creem] Subscription reactivated:', subscriptionId);
+
+      return {
+        success: true,
+        subscription: result,
+      };
+    } catch (error: any) {
+      console.error('[Creem] Reactivate subscription error:', {
+        subscriptionId,
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+
+      return {
+        success: false,
+        error: error.message || 'Failed to reactivate subscription',
+      };
+    }
+  }
+
+  async generateCustomerPortalLink(customerId: string, returnUrl: string) {
+    try {
+      console.log('[Creem] Generating customer portal link for:', customerId);
+      const CREEM_API_KEY = getCreemApiKey();
+      if (!CREEM_API_KEY) {
+        throw new Error('Creem API key not configured');
+      }
+
+      const creem = getCreemClient();
+      const result = await creem.generateCustomerLinks({
+        customerId: customerId,
+        xApiKey: CREEM_API_KEY,
+        returnUrl: returnUrl,
+      });
+
+      console.log('[Creem] Customer portal link generated');
+
+      return {
+        success: true,
+        url: result.url || result.portalUrl,
+      };
+    } catch (error: any) {
+      console.error('[Creem] Generate customer portal link error:', {
+        customerId,
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+
+      return {
+        success: false,
+        error: error.message || 'Failed to generate customer portal link',
+      };
+    }
+  }
+
   verifyWebhookSignature(payload: string, signature: string): boolean {
     const CREEM_WEBHOOK_SECRET = getCreemWebhookSecret();
     
@@ -283,6 +475,10 @@ class CreemPaymentService {
         
       case 'dispute.created':
         return this.handleDisputeCreated(eventData);
+        
+      case 'payment.failed':
+      case 'subscription.payment_failed':
+        return this.handlePaymentFailed(eventData);
 
       default:
         console.log(`Unhandled webhook event type: ${eventType}`);
@@ -481,6 +677,24 @@ class CreemPaymentService {
       customerId: customer?.id,
       subscriptionId: subscription?.id,
       amount: dispute.amount,
+    };
+  }
+  
+  private async handlePaymentFailed(payment: any) {
+    const { customer, subscription, metadata, attempt_count } = payment;
+    
+    const customerId = typeof customer === 'string' ? customer : customer?.id;
+    const userId = metadata?.userId;
+    const subscriptionId = subscription?.id || payment.subscription_id;
+    
+    return {
+      type: 'payment_failed',
+      customerId: customerId,
+      subscriptionId: subscriptionId,
+      userId: userId,
+      attemptCount: attempt_count || 1,
+      amount: payment.amount,
+      currency: payment.currency,
     };
   }
 

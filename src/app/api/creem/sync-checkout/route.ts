@@ -178,30 +178,70 @@ export async function POST(request: NextRequest) {
           error: `You already have an active ${planId.toUpperCase()} ${newInterval === 'year' ? 'yearly' : 'monthly'} subscription`,
         }, { status: 400 });
       } else {
-        // For different plans or intervals, automatically cancel the old subscription and create the new one
-        console.log(`[Creem Sync] Automatically canceling old subscription to allow plan/interval change`);
+        console.log(`[Creem Sync] Plan/interval change detected: ${currentPlan} ${currentInterval} → ${planId} ${newInterval}`);
         
-        // Immediately cancel the old subscription
-        await paymentRepository.update(existingSubscription.id, {
-          status: 'canceled',
-          cancelAtPeriodEnd: false,
-        });
+        const isUpgrade = 
+          (currentPlan === 'pro' && planId === 'proplus') ||
+          (currentInterval === 'month' && newInterval === 'year');
         
-        await paymentRepository.createEvent({
-          paymentId: existingSubscription.id,
-          eventType: 'canceled',
-          eventData: JSON.stringify({
-            subscriptionId: existingSubscription.subscriptionId,
-            canceledAt: new Date().toISOString(),
-            reason: 'plan_changed',
-            oldPlan: currentPlan,
-            oldInterval: currentInterval,
-            newPlan: planId,
-            newInterval: newInterval,
-          }),
-        });
-        
-        console.log(`[Creem Sync] Old subscription canceled, proceeding with new subscription`);
+        if (isUpgrade) {
+          console.log(`[Creem Sync] This is an upgrade - scheduling for period end`);
+          
+          await paymentRepository.update(existingSubscription.id, {
+            priceId: planId,
+            interval: newInterval,
+          });
+          
+          await paymentRepository.createEvent({
+            paymentId: existingSubscription.id,
+            eventType: 'upgraded',
+            eventData: JSON.stringify({
+              subscriptionId: existingSubscription.subscriptionId,
+              oldPlan: currentPlan,
+              oldInterval: currentInterval,
+              newPlan: planId,
+              newInterval: newInterval,
+              scheduledAt: new Date().toISOString(),
+              effectiveAt: existingSubscription.periodEnd?.toISOString(),
+            }),
+          });
+          
+          console.log(`[Creem Sync] Upgrade scheduled for period end: ${existingSubscription.periodEnd?.toISOString()}`);
+          
+          return NextResponse.json({
+            success: true,
+            message: `Subscription will be upgraded to ${planId.toUpperCase()} ${newInterval === 'year' ? 'yearly' : 'monthly'} at the end of current period`,
+            subscription: {
+              id: existingSubscription.id,
+              planId: planId,
+              status: existingSubscription.status,
+              currentPeriodEnd: existingSubscription.periodEnd?.toISOString(),
+            },
+          });
+        } else {
+          console.log(`[Creem Sync] This is a downgrade - canceling old and creating new`);
+          
+          await paymentRepository.update(existingSubscription.id, {
+            status: 'canceled',
+            cancelAtPeriodEnd: false,
+          });
+          
+          await paymentRepository.createEvent({
+            paymentId: existingSubscription.id,
+            eventType: 'canceled',
+            eventData: JSON.stringify({
+              subscriptionId: existingSubscription.subscriptionId,
+              canceledAt: new Date().toISOString(),
+              reason: 'plan_changed',
+              oldPlan: currentPlan,
+              oldInterval: currentInterval,
+              newPlan: planId,
+              newInterval: newInterval,
+            }),
+          });
+          
+          console.log(`[Creem Sync] Old subscription canceled, proceeding with new subscription`);
+        }
       }
     }
 

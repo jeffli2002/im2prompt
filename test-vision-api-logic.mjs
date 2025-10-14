@@ -123,3 +123,4 @@ console.log('   ✅ API failures should not block requests');
 console.log('\n💡 The Vision API integration logic is working correctly!');
 
 
+

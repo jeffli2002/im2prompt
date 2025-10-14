@@ -213,6 +213,176 @@ export class CreemProvider implements PaymentProvider {
     }
   }
 
+  async upgradeSubscription(
+    subscriptionId: string,
+    newProductId: string,
+    useProration: boolean = false
+  ): Promise<SubscriptionResult> {
+    try {
+      const updateBehavior = useProration ? 'proration-charge' : 'proration-none';
+      
+      const response = await this.makeRequest<{
+        id: string;
+        customerId: string;
+        priceId: string;
+        status: string;
+        interval: 'month' | 'year';
+        currentPeriodStart: number;
+        currentPeriodEnd: number;
+        trialStart?: number;
+        trialEnd?: number;
+        cancelAtPeriodEnd: boolean;
+      }>(`/subscriptions/${subscriptionId}/upgrade`, {
+        method: 'POST',
+        body: JSON.stringify({
+          product_id: newProductId,
+          update_behavior: updateBehavior,
+        }),
+      });
+
+      return {
+        id: response.id,
+        status: response.status as PaymentStatus,
+        customerId: response.customerId,
+        priceId: response.priceId,
+        interval: response.interval,
+        currentPeriodStart: new Date(response.currentPeriodStart * 1000),
+        currentPeriodEnd: new Date(response.currentPeriodEnd * 1000),
+        periodStart: new Date(response.currentPeriodStart * 1000),
+        periodEnd: new Date(response.currentPeriodEnd * 1000),
+        trialStart: response.trialStart ? new Date(response.trialStart * 1000) : undefined,
+        trialEnd: response.trialEnd ? new Date(response.trialEnd * 1000) : undefined,
+        cancelAtPeriodEnd: response.cancelAtPeriodEnd,
+      };
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'upgradeSubscription',
+        subscriptionId,
+        newProductId,
+      });
+      throw new Error('Failed to upgrade Creem subscription');
+    }
+  }
+
+  async downgradeSubscription(
+    subscriptionId: string,
+    newProductId: string,
+    scheduleAtPeriodEnd: boolean = true
+  ): Promise<SubscriptionResult> {
+    try {
+      const updateBehavior = scheduleAtPeriodEnd ? 'proration-none' : 'proration-charge';
+      
+      const response = await this.makeRequest<{
+        id: string;
+        customerId: string;
+        priceId: string;
+        status: string;
+        interval: 'month' | 'year';
+        currentPeriodStart: number;
+        currentPeriodEnd: number;
+        trialStart?: number;
+        trialEnd?: number;
+        cancelAtPeriodEnd: boolean;
+      }>(`/subscriptions/${subscriptionId}/upgrade`, {
+        method: 'POST',
+        body: JSON.stringify({
+          product_id: newProductId,
+          update_behavior: updateBehavior,
+        }),
+      });
+
+      return {
+        id: response.id,
+        status: response.status as PaymentStatus,
+        customerId: response.customerId,
+        priceId: response.priceId,
+        interval: response.interval,
+        currentPeriodStart: new Date(response.currentPeriodStart * 1000),
+        currentPeriodEnd: new Date(response.currentPeriodEnd * 1000),
+        periodStart: new Date(response.currentPeriodStart * 1000),
+        periodEnd: new Date(response.currentPeriodEnd * 1000),
+        trialStart: response.trialStart ? new Date(response.trialStart * 1000) : undefined,
+        trialEnd: response.trialEnd ? new Date(response.trialEnd * 1000) : undefined,
+        cancelAtPeriodEnd: response.cancelAtPeriodEnd,
+      };
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'downgradeSubscription',
+        subscriptionId,
+        newProductId,
+      });
+      throw new Error('Failed to downgrade Creem subscription');
+    }
+  }
+
+  async reactivateSubscription(subscriptionId: string): Promise<SubscriptionResult> {
+    try {
+      const response = await this.makeRequest<{
+        id: string;
+        customerId: string;
+        priceId: string;
+        status: string;
+        interval: 'month' | 'year';
+        currentPeriodStart: number;
+        currentPeriodEnd: number;
+        trialStart?: number;
+        trialEnd?: number;
+        cancelAtPeriodEnd: boolean;
+      }>(`/subscriptions/${subscriptionId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          cancel_at_period_end: false,
+        }),
+      });
+
+      return {
+        id: response.id,
+        status: response.status as PaymentStatus,
+        customerId: response.customerId,
+        priceId: response.priceId,
+        interval: response.interval,
+        currentPeriodStart: new Date(response.currentPeriodStart * 1000),
+        currentPeriodEnd: new Date(response.currentPeriodEnd * 1000),
+        periodStart: new Date(response.currentPeriodStart * 1000),
+        periodEnd: new Date(response.currentPeriodEnd * 1000),
+        trialStart: response.trialStart ? new Date(response.trialStart * 1000) : undefined,
+        trialEnd: response.trialEnd ? new Date(response.trialEnd * 1000) : undefined,
+        cancelAtPeriodEnd: response.cancelAtPeriodEnd,
+      };
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'reactivateSubscription',
+        subscriptionId,
+      });
+      throw new Error('Failed to reactivate Creem subscription');
+    }
+  }
+
+  async generateCustomerPortalLink(customerId: string, returnUrl: string): Promise<{ url: string }> {
+    try {
+      const response = await this.makeRequest<{
+        url: string;
+        portal_url?: string;
+      }>('/customer/portal', {
+        method: 'POST',
+        body: JSON.stringify({
+          customer_id: customerId,
+          return_url: returnUrl,
+        }),
+      });
+
+      return {
+        url: response.url || response.portal_url || '',
+      };
+    } catch (error) {
+      creemErrorLogger.logError(error as Error, {
+        operation: 'generateCustomerPortalLink',
+        customerId,
+      });
+      throw new Error('Failed to generate customer portal link');
+    }
+  }
+
   async getSubscription(subscriptionId: string): Promise<SubscriptionResult | null> {
     try {
       const response = await this.makeRequest<{

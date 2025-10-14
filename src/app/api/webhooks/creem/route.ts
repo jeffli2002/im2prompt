@@ -309,6 +309,10 @@ export async function POST(request: NextRequest) {
       case 'dispute_created':
         await handleDisputeCreated(result);
         break;
+        
+      case 'payment_failed':
+        await handlePaymentFailed(result);
+        break;
     }
 
     const processingTime = Date.now() - startTime;
@@ -687,5 +691,65 @@ async function handleDisputeCreated(data: any) {
     }
   } catch (error) {
     console.error('[Creem Webhook] Error in handleDisputeCreated:', error);
+  }
+}
+
+async function handlePaymentFailed(data: any) {
+  const { customerId, subscriptionId, userId, attemptCount, amount, currency } = data;
+  
+  try {
+    console.log(`[Creem Webhook] Payment failed for subscription ${subscriptionId}, attempt ${attemptCount}`);
+    
+    if (!subscriptionId) {
+      console.error('[Creem Webhook] Missing subscription ID in payment failed event');
+      return;
+    }
+    
+    const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
+    
+    if (paymentRecord) {
+      await paymentRepository.update(subscriptionId, {
+        status: 'past_due',
+      });
+      
+      await paymentRepository.createEvent({
+        paymentId: paymentRecord.id,
+        eventType: 'invoice.payment_failed',
+        creemEventId: data.eventId || uuidv4(),
+        eventData: JSON.stringify({
+          subscriptionId,
+          userId: paymentRecord.userId,
+          attemptCount,
+          amount,
+          currency,
+          failedAt: new Date().toISOString(),
+        }),
+      });
+      
+      logger.warn('[Creem Webhook] Payment failed, subscription marked as past_due', {
+        subscriptionId,
+        userId: paymentRecord.userId,
+        attemptCount,
+        amount,
+      });
+      
+      if (attemptCount >= 3) {
+        logger.error('[Creem Webhook] Multiple payment failures detected', {
+          subscriptionId,
+          attemptCount,
+          userId: paymentRecord.userId,
+        });
+      }
+    } else {
+      console.error('[Creem Webhook] Payment record not found for failed payment', {
+        subscriptionId,
+      });
+    }
+  } catch (error) {
+    console.error('[Creem Webhook] Error in handlePaymentFailed:', error);
+    logger.error('[Creem Webhook] Payment failure handler error', {
+      error,
+      subscriptionId,
+    });
   }
 }
