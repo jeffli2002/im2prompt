@@ -70,6 +70,7 @@ export default function ImageToPromptPage() {
   const { usage, canUseImageToText, trackImageToText } = useQuota();
   const [selectedModel, setSelectedModel] = useState<string>('general');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('english');
+  const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string>('');
@@ -95,7 +96,8 @@ export default function ImageToPromptPage() {
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      setImageUrl(''); // Clear URL if file is uploaded
+      setImageUrl('');
+      setUploadMode('file');
     }
   }, []);
 
@@ -218,18 +220,22 @@ export default function ImageToPromptPage() {
               <h3 className="font-semibold">Step 1: Upload Image</h3>
               <div className="flex items-center gap-2">
                 <Button 
-                  variant={!imageUrl ? "default" : "outline"}
+                  variant={uploadMode === 'file' ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setImageUrl('')}
+                  onClick={() => {
+                    setUploadMode('file');
+                    setImageUrl('');
+                  }}
                   className="text-xs"
                 >
                   <Upload className="h-3 w-3 mr-1" />
                   File
                 </Button>
                 <Button 
-                  variant={imageUrl ? "default" : "outline"}
+                  variant={uploadMode === 'url' ? "default" : "outline"}
                   size="sm"
                   onClick={() => {
+                    setUploadMode('url');
                     setImageFile(null);
                     setImagePreview(null);
                   }}
@@ -241,7 +247,7 @@ export default function ImageToPromptPage() {
               </div>
             </div>
 
-            {!imageUrl ? (
+            {uploadMode === 'file' ? (
               <div
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
