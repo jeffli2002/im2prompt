@@ -73,7 +73,7 @@ export const Footer = ({
     title: 'im2prompt',
   },
   sections = defaultSections,
-  description = 'Transform images into AI prompts and generate stunning visuals with our powerful AI platform. Support for Sora2, Stable Diffusion, Flux, and more.',
+  description = 'Transform images into AI prompts and generate stunning visuals with our powerful AI platform. Support for Sora2, Nano Banana, Flux, and more.',
   socialLinks = defaultSocialLinks,
   copyright = '© 2025 im2Prompt. All rights reserved.',
 }: FooterProps) => {
