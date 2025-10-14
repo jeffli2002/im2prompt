@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const validStyles = ['general', 'midjourney', 'stable-diffusion', 'flux', 'sora2', 'veo3'];
+    const validStyles = ['general', 'midjourney', 'nanoBanana', 'flux', 'sora2', 'veo3'];
     if (!validStyles.includes(modelStyle)) {
       return NextResponse.json(
         { error: 'Invalid model style' },
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     const modelStyleToPromptStyle: Record<string, string> = {
       'general': 'normal',
       'midjourney': 'midjourney',
-      'stable-diffusion': 'stableDiffusion',
+      'nanoBanana': 'nanoBanana',
       'flux': 'flux',
       'sora2': 'sora2',
       'veo3': 'veo3'
@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
     const stylePrompts = {
       general: 'Analyze this image and provide a detailed description that could be used as a prompt to recreate it. Focus on the subject, style, composition, colors, lighting, and mood.',
       midjourney: 'Analyze this image and create a Midjourney prompt. Include artistic style, detailed subject description, lighting, composition, camera angle, and end with parameters like --ar, --v, etc.',
-      'stable-diffusion': 'Analyze this image and create a Stable Diffusion prompt. Include positive prompt with detailed description, art style, quality tags. Also provide a negative prompt with things to avoid.',
+      'nanoBanana': 'Analyze this image and create a Nano Banana prompt. Include positive prompt with detailed description, art style, quality tags. Also provide a negative prompt with things to avoid.',
       flux: 'Analyze this image and create a Flux AI prompt. Focus on photorealistic details, lighting, textures, and technical camera settings.',
       sora2: 'Analyze this video frame/image and create a Sora2 video generation prompt. Describe the scene, actions, camera movements, transitions, and temporal elements in detail.',
       veo3: 'Analyze this image and create a Veo3 video generation prompt. Include scene description, motion dynamics, camera work, and cinematic style.'
@@ -327,8 +327,8 @@ export async function POST(req: NextRequest) {
         }
       }
       
-      // For Stable Diffusion, try to extract negative prompt
-      if (modelStyle === 'stable-diffusion' && extractedPrompt.includes('Negative prompt:')) {
+      // For Nano Banana, try to extract negative prompt
+      if (modelStyle === 'nanoBanana' && extractedPrompt.includes('Negative prompt:')) {
         const parts = extractedPrompt.split('Negative prompt:');
         extractedPrompt = parts[0]?.replace('Positive prompt:', '').trim() || '';
         negativePrompt = parts[1]?.trim() || '';
@@ -381,7 +381,7 @@ export async function POST(req: NextRequest) {
           midjourney: language === 'chinese'
             ? '日落时分壮观的山地景观，清澈的湖面倒影，戏剧性云层，黄金时段光线，照片写实，高度细节，8k分辨率'
             : 'A stunning mountain landscape at sunset, crystal clear lake reflection, dramatic clouds, golden hour lighting, photorealistic, highly detailed, 8k resolution',
-          'stable-diffusion': language === 'chinese'
+          'nanoBanana': language === 'chinese'
             ? '黄金时段雄伟的山地景观，原始湖泊完美倒影，戏剧性天空云层，照片写实，高度细节，8k，杰作，最佳质量'
             : 'A majestic mountain landscape during golden hour, pristine lake with perfect reflections, dramatic sky with clouds, photorealistic, highly detailed, 8k, masterpiece, best quality',
           flux: language === 'chinese'
@@ -396,7 +396,7 @@ export async function POST(req: NextRequest) {
         };
 
         extractedPrompt = mockPrompts[modelStyle as keyof typeof mockPrompts] || mockPrompts.general;
-        negativePrompt = modelStyle === 'stable-diffusion' 
+        negativePrompt = modelStyle === 'nanoBanana' 
           ? (language === 'chinese' ? '模糊，低质量，扭曲，丑陋，解剖错误，比例失调，变形，低分辨率' : 'blurry, low quality, distorted, ugly, bad anatomy, bad proportions, deformed, low resolution')
           : '';
         
@@ -445,7 +445,7 @@ export async function POST(req: NextRequest) {
             userId,
             promptText: extractedPrompt,
             negativePrompt: negativePrompt || null,
-            modelStyle: modelStyle as 'general' | 'midjourney' | 'stable-diffusion' | 'flux' | 'sora2' | 'veo3',
+            modelStyle: modelStyle as 'general' | 'midjourney' | 'nanoBanana' | 'flux' | 'sora2' | 'veo3',
             s3KeyOriginal: uploadedImageKey || null,
             creditsSpent: shouldChargeCredits ? creditsPerExtraction : 0,
             metadata: JSON.stringify({
@@ -519,8 +519,8 @@ export async function GET(req: NextRequest) {
     const conditions = [eq(prompts.userId, userId)];
     
     // Filter by model style if provided
-    if (modelStyle && ['general', 'midjourney', 'stable-diffusion', 'flux', 'sora2', 'veo3'].includes(modelStyle)) {
-      conditions.push(eq(prompts.modelStyle, modelStyle as 'general' | 'midjourney' | 'stable-diffusion' | 'flux' | 'sora2' | 'veo3'));
+    if (modelStyle && ['general', 'midjourney', 'nanoBanana', 'flux', 'sora2', 'veo3'].includes(modelStyle)) {
+      conditions.push(eq(prompts.modelStyle, modelStyle as 'general' | 'midjourney' | 'nanoBanana' | 'flux' | 'sora2' | 'veo3'));
     }
 
     // Add ordering and pagination

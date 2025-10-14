@@ -7,7 +7,7 @@ export interface CreditsConfig {
     imageToPrompt: {
       general: number;
       midjourney: number;
-      'stable-diffusion': number;
+      'nanoBanana': number;
       flux: number;
       sora2: number;
     };
@@ -62,7 +62,7 @@ export const creditsConfig: CreditsConfig = {
     imageToPrompt: {
       general: 2,
       midjourney: 2,
-      'stable-diffusion': 2,
+      'nanoBanana': 2,
       flux: 2,
       sora2: 2,
     },

@@ -220,7 +220,7 @@ export const prompts = pgTable('prompts', {
   promptText: text('prompt_text').notNull(),
   negativePrompt: text('negative_prompt'),
   modelStyle: text('model_style', {
-    enum: ['general', 'midjourney', 'stable-diffusion', 'flux', 'sora2', 'veo3']
+    enum: ['general', 'midjourney', 'nanoBanana', 'flux', 'sora2', 'veo3']
   }).notNull(),
   s3KeyOriginal: text('s3_key_original'), // Original uploaded image
   s3KeyRender: text('s3_key_render'), // Generated render if any
@@ -296,7 +296,7 @@ export const publicContent = pgTable('public_content', {
   promptText: text('prompt_text').notNull(),
   negativePrompt: text('negative_prompt'),
   modelStyle: text('model_style', {
-    enum: ['general', 'midjourney', 'stable-diffusion', 'flux', 'sora2', 'veo3']
+    enum: ['general', 'midjourney', 'nanoBanana', 'flux', 'sora2', 'veo3']
   }).notNull(),
   cloudinaryPublicId: text('cloudinary_public_id').notNull(),
   cloudinaryUrl: text('cloudinary_url').notNull(),

@@ -29,35 +29,35 @@ const aiModels: AIModel[] = [
   {
     id: 'general',
     name: 'General Image Prompt',
-    description: `Natural language description (${creditsConfig.consumption.imageToPrompt.general} credits)`,
+    description: 'Natural language description',
     icon: <FileText className="h-5 w-5" />,
     gradient: 'from-blue-500/20 to-blue-600/20'
   },
   {
     id: 'midjourney',
     name: 'Midjourney',
-    description: `Midjourney prompts with parameters (${creditsConfig.consumption.imageToPrompt.midjourney} credits)`,
+    description: 'Midjourney prompts with parameters',
     icon: <Palette className="h-5 w-5" />,
     gradient: 'from-purple-500/20 to-purple-600/20'
   },
   {
-    id: 'stable-diffusion',
-    name: 'Stable Diffusion',
-    description: `Stable Diffusion format (${creditsConfig.consumption.imageToPrompt['stable-diffusion']} credits)`,
+    id: 'nanoBanana',
+    name: 'Nano Banana',
+    description: 'Nano Banana format',
     icon: <Wand2 className="h-5 w-5" />,
     gradient: 'from-pink-500/20 to-pink-600/20'
   },
   {
     id: 'flux',
     name: 'Flux',
-    description: `Photorealistic prompts (${creditsConfig.consumption.imageToPrompt.flux} credits)`,
+    description: 'Photorealistic prompts',
     icon: <Sparkles className="h-5 w-5" />,
     gradient: 'from-cyan-500/20 to-blue-600/20'
   },
   {
     id: 'sora2',
     name: 'Sora 2',
-    description: `Cinematic video prompts (${creditsConfig.consumption.imageToPrompt['sora2']} credits)`,
+    description: 'Cinematic video prompts',
     icon: <Video className="h-5 w-5" />,
     badge: 'NEW',
     gradient: 'from-red-500/20 to-orange-600/20'
@@ -422,6 +422,18 @@ export default function ImageToPromptPage() {
                     </>
                   )}
                 </Button>
+                
+                {!user && (
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    {creditsConfig.consumption.imageToPrompt[selectedModel as keyof typeof creditsConfig.consumption.imageToPrompt] || 2} credits per generation
+                  </p>
+                )}
+                
+                {user && usage.imageToText.daily >= usage.imageToText.dailyLimit && (
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    {creditsConfig.consumption.imageToPrompt[selectedModel as keyof typeof creditsConfig.consumption.imageToPrompt] || 2} credits per generation
+                  </p>
+                )}
               </div>
 
               {/* Generated Prompt Output */}
