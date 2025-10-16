@@ -6,10 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { cancelSubscription } from '@/server/actions/payment/cancel-subscription';
 import type { PaymentRecord } from '@/payment/types';
 import { Calendar, CreditCard, AlertCircle } from 'lucide-react';
-import { useTransition } from 'react';
+import { useMemo, useTransition } from 'react';
 import { toast } from 'sonner';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
-import { useI18nConfig } from '@/hooks/use-config';
+import { useI18nConfig, usePaymentConfig } from '@/hooks/use-config';
+import { cn } from '@/lib/utils';
 
 const subscriptionErrorLogger = new ErrorLogger('subscription-card');
 
@@ -21,6 +22,22 @@ interface SubscriptionCardProps {
 export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardProps) {
   const [isPending, startTransition] = useTransition();
   const i18nConfig = useI18nConfig();
+  const paymentConfig = usePaymentConfig();
+
+  const activePlan = useMemo(() => {
+    return paymentConfig.plans.find((plan) => {
+      const candidateIds = [
+        plan.id,
+        plan.stripePriceId,
+        plan.stripePriceIds?.monthly,
+        plan.stripePriceIds?.yearly,
+        plan.creemPriceIds?.monthly,
+        plan.creemPriceIds?.yearly,
+      ].filter(Boolean) as string[];
+
+      return candidateIds.some((id) => id === subscription.priceId);
+    });
+  }, [paymentConfig, subscription.priceId]);
 
   const formatDate = (date: Date | null | undefined) => {
     if (!date) return 'unknown';
@@ -90,7 +107,12 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
   const isTrialing = subscription.status === 'trialing';
 
   return (
-    <Card className="w-full">
+    <Card
+      className={cn(
+        'w-full transition-shadow',
+        activePlan ? 'border-primary/60 shadow-lg shadow-primary/20 ring-2 ring-primary/10' : ''
+      )}
+    >
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -99,7 +121,7 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
               Current Subscription
             </CardTitle>
             <CardDescription>
-              Your subscription plan details
+              {activePlan ? `You are on the ${activePlan.name} plan.` : 'Your subscription plan details'}
             </CardDescription>
           </div>
           <Badge className={getStatusColor(subscription.status)}>
@@ -109,6 +131,24 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {activePlan && (
+          <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-primary/70">
+                Current Plan
+              </p>
+              <p className="text-lg font-semibold text-primary">{activePlan.name}</p>
+            </div>
+            <Badge variant="secondary" className="bg-primary/15 text-primary">
+              {subscription.interval === 'year'
+                ? 'Yearly'
+                : subscription.interval === 'month'
+                  ? 'Monthly'
+                  : 'Custom'}
+            </Badge>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="text-sm text-muted-foreground">Billing Cycle</div>

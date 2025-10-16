@@ -155,6 +155,19 @@ export function UsagePage() {
     return <div>Loading...</div>;
   }
 
+  const shouldShowQuota = (quota?: { used: number; limit: number; isUnlimited: boolean }) => {
+    if (!quota) return false;
+    if (quota.isUnlimited) return true;
+    const limit = quota.limit ?? 0;
+    const used = quota.used ?? 0;
+    return limit > 0 || used > 0;
+  };
+
+  const calculateUsagePercent = (quota?: { used: number; limit: number }) => {
+    if (!quota || !quota.limit || quota.limit <= 0) return 0;
+    return Math.min(100, ((quota.used || 0) / quota.limit) * 100);
+  };
+
   return (
     <div className="container mx-auto space-y-6 p-6">
       <div className="space-y-2">
@@ -205,8 +218,8 @@ export function UsagePage() {
       {/* Daily & Monthly Quota Usage Section */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Image Generation - Daily */}
-        {quotaUsage?.imageGeneration && (
-          <Card className="border-l-4 border-l-blue-500">
+        {quotaUsage?.imageGeneration && shouldShowQuota(quotaUsage.imageGeneration.daily) && (
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <ImageIcon className="h-5 w-5 text-blue-500" />
@@ -221,19 +234,20 @@ export function UsagePage() {
                   {quotaUsage.imageGeneration.daily.used || 0} / {quotaUsage.imageGeneration.daily.isUnlimited ? '∞' : quotaUsage.imageGeneration.daily.limit || 0}
                 </span>
               </div>
-              {!quotaUsage.imageGeneration.daily.isUnlimited && (
-                <Progress 
-                  value={((quotaUsage.imageGeneration.daily.used || 0) / (quotaUsage.imageGeneration.daily.limit || 1)) * 100} 
-                  className="h-2"
-                />
+              {!quotaUsage.imageGeneration.daily.isUnlimited &&
+                (quotaUsage.imageGeneration.daily.limit || 0) > 0 && (
+                  <Progress 
+                    value={calculateUsagePercent(quotaUsage.imageGeneration.daily)} 
+                    className="h-2"
+                  />
               )}
             </CardContent>
           </Card>
         )}
 
         {/* Image Generation - Monthly */}
-        {quotaUsage?.imageGeneration && (
-          <Card className="border-l-4 border-l-indigo-500">
+        {quotaUsage?.imageGeneration && shouldShowQuota(quotaUsage.imageGeneration.monthly) && (
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <ImageIcon className="h-5 w-5 text-indigo-500" />
@@ -248,19 +262,20 @@ export function UsagePage() {
                   {quotaUsage.imageGeneration.monthly.used || 0} / {quotaUsage.imageGeneration.monthly.isUnlimited ? '∞' : quotaUsage.imageGeneration.monthly.limit || 0}
                 </span>
               </div>
-              {!quotaUsage.imageGeneration.monthly.isUnlimited && (
-                <Progress 
-                  value={((quotaUsage.imageGeneration.monthly.used || 0) / (quotaUsage.imageGeneration.monthly.limit || 1)) * 100} 
-                  className="h-2"
-                />
+              {!quotaUsage.imageGeneration.monthly.isUnlimited &&
+                (quotaUsage.imageGeneration.monthly.limit || 0) > 0 && (
+                  <Progress 
+                    value={calculateUsagePercent(quotaUsage.imageGeneration.monthly)} 
+                    className="h-2"
+                  />
               )}
             </CardContent>
           </Card>
         )}
 
         {/* Video Generation - Daily */}
-        {quotaUsage?.videoGeneration && (
-          <Card className="border-l-4 border-l-purple-500">
+        {quotaUsage?.videoGeneration && shouldShowQuota(quotaUsage.videoGeneration.daily) && (
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Video className="h-5 w-5 text-purple-500" />
@@ -275,19 +290,20 @@ export function UsagePage() {
                   {quotaUsage.videoGeneration.daily.used || 0} / {quotaUsage.videoGeneration.daily.isUnlimited ? '∞' : quotaUsage.videoGeneration.daily.limit || 0}
                 </span>
               </div>
-              {!quotaUsage.videoGeneration.daily.isUnlimited && (
-                <Progress 
-                  value={((quotaUsage.videoGeneration.daily.used || 0) / (quotaUsage.videoGeneration.daily.limit || 1)) * 100} 
-                  className="h-2"
-                />
+              {!quotaUsage.videoGeneration.daily.isUnlimited &&
+                (quotaUsage.videoGeneration.daily.limit || 0) > 0 && (
+                  <Progress 
+                    value={calculateUsagePercent(quotaUsage.videoGeneration.daily)} 
+                    className="h-2"
+                  />
               )}
             </CardContent>
           </Card>
         )}
 
         {/* Video Generation - Monthly */}
-        {quotaUsage?.videoGeneration && (
-          <Card className="border-l-4 border-l-pink-500">
+        {quotaUsage?.videoGeneration && shouldShowQuota(quotaUsage.videoGeneration.monthly) && (
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Video className="h-5 w-5 text-pink-500" />
@@ -302,19 +318,20 @@ export function UsagePage() {
                   {quotaUsage.videoGeneration.monthly.used || 0} / {quotaUsage.videoGeneration.monthly.isUnlimited ? '∞' : quotaUsage.videoGeneration.monthly.limit || 0}
                 </span>
               </div>
-              {!quotaUsage.videoGeneration.monthly.isUnlimited && (
-                <Progress 
-                  value={((quotaUsage.videoGeneration.monthly.used || 0) / (quotaUsage.videoGeneration.monthly.limit || 1)) * 100} 
-                  className="h-2"
-                />
+              {!quotaUsage.videoGeneration.monthly.isUnlimited &&
+                (quotaUsage.videoGeneration.monthly.limit || 0) > 0 && (
+                  <Progress 
+                    value={calculateUsagePercent(quotaUsage.videoGeneration.monthly)} 
+                    className="h-2"
+                  />
               )}
             </CardContent>
           </Card>
         )}
 
         {/* Image Extraction - Monthly */}
-        {quotaUsage?.imageExtraction && (
-          <Card className="border-l-4 border-l-green-500">
+        {quotaUsage?.imageExtraction && shouldShowQuota(quotaUsage.imageExtraction.monthly) && (
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <ImageIcon className="h-5 w-5 text-green-500" />
@@ -329,11 +346,12 @@ export function UsagePage() {
                   {quotaUsage.imageExtraction.monthly.used || 0} / {quotaUsage.imageExtraction.monthly.isUnlimited ? '∞' : quotaUsage.imageExtraction.monthly.limit || 0}
                 </span>
               </div>
-              {!quotaUsage.imageExtraction.monthly.isUnlimited && (
-                <Progress 
-                  value={((quotaUsage.imageExtraction.monthly.used || 0) / (quotaUsage.imageExtraction.monthly.limit || 1)) * 100} 
-                  className="h-2"
-                />
+              {!quotaUsage.imageExtraction.monthly.isUnlimited &&
+                (quotaUsage.imageExtraction.monthly.limit || 0) > 0 && (
+                  <Progress 
+                    value={calculateUsagePercent(quotaUsage.imageExtraction.monthly)} 
+                    className="h-2"
+                  />
               )}
             </CardContent>
           </Card>
