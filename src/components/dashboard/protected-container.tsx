@@ -40,3 +40,5 @@ export function ProtectedContainer({ children, sidebarGroups }: ProtectedContain
     </div>
   );
 }
+
+export default ProtectedContainer;

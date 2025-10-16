@@ -15,7 +15,7 @@ import { CreditCard, Home, LogOut, Settings, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 
-export function UserAvatarMenu() {
+function UserAvatarMenu() {
   const router = useRouter();
   const user = useUser();
   const isAuthenticated = useIsAuthenticated();
@@ -82,3 +82,6 @@ export function UserAvatarMenu() {
     </DropdownMenu>
   );
 }
+
+export { UserAvatarMenu };
+export default UserAvatarMenu;

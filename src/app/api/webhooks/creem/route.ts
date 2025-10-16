@@ -8,9 +8,14 @@ import db from '@/server/db';
 import { userCredits, creditTransactions } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
-import { paymentConfig } from '@/config/payment.config';
 import { logger } from '@/lib/monitoring/logger';
 import { env } from '@/env';
+import { paymentConfig } from '@/config/payment.config';
+import {
+  getCreditsForPlan,
+  formatPlanName,
+  type BillingInterval,
+} from '@/lib/creem/plan-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,34 +35,31 @@ interface WebhookEventData {
 }
 
 /**
- * Calculate credits based on plan and interval
- */
-function calculateCredits(planId: string, isYearly: boolean): number {
-  const plan = paymentConfig.plans.find(p => p.id === planId);
-  if (!plan || !plan.credits || !plan.credits.monthly) return 0;
-  
-  return isYearly ? (plan.credits.monthly * 12) : plan.credits.monthly;
-}
-
-/**
  * Grant subscription credits to user with idempotency
  * Returns true if credits were granted, false if already granted
  */
 async function grantSubscriptionCredits(
   userId: string,
-  planId: string,
+  planIdentifier: string,
   subscriptionId: string,
-  isYearly: boolean,
+  interval?: BillingInterval,
   isRenewal: boolean = false
 ): Promise<boolean> {
+  const creditInfo = getCreditsForPlan(planIdentifier, interval);
+
+  if (!creditInfo.plan || creditInfo.amount <= 0) {
+    console.log(
+      `[Creem Webhook] No credits to grant for identifier ${planIdentifier} (interval=${interval || 'auto'})`
+    );
+    return false;
+  }
+
+  const normalizedPlanId = creditInfo.planId;
+  const isYearly = creditInfo.interval === 'year';
+  const creditsToGrant = creditInfo.amount;
+  const planDisplayName = formatPlanName(creditInfo.plan, normalizedPlanId);
+
   try {
-    const creditsToGrant = calculateCredits(planId, isYearly);
-    
-    if (creditsToGrant === 0) {
-      console.log(`[Creem Webhook] No credits to grant for plan ${planId}`);
-      return false;
-    }
-    
     // Create idempotent reference ID
     const referenceId = `creem_${subscriptionId}_${isRenewal ? 'renewal' : 'initial'}_${Date.now()}`;
 
@@ -109,10 +111,11 @@ async function grantSubscriptionCredits(
         amount: creditsToGrant,
         balanceAfter: newBalance,
         source: 'subscription',
-        description: `${planId.charAt(0).toUpperCase() + planId.slice(1)} subscription ${isRenewal ? 'renewal' : 'credits'} (Creem)`,
+        description: `${planDisplayName} subscription ${isRenewal ? 'renewal' : 'credits'} (Creem)`,
         referenceId,
         metadata: JSON.stringify({
-          planId,
+          planId: normalizedPlanId,
+          planIdentifier,
           isYearly,
           subscriptionId,
           provider: 'creem',
@@ -125,7 +128,7 @@ async function grantSubscriptionCredits(
 
     if (granted) {
       console.log(
-        `[Creem Webhook] Granted ${creditsToGrant} credits to user ${userId} for ${planId} ${isRenewal ? 'renewal' : 'subscription'}`
+        `[Creem Webhook] Granted ${creditsToGrant} credits to user ${userId} for ${normalizedPlanId} ${isRenewal ? 'renewal' : 'subscription'}`
       );
     }
     
@@ -141,14 +144,25 @@ async function grantSubscriptionCredits(
  */
 async function adjustCreditsForPlanChange(
   userId: string,
-  oldPlanId: string,
-  newPlanId: string,
+  oldPlanIdentifier: string,
+  newPlanIdentifier: string,
   subscriptionId: string,
   isYearly: boolean
 ) {
   try {
-    const oldCredits = calculateCredits(oldPlanId, isYearly);
-    const newCredits = calculateCredits(newPlanId, isYearly);
+    const interval: BillingInterval = isYearly ? 'year' : 'month';
+    const oldCreditInfo = getCreditsForPlan(oldPlanIdentifier, interval);
+    const newCreditInfo = getCreditsForPlan(newPlanIdentifier, interval);
+
+    if (!oldCreditInfo.plan || !newCreditInfo.plan) {
+      console.log(
+        `[Creem Webhook] Unable to resolve plans for credit adjustment (${oldPlanIdentifier} → ${newPlanIdentifier})`
+      );
+      return;
+    }
+
+    const oldCredits = oldCreditInfo.amount;
+    const newCredits = newCreditInfo.amount;
     const creditDifference = newCredits - oldCredits;
     
     if (creditDifference === 0) {
@@ -190,11 +204,13 @@ async function adjustCreditsForPlanChange(
         amount: Math.abs(creditDifference),
         balanceAfter: newBalance,
         source: 'subscription',
-        description: `Plan ${creditDifference > 0 ? 'upgrade' : 'downgrade'}: ${oldPlanId} → ${newPlanId}`,
+        description: `Plan ${creditDifference > 0 ? 'upgrade' : 'downgrade'}: ${oldCreditInfo.planId} → ${newCreditInfo.planId}`,
         referenceId,
         metadata: JSON.stringify({
-          oldPlanId,
-          newPlanId,
+          oldPlanId: oldCreditInfo.planId,
+          newPlanId: newCreditInfo.planId,
+          oldPlanIdentifier,
+          newPlanIdentifier,
           subscriptionId,
           provider: 'creem',
           creditDifference,
@@ -202,7 +218,9 @@ async function adjustCreditsForPlanChange(
       });
     });
     
-    console.log(`[Creem Webhook] Adjusted credits by ${creditDifference} for user ${userId} (${oldPlanId} → ${newPlanId})`);
+    console.log(
+      `[Creem Webhook] Adjusted credits by ${creditDifference} for user ${userId} (${oldCreditInfo.planId} → ${newCreditInfo.planId})`
+    );
   } catch (error) {
     console.error('[Creem Webhook] Error adjusting credits:', error);
   }
@@ -368,7 +386,7 @@ async function handleCheckoutComplete(data: any) {
         
         // Grant credits immediately for non-trial subscriptions
         if (!trialEnd) {
-          await grantSubscriptionCredits(userId, planId, subscriptionId, false, false);
+          await grantSubscriptionCredits(userId, planId, subscriptionId, data.interval, false);
         } else {
           console.log(`[Creem Webhook] Trial subscription - credits will be granted after trial ends`);
         }
@@ -423,7 +441,7 @@ async function handleSubscriptionCreated(data: any) {
 
       // Only grant credits if not in trial or if trial just ended
       if (planId && userId && status !== 'trialing') {
-        await grantSubscriptionCredits(userId, planId, subscriptionId, false, false);
+        await grantSubscriptionCredits(userId, planId, subscriptionId, data.interval, false);
       } else if (status === 'trialing') {
         console.log(`[Creem Webhook] Trial subscription created - credits will be granted after trial ends`);
       }
@@ -498,13 +516,25 @@ async function handleSubscriptionUpdate(data: any) {
       // Detect plan change (upgrade/downgrade)
       if (oldPlanId !== newPlanId) {
         console.log(`[Creem Webhook] Plan change detected: ${oldPlanId} → ${newPlanId}`);
-        await adjustCreditsForPlanChange(actualUserId, oldPlanId, newPlanId, targetSubscription.id, false);
+        await adjustCreditsForPlanChange(
+          actualUserId,
+          oldPlanId,
+          newPlanId,
+          targetSubscription.id,
+          (targetSubscription.interval || data.interval) === 'year'
+        );
       }
       
       // Detect status change from trialing to active (trial ended, grant credits)
       if (oldStatus === 'trialing' && newStatus === 'active') {
         console.log(`[Creem Webhook] Trial ended, granting credits for ${newPlanId}`);
-        await grantSubscriptionCredits(actualUserId, newPlanId, targetSubscription.id, false, false);
+        await grantSubscriptionCredits(
+          actualUserId,
+          newPlanId,
+          targetSubscription.id,
+          targetSubscription.interval || data.interval,
+          false
+        );
       }
       
       await paymentRepository.update(targetSubscription.id, {
@@ -566,7 +596,13 @@ async function handlePaymentSuccess(data: any) {
         const isYearly = paymentRecord.interval === 'year';
         
         console.log(`[Creem Webhook] Renewal payment detected for ${planId}`);
-        await grantSubscriptionCredits(paymentRecord.userId, planId, subscriptionId, isYearly, true);
+        await grantSubscriptionCredits(
+          paymentRecord.userId,
+          planId,
+          subscriptionId,
+          isYearly ? 'year' : 'month',
+          true
+        );
       }
       
       await paymentRepository.createEvent({
@@ -617,7 +653,13 @@ async function handleSubscriptionTrialEnded(data: any) {
       // Grant initial credits now that trial has ended and payment succeeded
       if (userId && planId) {
         console.log(`[Creem Webhook] Trial ended, granting credits for ${planId}`);
-        await grantSubscriptionCredits(userId, planId, subscriptionId, false, false);
+        await grantSubscriptionCredits(
+          userId,
+          planId,
+          subscriptionId,
+          paymentRecord.interval || 'month',
+          false
+        );
       }
     }
     

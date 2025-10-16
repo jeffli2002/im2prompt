@@ -9,7 +9,7 @@ import {
 } from '@/server/actions/file-actions';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { ErrorLogger } from '@/lib/logger/logger';
 
 const filesErrorLogger = new ErrorLogger('use-files');
 

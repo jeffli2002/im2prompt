@@ -18,4 +18,6 @@ export function NavbarWrapper() {
       onPricingClick={navbarData.handlePricingClick}
     />
   );
-} 
+}
+
+export default NavbarWrapper;

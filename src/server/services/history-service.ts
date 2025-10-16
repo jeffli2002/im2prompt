@@ -1,7 +1,7 @@
 import { contentRepository, type CreateHistoryData, type HistoryFilters } from '@/server/db/repositories/content-repository';
 import { configRepository } from '@/server/db/repositories/config-repository';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import { paymentConfig } from '@/config/payment.config';
+import { resolvePlanByIdentifier } from '@/lib/creem/plan-utils';
 
 export interface GetHistoryParams {
   userId: string;
@@ -25,12 +25,8 @@ export class HistoryService {
     
     if (!subscription) return 'free';
     
-    const plan = paymentConfig.plans.find(p => 
-      p.stripePriceIds?.monthly === subscription.priceId ||
-      p.stripePriceIds?.yearly === subscription.priceId ||
-      p.creemPriceIds?.monthly === subscription.priceId ||
-      p.creemPriceIds?.yearly === subscription.priceId
-    );
+    const resolved = resolvePlanByIdentifier(subscription.priceId, subscription.interval || undefined);
+    const plan = resolved?.plan;
     
     return (plan?.id as 'free' | 'pro' | 'proplus') || 'free';
   }

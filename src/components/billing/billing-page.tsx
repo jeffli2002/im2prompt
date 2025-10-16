@@ -13,6 +13,9 @@ import { toast } from 'sonner';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
 import { syncSingleSubscription } from '@/server/actions/payment/sync-subscription-periods';
 import { useTranslations, useLocale } from 'next-intl';
+import Link from 'next/link';
+import { usePaymentPlan } from '@/hooks/use-config';
+import { creditsConfig } from '@/config/credits.config';
 
 const billingErrorLogger = new ErrorLogger('billing-page');
 
@@ -25,6 +28,10 @@ export function BillingPage() {
   const [error, setError] = useState<string | null>(null);
   const [syncCompleted, setSyncCompleted] = useState(false);
   const searchParams = useSearchParams();
+  const freePlan = usePaymentPlan('free');
+  const freeDailyQuota = creditsConfig.freeUser.imageToText.freeQuotaPerDay;
+  const freeMonthlyQuota = creditsConfig.freeUser.imageToText.freeQuotaPerMonth;
+  const signupBonusCredits = freePlan?.credits?.onSignup ?? 0;
 
   const loadBillingInfo = useCallback(async () => {
     try {
@@ -277,11 +284,38 @@ export function BillingPage() {
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle>{t('currentSubscription')}</CardTitle>
-            <CardDescription>{t('noActiveSubscription')}</CardDescription>
+            <CardTitle>{t('freePlan.title')}</CardTitle>
+            <CardDescription>{t('freePlan.description')}</CardDescription>
           </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">{t('noSubscriptionDescription')}</p>
+          <CardContent className="space-y-4">
+            <div className="space-y-4 rounded-xl border bg-muted/40 p-4">
+              <div>
+                <p className="text-sm font-medium">{t('freePlan.dailyQuotaTitle')}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('freePlan.dailyQuotaValue', { count: freeDailyQuota })}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">{t('freePlan.monthlyQuotaTitle')}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('freePlan.monthlyQuotaValue', { count: freeMonthlyQuota })}
+                </p>
+              </div>
+              {signupBonusCredits > 0 && (
+                <div>
+                  <p className="text-sm font-medium">{t('freePlan.signupBonusTitle')}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t('freePlan.signupBonusValue', { credits: signupBonusCredits })}
+                  </p>
+                </div>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {t('freePlan.ctaDescription')}
+            </p>
+            <Button asChild size="lg" className="w-full sm:w-auto">
+              <Link href="/pricing">{t('freePlan.upgradeButton')}</Link>
+            </Button>
           </CardContent>
         </Card>
       )}

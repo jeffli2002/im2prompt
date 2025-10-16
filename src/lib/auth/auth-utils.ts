@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth/auth';
 import { env } from '@/env';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 export interface SessionUser {
   id: string;
@@ -31,9 +31,23 @@ export async function getSessionWithAuthBypass(): Promise<Session | null> {
     };
   }
 
-  // Otherwise get real session from better-auth
+  const headerList = headers();
+  const cookieHeader = headerList.get('cookie');
+
+  if (cookieHeader) {
+    return await auth.api.getSession({
+      headers: headerList,
+    });
+  }
+
+  const cookieStore = cookies();
+  const serializedCookies = cookieStore
+    .getAll()
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join('; ');
+
   return await auth.api.getSession({
-    headers: await headers(),
+    headers: serializedCookies ? { cookie: serializedCookies } : {},
   });
 }
 

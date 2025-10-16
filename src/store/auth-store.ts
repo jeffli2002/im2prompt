@@ -1,3 +1,5 @@
+'use client';
+
 import { authClient } from '@/lib/auth/auth-client';
 import type { User } from 'better-auth/types';
 import { create } from 'zustand';

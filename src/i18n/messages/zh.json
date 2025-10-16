@@ -258,6 +258,18 @@
       "syncFailed": "同步订阅信息失败",
       "paymentSuccess": "支付成功！您的订阅已激活。",
       "paymentCanceled": "支付已取消。您可以随时重新订阅。"
+    },
+    "freePlan": {
+      "title": "免费套餐",
+      "description": "您当前正在使用免费套餐，先体验基础功能。",
+      "dailyQuotaTitle": "每日额度",
+      "dailyQuotaValue": "每天可进行 {count} 次图片转提示",
+      "monthlyQuotaTitle": "每月额度",
+      "monthlyQuotaValue": "每月可进行 {count} 次图片转提示",
+      "signupBonusTitle": "注册奖励",
+      "signupBonusValue": "注册即可一次性获得 {credits} 积分",
+      "ctaDescription": "需要更多额度或高级功能？升级付费套餐即可解锁。",
+      "upgradeButton": "去升级"
     }
   },
   "navbar": {

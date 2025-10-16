@@ -1,7 +1,8 @@
 // Detect runtime environment
 const isCloudflareWorkers = typeof navigator !== 'undefined' && navigator.userAgent?.includes('Cloudflare-Workers');
 const isVercelEdge = typeof (globalThis as Record<string, unknown>).EdgeRuntime !== 'undefined';
-const isEdgeRuntime = isCloudflareWorkers || isVercelEdge;
+const isBrowser = typeof window !== 'undefined';
+const isEdgeRuntime = isCloudflareWorkers || isVercelEdge || isBrowser;
 
 // Simple logger interface, compatible with pino
 interface SimpleLogger {
@@ -61,12 +62,10 @@ function createEdgeLogger(prefix = ''): SimpleLogger {
 let logger: SimpleLogger;
 
 if (isEdgeRuntime) {
-  // Use simple logger for Edge Runtime
   logger = createEdgeLogger();
 } else {
-  // Use pino in Node.js environment
-  const pino = require('pino');
-  
+  const { default: pino } = await import('pino');
+
   logger = pino({
     level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
     ...(process.env.NODE_ENV === 'production' && {

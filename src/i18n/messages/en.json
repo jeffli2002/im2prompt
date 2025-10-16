@@ -285,6 +285,18 @@
       "syncFailed": "Failed to sync subscription information",
       "paymentSuccess": "Payment successful! Your subscription has been activated.",
       "paymentCanceled": "Payment canceled. You can resubscribe at any time."
+    },
+    "freePlan": {
+      "title": "Free Plan",
+      "description": "You're currently using the free tier. Enjoy im2Prompt with these starter limits.",
+      "dailyQuotaTitle": "Daily quota",
+      "dailyQuotaValue": "{count} Image-to-Prompt generations per day",
+      "monthlyQuotaTitle": "Monthly quota",
+      "monthlyQuotaValue": "{count} Image-to-Prompt generations per month",
+      "signupBonusTitle": "Signup bonus",
+      "signupBonusValue": "{credits} credits granted once after signup",
+      "ctaDescription": "Need more runs or credits? Upgrade to unlock higher limits and premium features.",
+      "upgradeButton": "Upgrade Plan"
     }
   },
   "navbar": {

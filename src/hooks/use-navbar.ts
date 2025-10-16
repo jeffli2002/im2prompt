@@ -1,3 +1,4 @@
+'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { useAuthInitialized, useAuthLoading, useIsAuthenticated } from '@/store/auth-store';
@@ -129,3 +130,4 @@ export function useNavbar(): UseNavbarReturn {
     handlePricingClick,
   };
 } 
+ 

@@ -5,24 +5,31 @@ import db from '@/server/db';
 import { userCredits, creditTransactions } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
+import { getCreditsForPlan, formatPlanName } from '@/lib/creem/plan-utils';
 
 export const dynamic = 'force-dynamic';
 
 async function grantSubscriptionCredits(
   userId: string,
-  planId: string,
+  planIdentifier: string,
   subscriptionId: string,
-  isYearly: boolean
+  interval: 'month' | 'year'
 ) {
-  try {
-    const creditsToGrant = isYearly
-      ? planId === 'proplus'
-        ? 10800
-        : 6000
-      : planId === 'proplus'
-      ? 900
-      : 500;
+  const creditInfo = getCreditsForPlan(planIdentifier, interval);
 
+  if (!creditInfo.plan || creditInfo.amount <= 0) {
+    console.log(
+      `[Creem Sync] No credits configured for plan identifier ${planIdentifier} (interval=${interval})`
+    );
+    return;
+  }
+
+  const creditsToGrant = creditInfo.amount;
+  const normalizedPlanId = creditInfo.planId;
+  const planDisplayName = formatPlanName(creditInfo.plan, normalizedPlanId);
+  const isYearly = creditInfo.interval === 'year';
+
+  try {
     await db.transaction(async (tx) => {
       const [userCredit] = await tx
         .select()
@@ -58,10 +65,11 @@ async function grantSubscriptionCredits(
         amount: creditsToGrant,
         balanceAfter: userCredit ? userCredit.balance + creditsToGrant : creditsToGrant,
         source: 'subscription',
-        description: `${planId.charAt(0).toUpperCase() + planId.slice(1)} subscription credits (Creem)`,
+        description: `${planDisplayName} subscription credits (Creem)`,
         referenceId: `creem_${subscriptionId}`,
         metadata: JSON.stringify({
-          planId,
+          planId: normalizedPlanId,
+          planIdentifier,
           isYearly,
           subscriptionId,
           provider: 'creem',
@@ -70,7 +78,7 @@ async function grantSubscriptionCredits(
     });
 
     console.log(
-      `[Creem Sync] Granted ${creditsToGrant} credits to user ${userId} for ${planId} subscription`
+      `[Creem Sync] Granted ${creditsToGrant} credits to user ${userId} for ${normalizedPlanId} subscription`
     );
   } catch (error) {
     console.error('[Creem Sync] Error granting subscription credits:', error);
@@ -274,7 +282,12 @@ export async function POST(request: NextRequest) {
     console.log(`[Creem Sync] Subscription created successfully in database`);
 
     // Grant subscription credits
-    await grantSubscriptionCredits(session.user.id, planId, subscriptionId, isYearly);
+    await grantSubscriptionCredits(
+      session.user.id,
+      planId,
+      subscriptionId,
+      newInterval
+    );
 
     console.log(`[Creem Sync] Successfully synced subscription for user ${session.user.id}`);
 

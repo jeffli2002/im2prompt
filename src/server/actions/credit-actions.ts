@@ -11,6 +11,8 @@ import db from '@/server/db';
 import { userQuotaUsage } from '@/server/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { quotaService, updateQuotaUsage, type QuotaService } from '@/lib/quota/quota-service';
+import { resolvePlanByIdentifier } from '@/lib/creem/plan-utils';
+import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 
 export interface GetCreditBalanceResponse extends UserCreditAccount {
   availableBalance: number;
@@ -75,9 +77,7 @@ export interface GetQuotaUsageResponse {
  */
 export async function getCreditBalance(): Promise<ActionResult<GetCreditBalanceResponse>> {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getSessionWithAuthBypass();
 
     if (!session?.user) {
       return {
@@ -111,9 +111,7 @@ export async function getCreditHistory(
   params: GetCreditHistoryParams = {}
 ): Promise<ActionResult<CreditTransaction[]>> {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getSessionWithAuthBypass();
 
     if (!session?.user) {
       return {
@@ -147,9 +145,7 @@ export async function getCreditHistory(
  */
 export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageResponse>> {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getSessionWithAuthBypass();
 
     if (!session?.user) {
       return {
@@ -197,10 +193,11 @@ export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageRespons
     
     // Get limits from payment config
     const { paymentConfig } = await import('@/config');
-    const userPlan = subscription 
-      ? paymentConfig.plans.find(p => p.stripePriceIds?.monthly === subscription.priceId || p.stripePriceIds?.yearly === subscription.priceId)
-      : paymentConfig.plans.find(p => p.id === 'free');
-    
+    const resolvedPlan = subscription
+      ? resolvePlanByIdentifier(subscription.priceId, subscription.interval || undefined)
+      : resolvePlanByIdentifier('free');
+
+    const userPlan = resolvedPlan?.plan || paymentConfig.plans.find(p => p.id === 'free');
     const planLimits = userPlan?.limits || paymentConfig.plans[0]?.limits || {}; // Default to free plan
     
     // Determine limits
