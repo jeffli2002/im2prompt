@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     // Parse multipart form data
     const formData = await req.formData();
     const imageFile = formData.get('image') as File | null;
-    const modelStyle = formData.get('modelStyle') as string || 'general';
+    const rawModelStyle = (formData.get('modelStyle') as string | null) || 'general';
     const imageUrl = formData.get('imageUrl') as string | null;
     const language = formData.get('language') as string || 'english';
 
@@ -40,13 +40,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate model style
-    const validStyles = ['general', 'midjourney', 'stable-diffusion', 'flux', 'sora2', 'veo3'];
-    if (!validStyles.includes(modelStyle)) {
+    const validStyles = ['general', 'midjourney', 'nanoBanana', 'flux', 'sora2', 'veo3'] as const;
+    type ModelStyle = (typeof validStyles)[number];
+    const styleAliasMap: Record<string, ModelStyle> = {
+      'stable-diffusion': 'nanoBanana',
+    };
+    const maybeAlias = styleAliasMap[rawModelStyle] || rawModelStyle;
+    if (!validStyles.includes(maybeAlias as ModelStyle)) {
       return NextResponse.json(
         { error: 'Invalid model style' },
         { status: 400 }
       );
     }
+    const modelStyle = maybeAlias as ModelStyle;
 
     // Check user credits (skip for free trial users)
     let userCreditRecord = null;
@@ -70,17 +76,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate mock prompt based on model style
-    const mockPrompts = {
+    const mockPrompts: Record<ModelStyle, string> = {
       general: 'A beautiful landscape with mountains in the background, a serene lake in the foreground, golden hour lighting, photorealistic style, high quality, detailed',
       midjourney: 'A stunning mountain landscape at sunset, crystal clear lake reflection, dramatic clouds, golden hour lighting, photorealistic, highly detailed, 8k resolution --ar 16:9 --v 6',
-      'stable-diffusion': 'A majestic mountain landscape during golden hour, pristine lake with perfect reflections, dramatic sky with clouds, photorealistic, highly detailed, 8k, masterpiece, best quality',
+      nanoBanana: 'A majestic mountain landscape during golden hour, pristine lake with perfect reflections, dramatic sky with clouds, photorealistic, highly detailed, 8k, masterpiece, best quality',
       flux: 'A breathtaking mountain landscape at sunset, crystal clear alpine lake, dramatic cloud formations, golden hour lighting, photorealistic, ultra detailed, 8k resolution, professional photography',
       sora2: 'A cinematic shot of a serene mountain landscape at sunset, camera slowly panning across a crystal clear lake reflecting the golden sky, dramatic clouds moving overhead, golden hour lighting, photorealistic, 4k video quality',
       veo3: 'A peaceful mountain landscape at golden hour, camera gently moving across a pristine lake with perfect reflections, dramatic clouds drifting in the sky, warm lighting, cinematic quality, photorealistic'
     };
 
-    const extractedPrompt = mockPrompts[modelStyle as keyof typeof mockPrompts] || mockPrompts.general;
-    const negativePrompt = modelStyle === 'stable-diffusion' ? 'blurry, low quality, distorted, ugly, bad anatomy, bad proportions, deformed, low resolution' : undefined;
+    const extractedPrompt = mockPrompts[modelStyle] || mockPrompts.general;
+    const negativePrompt = modelStyle === 'nanoBanana'
+      ? 'blurry, low quality, distorted, ugly, bad anatomy, bad proportions, deformed, low resolution'
+      : undefined;
 
     // Start a database transaction (only for authenticated users)
     const promptId = `prompt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -122,7 +130,7 @@ export async function POST(req: NextRequest) {
             userId,
             promptText: extractedPrompt,
             negativePrompt: negativePrompt || null,
-            modelStyle: modelStyle as 'general' | 'midjourney' | 'stable-diffusion' | 'flux' | 'sora2' | 'veo3',
+            modelStyle,
             s3KeyOriginal: null,
             creditsSpent: CREDITS_PER_EXTRACTION,
             metadata: JSON.stringify({

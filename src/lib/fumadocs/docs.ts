@@ -37,14 +37,22 @@ export interface DocsTreeItem {
 function getMetaConfigFromSource(locale: string, folderPath = ''): MetaConfig | null {
   try {
     // Access the compiled meta data from .source/index.ts
-    const sourceData = docs.toFumadocsSource();
+    const sourceData = docs.toFumadocsSource() as {
+      files?: Array<{ path: string; type: string; data?: unknown }>;
+    } | {
+      files: () => Array<{ path: string; type: string; data?: unknown }>;
+    };
     
     // Build the expected meta path
     const metaPath = folderPath ? `${locale}/${folderPath}/meta.json` : `${locale}/meta.json`;
     
     // Find the meta file in the source data
-    const metaFiles = Array.isArray(sourceData.files) ? sourceData.files : sourceData.files();
-    const metaFile = metaFiles.find(file => 
+    const rawFiles = Array.isArray((sourceData as any).files)
+      ? (sourceData as any).files
+      : typeof (sourceData as any).files === 'function'
+        ? (sourceData as any).files()
+        : [];
+    const metaFile = rawFiles.find((file: { path: string; type: string; data?: unknown }) => 
       file.path === metaPath && file.type === 'meta'
     );
     
@@ -200,4 +208,3 @@ export function buildDocsTree(locale = 'en'): DocsTreeItem[] {
 
   return tree;
 }
-

@@ -8,10 +8,10 @@ import type { ActionResult } from '@/payment/types';
 import type { UserCreditAccount, CreditTransaction } from '@/lib/credits';
 import { creditsConfig } from '@/config/credits.config';
 import db from '@/server/db';
-import { userQuotaUsage } from '@/server/db/schema';
+import { creditTransactions, userQuotaUsage } from '@/server/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { quotaService, updateQuotaUsage, type QuotaService } from '@/lib/quota/quota-service';
-import { resolvePlanByIdentifier } from '@/lib/creem/plan-utils';
+import { getCreditsForPlan, resolvePlanByIdentifier } from '@/lib/creem/plan-utils';
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 
 export interface GetCreditBalanceResponse extends UserCreditAccount {
@@ -86,7 +86,12 @@ export async function getCreditBalance(): Promise<ActionResult<GetCreditBalanceR
       };
     }
 
-    const account = await creditService.getOrCreateCreditAccount(session.user.id);
+    let account = await creditService.getOrCreateCreditAccount(session.user.id);
+
+    const granted = await ensureSubscriptionCredits(session.user.id);
+    if (granted) {
+      account = await creditService.getOrCreateCreditAccount(session.user.id);
+    }
     
     return {
       success: true,
@@ -101,6 +106,55 @@ export async function getCreditBalance(): Promise<ActionResult<GetCreditBalanceR
       success: false,
       error: 'Failed to get credit balance',
     };
+  }
+}
+
+async function ensureSubscriptionCredits(userId: string): Promise<boolean> {
+  try {
+    // Skip if user already has subscription-based credit history
+    const existingSubscriptionCredit = await db
+      .select({ id: creditTransactions.id })
+      .from(creditTransactions)
+      .where(and(
+        eq(creditTransactions.userId, userId),
+        eq(creditTransactions.source, 'subscription')
+      ))
+      .limit(1);
+
+    if (existingSubscriptionCredit.length > 0) {
+      return false;
+    }
+
+    const subscription = await paymentRepository.findActiveSubscriptionByUserId(userId);
+    if (!subscription) {
+      return false;
+    }
+
+    const interval = subscription.interval === 'year' ? 'year' : 'month';
+    const creditInfo = getCreditsForPlan(subscription.priceId, interval);
+
+    if (!creditInfo.plan || creditInfo.amount <= 0) {
+      return false;
+    }
+
+    await creditService.earnCredits({
+      userId,
+      amount: creditInfo.amount,
+      source: 'subscription',
+      description: `${creditInfo.plan.name} subscription credits`,
+      referenceId: `auto_grant_${subscription.subscriptionId || subscription.id}_${Date.now()}`,
+      metadata: {
+        planId: creditInfo.planId,
+        interval,
+        provider: subscription.provider,
+        reason: 'auto_grant_missing_subscription_credits',
+      },
+    });
+
+    return true;
+  } catch (error) {
+    console.error('Failed to ensure subscription credits:', error);
+    return false;
   }
 }
 

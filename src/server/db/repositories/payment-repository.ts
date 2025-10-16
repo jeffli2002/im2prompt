@@ -31,6 +31,7 @@ export interface UpdatePaymentData {
   cancelAtPeriodEnd?: boolean;
   trialStart?: Date;
   trialEnd?: Date;
+  interval?: PaymentInterval | null;
 }
 
 export interface CreatePaymentEventData {
@@ -179,6 +180,7 @@ export class PaymentRepository {
     if (data.cancelAtPeriodEnd !== undefined) updateData.cancelAtPeriodEnd = data.cancelAtPeriodEnd;
     if (data.trialStart !== undefined) updateData.trialStart = data.trialStart;
     if (data.trialEnd !== undefined) updateData.trialEnd = data.trialEnd;
+    if (data.interval !== undefined) updateData.interval = data.interval;
 
     const [result] = await db
       .update(payment)

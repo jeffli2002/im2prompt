@@ -1,9 +1,9 @@
 'use server';
 
-import { getSession } from '@/lib/auth/auth-utils';
+import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 import { creemService } from '@/lib/creem/creem-service';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import { ActionResult } from '@/payment/types';
+import type { ActionResult } from '@/payment/types';
 import { logger } from '@/lib/monitoring/logger';
 import { env } from '@/env';
 
@@ -11,7 +11,7 @@ export async function generateCustomerPortalLink(
   returnUrl?: string
 ): Promise<ActionResult<{ url: string }>> {
   try {
-    const session = await getSession();
+    const session = await getSessionWithAuthBypass();
     
     if (!session?.user?.id) {
       logger.warn('[Customer Portal] Unauthorized portal access attempt');

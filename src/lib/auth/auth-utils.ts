@@ -31,7 +31,7 @@ export async function getSessionWithAuthBypass(): Promise<Session | null> {
     };
   }
 
-  const headerList = headers();
+  const headerList = await headers();
   const cookieHeader = headerList.get('cookie');
 
   if (cookieHeader) {
@@ -40,14 +40,19 @@ export async function getSessionWithAuthBypass(): Promise<Session | null> {
     });
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const serializedCookies = cookieStore
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join('; ');
 
+  const fallbackHeaders = new Headers();
+  if (serializedCookies) {
+    fallbackHeaders.set('cookie', serializedCookies);
+  }
+
   return await auth.api.getSession({
-    headers: serializedCookies ? { cookie: serializedCookies } : {},
+    headers: fallbackHeaders,
   });
 }
 

@@ -10,6 +10,7 @@ export interface LogContext {
   metric?: string;
   value?: number;
   tags?: Record<string, string>;
+  [key: string]: unknown;
 }
 
 export enum LogLevel {

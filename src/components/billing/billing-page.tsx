@@ -314,7 +314,7 @@ export function BillingPage() {
               {t('freePlan.ctaDescription')}
             </p>
             <Button asChild size="lg" className="w-full sm:w-auto">
-              <Link href="/pricing">{t('freePlan.upgradeButton')}</Link>
+              <Link href="/#pricing">{t('freePlan.upgradeButton')}</Link>
             </Button>
           </CardContent>
         </Card>

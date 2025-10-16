@@ -1,9 +1,9 @@
 'use server';
 
-import { getSession } from '@/lib/auth/auth-utils';
+import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 import { creemService } from '@/lib/creem/creem-service';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import { ActionResult } from '@/payment/types';
+import type { ActionResult } from '@/payment/types';
 import { logger } from '@/lib/monitoring/logger';
 
 export async function downgradeSubscription(
@@ -13,7 +13,7 @@ export async function downgradeSubscription(
   scheduleAtPeriodEnd: boolean = true
 ): Promise<ActionResult<{ downgraded: boolean; scheduledAtPeriodEnd?: boolean }>> {
   try {
-    const session = await getSession();
+    const session = await getSessionWithAuthBypass();
     
     if (!session?.user?.id) {
       logger.warn('[Downgrade] Unauthorized downgrade attempt', {

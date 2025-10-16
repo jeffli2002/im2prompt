@@ -9,7 +9,7 @@ export const paymentConfig: PaymentConfig = {
   stripe: {
     secretKey: process.env.STRIPE_SECRET_KEY || '',
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
-    apiVersion: '2025-06-30.basil',
+    apiVersion: '2025-08-27.basil',
   },
 
   creem: {

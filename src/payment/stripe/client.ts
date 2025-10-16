@@ -6,7 +6,7 @@ import { paymentConfig } from '../../config/payment.config';
 export const stripeConfig = {
   secretKey: paymentConfig.stripe.secretKey || '',
   webhookSecret: paymentConfig.stripe.webhookSecret || '',
-  apiVersion: paymentConfig.stripe.apiVersion as '2025-06-30.basil',
+  apiVersion: paymentConfig.stripe.apiVersion as '2025-08-27.basil',
 };
 
 // Server-side Stripe instance - only create if secret key is provided
