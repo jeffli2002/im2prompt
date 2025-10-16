@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn, isWebView, isMobile } from '@/lib/utils';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { LoginFormProps } from '@/types/login';
 import { useState, useEffect } from 'react';
 import { AlertCircle } from 'lucide-react';
@@ -22,6 +22,7 @@ export function LoginForm({
   ...props 
 }: LoginFormProps & React.ComponentProps<'div'>) {
   const t = useTranslations('auth');
+  const locale = useLocale();
   const [isInWebView, setIsInWebView] = useState(false);
   const [showWebViewWarning, setShowWebViewWarning] = useState(false);
 
@@ -150,7 +151,7 @@ export function LoginForm({
                   <div className="flex items-center">
                     <Label htmlFor="password">{t('password')}</Label>
                     <a
-                      href="/reset-password"
+                      href={`/${locale}/reset-password`}
                       className="ml-auto text-sm underline-offset-4 hover:underline"
                     >
                       {t('forgotPassword')}

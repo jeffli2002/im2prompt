@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { CreditCard, AlertTriangle } from 'lucide-react';
+import { env } from '@/env';
 
 interface PurchaseConfirmationDialogProps {
   isOpen: boolean;
@@ -20,7 +21,6 @@ interface PurchaseConfirmationDialogProps {
   planName?: string;
   isProcessing?: boolean;
 }
-
 export function PurchaseConfirmationDialog({
   isOpen,
   onClose,
@@ -29,6 +29,7 @@ export function PurchaseConfirmationDialog({
   isProcessing = false,
 }: PurchaseConfirmationDialogProps) {
   const t = useTranslations('pricing.purchaseDialog');
+  const isTestMode = env.NEXT_PUBLIC_CREEM_TEST_MODE === 'true';
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -36,24 +37,28 @@ export function PurchaseConfirmationDialog({
         <AlertDialogHeader>
           <div className="flex items-center gap-2">
             <CreditCard className="h-5 w-5 text-primary" />
-            <AlertDialogTitle>{t('title')}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {isTestMode ? t('titleTest') : t('title')}
+            </AlertDialogTitle>
           </div>
           <AlertDialogDescription asChild>
             <div className="space-y-3 text-left">
-              <p>{t('description')}</p>
-              
-              <div className="bg-muted p-3 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-500" />
-                  <span className="font-medium text-amber-700 dark:text-amber-300">
-                    {t('warning')}
-                  </span>
+              <p>{isTestMode ? t('descriptionTest') : t('description')}</p>
+
+              {isTestMode && (
+                <div className="bg-muted p-3 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-500" />
+                    <span className="font-medium text-amber-700 dark:text-amber-300">
+                      {t('warning')}
+                    </span>
+                  </div>
+                  <p className="font-mono text-sm bg-background p-2 rounded border">
+                    {t('testCardNumber')}
+                  </p>
                 </div>
-                <p className="font-mono text-sm bg-background p-2 rounded border">
-                  {t('testCardNumber')}
-                </p>
-              </div>
-              
+              )}
+
               {planName && (
                 <p className="text-sm text-muted-foreground">
                   {t('purchaseInfo', { planName: planName })}
@@ -85,4 +90,4 @@ export function PurchaseConfirmationDialog({
       </AlertDialogContent>
     </AlertDialog>
   );
-} 
+}

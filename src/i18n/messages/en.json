@@ -70,6 +70,28 @@
       "prefix": "By clicking continue, you agree to our",
       "middle": "and",
       "suffix": "."
+    },
+    "resetPassword": {
+      "title": "Reset your password",
+      "description": "Enter the email associated with your account and we\u2019ll send reset instructions.",
+      "emailLabel": "Email address",
+      "submit": "Send reset link",
+      "sending": "Sending...",
+      "success": "If an account exists for that email, you\u2019ll receive reset instructions shortly.",
+      "requestUnknownError": "We couldn't process your request. Please try again.",
+      "backToLogin": "Back to login",
+      "requestAnother": "Request a new link",
+      "tokenTitle": "Set a new password",
+      "tokenSubtitle": "Choose a secure password to protect your account.",
+      "newPasswordLabel": "New password",
+      "confirmPasswordLabel": "Confirm new password",
+      "mismatch": "Passwords do not match.",
+      "minLength": "Password must be at least 8 characters.",
+      "updateButton": "Update password",
+      "updating": "Updating...",
+      "tokenSuccess": "Your password has been updated. Redirecting you to sign in.",
+      "tokenError": "This reset link is invalid or has expired. Request a new link to continue.",
+      "resetUnknownError": "We couldn't reset your password. Please request a new link or try again later."
     }
   },
   "dashboard": {
@@ -142,8 +164,10 @@
     "getStartedText": "Get Started",
     "purchaseText": "Purchase",
     "purchaseDialog": {
-      "title": "Test Payment Notice",
-      "description": "im2Prompt is currently in beta. Please use the test card number 5555555555554444 for payment testing. Do not make real payments.",
+      "title": "Confirm Your Purchase",
+      "description": "Review your plan details before continuing to payment.",
+      "titleTest": "Test Payment Notice",
+      "descriptionTest": "im2Prompt is currently in beta. Please use the test card number 5555555555554444 for payment testing. Do not make real payments.",
       "testCardNumber": "Test Card Number: 5555555555554444",
       "warning": "⚠️ This is for testing purposes only",
       "continueButton": "Continue to Payment",

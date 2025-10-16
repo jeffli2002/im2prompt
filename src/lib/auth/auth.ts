@@ -3,8 +3,9 @@ import db from '@/server/db';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin, apiKey } from 'better-auth/plugins';
+import { ErrorLogger } from '@/lib/logger/logger-utils';
 
-
+const resetPasswordLogger = new ErrorLogger('auth-reset-password');
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -18,6 +19,42 @@ export const auth = betterAuth({
   ],
   emailAndPassword: {
     enabled: true,
+    async sendResetPassword({ user, url }) {
+      try {
+        if (env.RESEND_API_KEY && env.RESEND_FROM_EMAIL) {
+          const response = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              from: env.RESEND_FROM_EMAIL,
+              to: user.email,
+              subject: 'Reset your im2Prompt password',
+              html: `
+                <p>Hello ${user.name || ''},</p>
+                <p>You recently requested to reset your im2Prompt password.</p>
+                <p><a href="${url}">Click here to create a new password</a>. This link will expire in 1 hour.</p>
+                <p>If you did not request a password reset, you can safely ignore this email.</p>
+              `,
+            }),
+          });
+
+          if (!response.ok) {
+            const detail = await response.text();
+            resetPasswordLogger.logError(
+              new Error('Failed to send reset password email'),
+              { email: user.email, response: detail },
+            );
+          }
+        } else {
+          console.log(`[auth] Password reset link for ${user.email}: ${url}`);
+        }
+      } catch (error) {
+        resetPasswordLogger.logError(error as Error, { email: user.email });
+      }
+    },
   },
   socialProviders: {
     github: {
