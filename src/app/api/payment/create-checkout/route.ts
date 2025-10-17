@@ -11,6 +11,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    if (session.user.id === 'dev-user') {
+      console.warn('[Create Checkout] Attempted checkout with mock dev user. Rejecting request.');
+      return NextResponse.json(
+        { error: 'Test user is not allowed to create subscriptions' },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const { planId, interval = 'month', successUrl, cancelUrl } = body;
 

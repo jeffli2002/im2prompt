@@ -100,6 +100,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    if (session.user.id === 'dev-user') {
+      console.warn('[Creem Sync] Refusing to sync checkout for mock dev user');
+      return NextResponse.json({ error: 'Test user not allowed to sync subscriptions' }, { status: 403 });
+    }
+
     console.log(`[Creem Sync] User authenticated: ${session.user.id}`);
 
     const body = await request.json();

@@ -16,6 +16,7 @@ import {
   ArrowDownRight
 } from 'lucide-react';
 import { getCreditBalance, getCreditHistory, getQuotaUsage } from '@/server/actions/credit-actions';
+import { useAuthInitialized, useAuthLoading, useIsAuthenticated } from '@/store/auth-store';
 import type { CreditTransaction } from '@/lib/credits';
 import { formatDistance } from 'date-fns';
 import { creditsConfig } from '@/config/credits.config';
@@ -82,9 +83,18 @@ export function UsagePage() {
   const [quotaUsage, setQuotaUsage] = useState<QuotaUsageData | null>(null);
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const isAuthInitialized = useAuthInitialized();
+  const isAuthLoading = useAuthLoading();
+  const isAuthenticated = useIsAuthenticated();
 
   const loadData = async () => {
+    if (!isAuthenticated) {
+      return;
+    }
     setLoading(true);
+    let encounteredError: string | null = null;
     try {
       const [balanceResult, historyResult, quotaResult] = await Promise.all([
         getCreditBalance(),
@@ -94,25 +104,46 @@ export function UsagePage() {
 
       if (balanceResult.success && balanceResult.data) {
         setCreditBalance(balanceResult.data);
+      } else if (!balanceResult.success) {
+        encounteredError = balanceResult.error || 'Failed to load credit balance';
       }
 
       if (historyResult.success && historyResult.data) {
         setTransactions(historyResult.data);
+      } else if (!historyResult.success && !encounteredError) {
+        encounteredError = historyResult.error || 'Failed to load credit history';
       }
 
       if (quotaResult.success && quotaResult.data) {
         setQuotaUsage(quotaResult.data);
+      } else if (!quotaResult.success && !encounteredError) {
+        encounteredError = quotaResult.error || 'Failed to load quota usage';
       }
     } catch (error) {
       console.error('Failed to load usage data:', error);
+      encounteredError = 'Failed to load usage data';
     } finally {
+      setError(encounteredError);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (!isAuthInitialized || isAuthLoading) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setCreditBalance(null);
+      setQuotaUsage(null);
+      setTransactions([]);
+      setLoading(false);
+      setError('Please sign in to view your usage and credits');
+      return;
+    }
+
+    void loadData();
+  }, [isAuthInitialized, isAuthLoading, isAuthenticated]);
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
@@ -151,8 +182,29 @@ export function UsagePage() {
   const imageCredits = creditsConfig.consumption.imageGeneration['nano-banana'];
   const videoCredits = creditsConfig.consumption.videoGeneration['sora-2'];
 
-  if (loading) {
+  if (loading || isAuthLoading || !isAuthInitialized) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto space-y-6 p-6">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Usage & Credits</h1>
+          <p className="text-muted-foreground">Track your credit balance, usage history, and quota consumption</p>
+        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
+            <p className="text-muted-foreground">{error}</p>
+            {isAuthenticated && (
+              <Button onClick={() => void loadData()}>
+                <RefreshCw className="mr-2 h-4 w-4" /> Try Again
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   const shouldShowQuota = (quota?: { used: number; limit: number; isUnlimited: boolean }) => {
