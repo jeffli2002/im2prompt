@@ -36,7 +36,7 @@ export async function getSessionWithAuthBypass(): Promise<Session | null> {
 
   if (cookieHeader) {
     return await auth.api.getSession({
-      headers: headerList,
+      headers: Object.fromEntries(headerList.entries()),
     });
   }
 
@@ -46,10 +46,7 @@ export async function getSessionWithAuthBypass(): Promise<Session | null> {
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join('; ');
 
-  const fallbackHeaders = new Headers();
-  if (serializedCookies) {
-    fallbackHeaders.set('cookie', serializedCookies);
-  }
+  const fallbackHeaders = serializedCookies ? { cookie: serializedCookies } : {};
 
   return await auth.api.getSession({
     headers: fallbackHeaders,
@@ -74,6 +71,6 @@ export async function getSessionFromRequest(requestHeaders: Headers): Promise<Se
 
   // Otherwise get real session from better-auth
   return await auth.api.getSession({
-    headers: requestHeaders,
+    headers: Object.fromEntries(requestHeaders.entries()),
   });
 }
