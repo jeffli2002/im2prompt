@@ -15,7 +15,7 @@ export interface Session {
 /**
  * Get session with support for DISABLE_AUTH bypass
  * This function can be used in both server actions and API routes
- * 
+ *
  * When DISABLE_AUTH=true, returns a mock dev user session
  * Otherwise, returns the real session from better-auth
  */
@@ -32,11 +32,10 @@ export async function getSessionWithAuthBypass(): Promise<Session | null> {
   }
 
   const headerList = await headers();
-  const cookieHeader = headerList.get('cookie');
-
-  if (cookieHeader) {
+  const headerEntries = Object.fromEntries(headerList.entries());
+  if (headerEntries.cookie) {
     return await auth.api.getSession({
-      headers: Object.fromEntries(headerList.entries()),
+      headers: headerEntries,
     });
   }
 
@@ -46,8 +45,16 @@ export async function getSessionWithAuthBypass(): Promise<Session | null> {
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join('; ');
 
-  const fallbackHeaders = serializedCookies ? { cookie: serializedCookies } : {};
+  if (!serializedCookies) {
+    return await auth.api.getSession({
+      headers: headerEntries,
+    });
+  }
 
+  const fallbackHeaders = {
+    ...headerEntries,
+    cookie: serializedCookies,
+  };
   return await auth.api.getSession({
     headers: fallbackHeaders,
   });
