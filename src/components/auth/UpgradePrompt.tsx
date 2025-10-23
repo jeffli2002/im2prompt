@@ -1,105 +1,110 @@
-'use client'
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Sparkles, Zap, Shield, Check } from 'lucide-react'
-import { usePathname } from 'next/navigation'
-import { creditsConfig } from '@/config/credits.config'
-import { useEffect, useState } from 'react'
-import { getUserSubscription } from '@/server/actions/payment/get-billing-info'
-import { paymentConfig } from '@/config/payment.config'
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { creditsConfig } from '@/config/credits.config';
+import { paymentConfig } from '@/config/payment.config';
+import { getUserSubscription } from '@/server/actions/payment/get-billing-info';
+import { Check, Shield, Sparkles, Zap } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface UpgradePromptProps {
-  onClose?: () => void
-  creditsUsed?: number
-  creditsLimit?: number
-  type?: 'imageToText' | 'textToPrompt' | 'imageGeneration' | 'videoGeneration' | 'credits'
-  isAuthenticated?: boolean
-  limitType?: 'daily' | 'monthly'
+  onClose?: () => void;
+  creditsUsed?: number;
+  creditsLimit?: number;
+  type?: 'imageToText' | 'textToPrompt' | 'imageGeneration' | 'videoGeneration' | 'credits';
+  isAuthenticated?: boolean;
+  limitType?: 'daily' | 'monthly';
 }
 
-export default function UpgradePrompt({ 
-  onClose, 
+export default function UpgradePrompt({
+  onClose,
   creditsUsed = 0,
   creditsLimit = 5,
   type = 'credits',
   isAuthenticated = true,
-  limitType = 'daily'
+  limitType = 'daily',
 }: UpgradePromptProps) {
-  const pathname = usePathname()
-  const pathParts = pathname.split('/').filter(Boolean)
-  const locale = pathParts[0] && ['en', 'zh', 'es', 'fr', 'ja'].includes(pathParts[0]) ? pathParts[0] : 'en'
-  const [userPlanId, setUserPlanId] = useState<string>('free')
-  
+  const pathname = usePathname();
+  const pathParts = pathname.split('/').filter(Boolean);
+  const locale =
+    pathParts[0] && ['en', 'zh', 'es', 'fr', 'ja'].includes(pathParts[0]) ? pathParts[0] : 'en';
+  const [userPlanId, setUserPlanId] = useState<string>('free');
+
   useEffect(() => {
     if (isAuthenticated) {
       getUserSubscription().then((result) => {
         if (result.success && result.data) {
-          const priceId = result.data.priceId
-          const plan = paymentConfig.plans.find(p => 
-            p.stripePriceIds?.monthly === priceId || 
-            p.stripePriceIds?.yearly === priceId
-          )
+          const priceId = result.data.priceId;
+          const plan = paymentConfig.plans.find(
+            (p) => p.stripePriceIds?.monthly === priceId || p.stripePriceIds?.yearly === priceId
+          );
           if (plan) {
-            setUserPlanId(plan.id)
+            setUserPlanId(plan.id);
           }
         }
-      })
+      });
     }
-  }, [isAuthenticated])
-  
+  }, [isAuthenticated]);
+
   // Get configured credit costs
-  const imageCreditCost = creditsConfig.consumption.imageGeneration['nano-banana']
-  const videoCreditCost = creditsConfig.consumption.videoGeneration['sora-2']
-  
+  const imageCreditCost = creditsConfig.consumption.imageGeneration['nano-banana'];
+  const videoCreditCost = creditsConfig.consumption.videoGeneration['sora-2'];
+
   // Determine which plan to recommend
-  const targetPlan = userPlanId === 'pro' ? 'proplus' : 'pro'
-  const targetPlanConfig = paymentConfig.plans.find(p => p.id === targetPlan)
-  const targetPlanName = targetPlan === 'proplus' ? 'Pro+' : 'Pro'
-  const targetPlanPrice = targetPlanConfig?.price || 14.9
-  
+  const targetPlan = userPlanId === 'pro' ? 'proplus' : 'pro';
+  const targetPlanConfig = paymentConfig.plans.find((p) => p.id === targetPlan);
+  const targetPlanName = targetPlan === 'proplus' ? 'Pro+' : 'Pro';
+  const targetPlanPrice = targetPlanConfig?.price || 14.9;
+
   const getContentType = () => {
     switch (type) {
       case 'imageToText':
-        return 'Image-to-Text conversions'
+        return 'Image-to-Text conversions';
       case 'textToPrompt':
-        return 'Text-to-Prompt generations'
+        return 'Text-to-Prompt generations';
       case 'credits':
-        return 'credits'
+        return 'credits';
       default:
-        return 'credits'
+        return 'credits';
     }
-  }
+  };
 
-  const contentType = getContentType()
-  
+  const contentType = getContentType();
+
   // Calculate approximate images and videos based on credit costs
-  const creditsPerMonth = 500
-  const approxImages = Math.floor(creditsPerMonth / imageCreditCost)
-  const approxVideos = Math.floor(creditsPerMonth / videoCreditCost)
-  
+  const creditsPerMonth = 500;
+  const approxImages = Math.floor(creditsPerMonth / imageCreditCost);
+  const approxVideos = Math.floor(creditsPerMonth / videoCreditCost);
+
   const features = targetPlanConfig?.features.map((text, index) => ({
     icon: [Zap, Sparkles, Shield, Check, Check, Check][index] || Check,
-    text
+    text,
   })) || [
     { icon: Zap, text: '300 Image-to-Text per month' },
-    { icon: Sparkles, text: `${creditsPerMonth} credits/month (~${approxImages} images or ${approxVideos} videos)` },
+    {
+      icon: Sparkles,
+      text: `${creditsPerMonth} credits/month (~${approxImages} images or ${approxVideos} videos)`,
+    },
     { icon: Shield, text: 'No Ads' },
     { icon: Check, text: 'Commercial license' },
     { icon: Check, text: 'HD quality exports' },
     { icon: Check, text: 'Priority support' },
-  ]
+  ];
 
-  const resetTime = limitType === 'daily' ? 'midnight UTC' : 'the 1st of next month'
+  const resetTime = limitType === 'daily' ? 'midnight UTC' : 'the 1st of next month';
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <CardTitle className="text-xl">
-              {!isAuthenticated ? 'Sign In Required' : `${limitType === 'daily' ? 'Daily' : 'Monthly'} Limit Reached`}
+              {!isAuthenticated
+                ? 'Sign In Required'
+                : `${limitType === 'daily' ? 'Daily' : 'Monthly'} Limit Reached`}
             </CardTitle>
             {onClose && (
               <Button
@@ -112,29 +117,27 @@ export default function UpgradePrompt({
               </Button>
             )}
           </div>
-          <p className="text-gray-600 text-sm mt-2">
-            {!isAuthenticated 
+          <p className="mt-2 text-gray-600 text-sm">
+            {!isAuthenticated
               ? `Please sign in to use this feature. Free users get ${creditsLimit} ${contentType} per ${limitType}!`
               : type === 'imageToText'
-              ? `You've used all ${creditsLimit} free ${contentType} for ${limitType === 'daily' ? 'today' : 'this month'}.`
-              : `You've used all ${creditsLimit} free ${contentType} for ${limitType === 'daily' ? 'today' : 'this month'}. (1 image = ${imageCreditCost} credits, 1 video = ${videoCreditCost} credits)`
-            }
+                ? `You've used all ${creditsLimit} free ${contentType} for ${limitType === 'daily' ? 'today' : 'this month'}.`
+                : `You've used all ${creditsLimit} free ${contentType} for ${limitType === 'daily' ? 'today' : 'this month'}. (1 image = ${imageCreditCost} credits, 1 video = ${videoCreditCost} credits)`}
           </p>
           {isAuthenticated && (
             <div className="mt-2 text-center">
               <Badge variant="outline" className="text-xs">
-                Used {creditsUsed} / {creditsLimit} {type === 'credits' ? 'credits' : contentType} {limitType === 'daily' ? 'today' : 'this month'}
+                Used {creditsUsed} / {creditsLimit} {type === 'credits' ? 'credits' : contentType}{' '}
+                {limitType === 'daily' ? 'today' : 'this month'}
               </Badge>
             </div>
           )}
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="text-center py-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              Upgrade to {targetPlanName}
-            </h3>
+          <div className="rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 py-4 text-center">
+            <h3 className="mb-2 font-bold text-2xl text-gray-900">Upgrade to {targetPlanName}</h3>
             <div className="flex items-center justify-center gap-2">
-              <span className="text-3xl font-bold text-secondary-brand">${targetPlanPrice}/mo</span>
+              <span className="font-bold text-3xl text-secondary-brand">${targetPlanPrice}/mo</span>
             </div>
             <Badge className="mt-2 bg-purple-500">Save 20% with yearly</Badge>
           </div>
@@ -142,8 +145,8 @@ export default function UpgradePrompt({
           <div className="space-y-3">
             {features.map((feature, index) => (
               <div key={index} className="flex items-center gap-3">
-                <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                  <feature.icon className="w-4 h-4 text-secondary-brand" />
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-purple-100">
+                  <feature.icon className="h-4 w-4 text-secondary-brand" />
                 </div>
                 <span className="text-gray-700">{feature.text}</span>
               </div>
@@ -153,19 +156,19 @@ export default function UpgradePrompt({
           <div className="space-y-3">
             {!isAuthenticated ? (
               <>
-                <Button 
+                <Button
                   className="w-full bg-purple-600 hover:bg-purple-700"
                   onClick={() => {
-                    window.location.href = `/${locale}?auth=signin`
+                    window.location.href = `/${locale}?auth=signin`;
                   }}
                 >
                   Sign In
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full"
                   onClick={() => {
-                    window.location.href = `/${locale}?auth=signup`
+                    window.location.href = `/${locale}?auth=signup`;
                   }}
                 >
                   Create Free Account
@@ -173,29 +176,27 @@ export default function UpgradePrompt({
               </>
             ) : (
               <>
-                <Button 
+                <Button
                   className="w-full bg-purple-600 hover:bg-purple-700"
-                  onClick={() => window.location.href = `/${locale}/pricing`}
+                  onClick={() => (window.location.href = `/${locale}/#pricing`)}
                 >
                   Upgrade to {targetPlanName}
                 </Button>
-                
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={onClose}
-                >
+
+                <Button variant="outline" className="w-full" onClick={onClose}>
                   Try Again {limitType === 'daily' ? 'Tomorrow' : 'Next Month'}
                 </Button>
               </>
             )}
           </div>
 
-          <div className="text-center text-sm text-gray-500 space-y-1">
-            <p>Your {limitType} limit resets at {resetTime}</p>
+          <div className="space-y-1 text-center text-gray-500 text-sm">
+            <p>
+              Your {limitType} limit resets at {resetTime}
+            </p>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
