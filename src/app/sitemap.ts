@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://im2prompt.com';
+  const baseUrl = 'https://www.im2prompt.com';
   const currentDate = new Date();
 
   return [

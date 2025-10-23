@@ -2,12 +2,13 @@ import '@/styles/globals.css';
 
 import { routing } from '@/i18n/routing';
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import type React from 'react';
 
-import { appConfig } from '../config/app.config';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
+import { appConfig } from '../config/app.config';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.im2prompt.com'),
   title: appConfig.metadata.title.default,
   description: appConfig.metadata.description,
   keywords: appConfig.metadata.keywords,
@@ -43,19 +44,10 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
 };
 
-const geist = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-  display: 'swap',
-  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-  display: 'swap',
-  fallback: ['ui-monospace', 'SFMono-Regular', 'SF Mono', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
-});
+const fontVariables = {
+  '--font-geist-sans': 'system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
+  '--font-geist-mono': 'ui-monospace, SFMono-Regular, SF Mono, Menlo, Monaco, Consolas, monospace',
+};
 
 export default async function RootLayout({
   children,
@@ -63,15 +55,19 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
-  
+
   return (
     <html
       lang={routing.defaultLocale}
-      className={`${geist.variable} ${geistMono.variable} antialiased`}
+      className="antialiased"
+      style={fontVariables as React.CSSProperties}
       suppressHydrationWarning
     >
       <head>
-        <meta name="google-site-verification" content="n43QebBEBeyBsRUaZ4yd5VksyiYaeKzwOAinwhgVSeo" />
+        <meta
+          name="google-site-verification"
+          content="n43QebBEBeyBsRUaZ4yd5VksyiYaeKzwOAinwhgVSeo"
+        />
         {gaId && <GoogleAnalytics gaId={gaId} />}
       </head>
       <body>
