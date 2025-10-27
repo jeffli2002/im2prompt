@@ -1,16 +1,23 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { cancelSubscription } from '@/server/actions/payment/cancel-subscription';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { useI18nConfig, usePaymentConfig } from '@/hooks/use-config';
+import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { cn } from '@/lib/utils';
 import type { PaymentRecord } from '@/payment/types';
-import { Calendar, CreditCard, AlertCircle } from 'lucide-react';
+import { cancelSubscription } from '@/server/actions/payment/cancel-subscription';
+import { AlertCircle, Calendar, CreditCard } from 'lucide-react';
 import { useMemo, useTransition } from 'react';
 import { toast } from 'sonner';
-import { ErrorLogger } from '@/lib/logger/logger-utils';
-import { useI18nConfig, usePaymentConfig } from '@/hooks/use-config';
-import { cn } from '@/lib/utils';
 
 const subscriptionErrorLogger = new ErrorLogger('subscription-card');
 
@@ -89,7 +96,10 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
           onUpdate?.();
         } else {
           toast.error(result.error || 'Subscription cancellation failed');
-          if (result.error?.includes('already canceled') || result.error?.includes('already cancelled')) {
+          if (
+            result.error?.includes('already canceled') ||
+            result.error?.includes('already cancelled')
+          ) {
             onUpdate?.();
           }
         }
@@ -121,7 +131,9 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
               Current Subscription
             </CardTitle>
             <CardDescription>
-              {activePlan ? `You are on the ${activePlan.name} plan.` : 'Your subscription plan details'}
+              {activePlan
+                ? `You are on the ${activePlan.name} plan.`
+                : 'Your subscription plan details'}
             </CardDescription>
           </div>
           <Badge className={getStatusColor(subscription.status)}>
@@ -134,10 +146,10 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
         {activePlan && (
           <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-primary/70">
+              <p className="font-medium text-primary/70 text-xs uppercase tracking-wide">
                 Current Plan
               </p>
-              <p className="text-lg font-semibold text-primary">{activePlan.name}</p>
+              <p className="font-semibold text-lg text-primary">{activePlan.name}</p>
             </div>
             <Badge variant="secondary" className="bg-primary/15 text-primary">
               {subscription.interval === 'year'
@@ -151,15 +163,19 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <div className="text-sm text-muted-foreground">Billing Cycle</div>
+            <div className="text-muted-foreground text-sm">Billing Cycle</div>
             <div className="font-medium">
-              {subscription.interval === 'month' ? 'Monthly' : subscription.interval === 'year' ? 'Yearly' : 'One-time'}
+              {subscription.interval === 'month'
+                ? 'Monthly'
+                : subscription.interval === 'year'
+                  ? 'Yearly'
+                  : 'One-time'}
             </div>
           </div>
-          
+
           {subscription.periodStart && subscription.periodEnd && (
             <div>
-              <div className="text-sm text-muted-foreground">Current Period</div>
+              <div className="text-muted-foreground text-sm">Current Period</div>
               <div className="font-medium text-sm">
                 {formatDate(subscription.periodStart)} - {formatDate(subscription.periodEnd)}
               </div>
@@ -168,7 +184,7 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
         </div>
 
         {isTrialing && subscription.trialEnd && (
-          <div className="flex items-center gap-2 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+          <div className="flex items-center gap-2 rounded-lg border border-blue-500/20 bg-blue-500/10 p-3">
             <AlertCircle className="h-4 w-4 text-blue-500" />
             <div className="text-sm">
               <span className="font-medium text-blue-500">Trial End:</span>
@@ -178,10 +194,12 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
         )}
 
         {subscription.cancelAtPeriodEnd && (
-          <div className="flex items-center gap-2 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+          <div className="flex items-center gap-2 rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-3">
             <AlertCircle className="h-4 w-4 text-yellow-500" />
             <div className="text-sm">
-              <span className="font-medium text-yellow-500">Will be cancelled at the end of the period</span>
+              <span className="font-medium text-yellow-500">
+                Will be cancelled at the end of the period
+              </span>
               {subscription.periodEnd && (
                 <span className="ml-1">: {formatDate(subscription.periodEnd)}</span>
               )}
@@ -189,7 +207,7 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
           </div>
         )}
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <Calendar className="h-4 w-4" />
           <span>Subscription start time: {formatDate(subscription.createdAt)}</span>
         </div>
@@ -209,4 +227,4 @@ export function SubscriptionCard({ subscription, onUpdate }: SubscriptionCardPro
       )}
     </Card>
   );
-} 
+}

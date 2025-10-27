@@ -1,12 +1,12 @@
+import crypto from 'node:crypto';
 import { env } from '@/env';
-import crypto from 'crypto';
 import type {
   CreatePaymentParams,
   CreateSubscriptionParams,
-  UpdateSubscriptionParams,
   PaymentResult,
-  SubscriptionResult,
   PaymentStatus,
+  SubscriptionResult,
+  UpdateSubscriptionParams,
 } from '@/payment/types';
 
 // Import Creem SDK
@@ -37,7 +37,7 @@ let creemClient: any = null;
 const getCreemClient = () => {
   if (!creemClient) {
     const testMode = getCreemTestMode();
-    
+
     try {
       creemClient = new Creem({
         serverIdx: testMode ? 1 : 0,
@@ -47,7 +47,7 @@ const getCreemClient = () => {
       throw new Error('Creem SDK not available');
     }
   }
-  
+
   return creemClient;
 };
 
@@ -180,7 +180,7 @@ class CreemPaymentService {
         error.message?.includes('Subscription does not exist') ||
         error.response?.data?.message?.includes('Subscription does not exist') ||
         error.message?.includes('does not exist') ||
-        (error.response?.status === 404)
+        error.response?.status === 404
       ) {
         return {
           success: false,
@@ -224,7 +224,7 @@ class CreemPaymentService {
   async upgradeSubscription(
     subscriptionId: string,
     newProductKey: 'pro_monthly' | 'pro_yearly' | 'proplus_monthly' | 'proplus_yearly',
-    useProration: boolean = false
+    useProration = false
   ) {
     try {
       console.log('[Creem] Upgrading subscription:', subscriptionId, 'to', newProductKey);
@@ -277,10 +277,17 @@ class CreemPaymentService {
   async downgradeSubscription(
     subscriptionId: string,
     newProductKey: 'pro_monthly' | 'pro_yearly' | 'proplus_monthly' | 'proplus_yearly',
-    scheduleAtPeriodEnd: boolean = true
+    scheduleAtPeriodEnd = true
   ) {
     try {
-      console.log('[Creem] Downgrading subscription:', subscriptionId, 'to', newProductKey, 'scheduleAtPeriodEnd:', scheduleAtPeriodEnd);
+      console.log(
+        '[Creem] Downgrading subscription:',
+        subscriptionId,
+        'to',
+        newProductKey,
+        'scheduleAtPeriodEnd:',
+        scheduleAtPeriodEnd
+      );
       const CREEM_API_KEY = getCreemApiKey();
       if (!CREEM_API_KEY) {
         throw new Error('Creem API key not configured');
@@ -312,17 +319,16 @@ class CreemPaymentService {
           subscription: result,
           scheduledAtPeriodEnd: true,
         };
-      } else {
-        await this.cancelSubscription(subscriptionId);
-
-        console.log('[Creem] Old subscription canceled immediately for downgrade');
-
-        return {
-          success: true,
-          canceled: true,
-          scheduledAtPeriodEnd: false,
-        };
       }
+      await this.cancelSubscription(subscriptionId);
+
+      console.log('[Creem] Old subscription canceled immediately for downgrade');
+
+      return {
+        success: true,
+        canceled: true,
+        scheduledAtPeriodEnd: false,
+      };
     } catch (error: any) {
       console.error('[Creem] Downgrade subscription error:', {
         subscriptionId,
@@ -415,7 +421,7 @@ class CreemPaymentService {
 
   verifyWebhookSignature(payload: string, signature: string): boolean {
     const CREEM_WEBHOOK_SECRET = getCreemWebhookSecret();
-    
+
     if (!CREEM_WEBHOOK_SECRET) {
       console.error('[SECURITY] Webhook secret not configured - rejecting request');
       return false;
@@ -425,11 +431,11 @@ class CreemPaymentService {
       const hmac = crypto.createHmac('sha256', CREEM_WEBHOOK_SECRET);
       const digest = hmac.update(payload).digest('hex');
       const isValid = digest === signature;
-      
+
       if (!isValid) {
         console.error('[SECURITY] Invalid webhook signature detected');
       }
-      
+
       return isValid;
     } catch (error) {
       console.error('[SECURITY] Webhook signature verification error:', error);
@@ -460,22 +466,22 @@ class CreemPaymentService {
 
       case 'subscription.expired':
         return this.handleSubscriptionExpired(eventData);
-        
+
       case 'subscription.trial_will_end':
         return this.handleSubscriptionTrialWillEnd(eventData);
-        
+
       case 'subscription.trial_ended':
         return this.handleSubscriptionTrialEnded(eventData);
-        
+
       case 'subscription.paused':
         return this.handleSubscriptionPaused(eventData);
-        
+
       case 'refund.created':
         return this.handleRefundCreated(eventData);
-        
+
       case 'dispute.created':
         return this.handleDisputeCreated(eventData);
-        
+
       case 'payment.failed':
       case 'subscription.payment_failed':
         return this.handlePaymentFailed(eventData);
@@ -521,9 +527,7 @@ class CreemPaymentService {
       currentPeriodStart: current_period_start_date
         ? new Date(current_period_start_date)
         : undefined,
-      currentPeriodEnd: current_period_end_date
-        ? new Date(current_period_end_date)
-        : undefined,
+      currentPeriodEnd: current_period_end_date ? new Date(current_period_end_date) : undefined,
     };
   }
 
@@ -566,9 +570,7 @@ class CreemPaymentService {
       status: status,
       userId: userId,
       planId: planId,
-      currentPeriodEnd: current_period_end_date
-        ? new Date(current_period_end_date)
-        : undefined,
+      currentPeriodEnd: current_period_end_date ? new Date(current_period_end_date) : undefined,
       cancelAtPeriodEnd: cancel_at_period_end || !!canceled_at,
     };
   }
@@ -610,14 +612,14 @@ class CreemPaymentService {
       userId: userId,
     };
   }
-  
+
   private async handleSubscriptionTrialWillEnd(subscription: any) {
     const { customer, metadata, trial_end_date, product } = subscription;
-    
+
     const customerId = typeof customer === 'string' ? customer : customer?.id;
     const userId = metadata?.userId;
     const planId = metadata?.planId || this.getPlanFromProduct(product?.id);
-    
+
     return {
       type: 'subscription_trial_will_end',
       customerId: customerId,
@@ -626,14 +628,14 @@ class CreemPaymentService {
       trialEndDate: trial_end_date ? new Date(trial_end_date) : undefined,
     };
   }
-  
+
   private async handleSubscriptionTrialEnded(subscription: any) {
     const { customer, metadata, id, product } = subscription;
-    
+
     const customerId = typeof customer === 'string' ? customer : customer?.id;
     const userId = metadata?.userId;
     const planId = metadata?.planId || this.getPlanFromProduct(product?.id);
-    
+
     return {
       type: 'subscription_trial_ended',
       customerId: customerId,
@@ -642,13 +644,13 @@ class CreemPaymentService {
       planId: planId,
     };
   }
-  
+
   private async handleSubscriptionPaused(subscription: any) {
     const { id, customer, metadata } = subscription;
-    
+
     const customerId = typeof customer === 'string' ? customer : customer?.id;
     const userId = metadata?.userId;
-    
+
     return {
       type: 'subscription_paused',
       subscriptionId: id,
@@ -656,10 +658,10 @@ class CreemPaymentService {
       userId: userId,
     };
   }
-  
+
   private async handleRefundCreated(refund: any) {
     const { customer, subscription, checkout } = refund;
-    
+
     return {
       type: 'refund_created',
       customerId: customer?.id,
@@ -668,10 +670,10 @@ class CreemPaymentService {
       amount: refund.refund_amount,
     };
   }
-  
+
   private async handleDisputeCreated(dispute: any) {
     const { customer, subscription } = dispute;
-    
+
     return {
       type: 'dispute_created',
       customerId: customer?.id,
@@ -679,14 +681,14 @@ class CreemPaymentService {
       amount: dispute.amount,
     };
   }
-  
+
   private async handlePaymentFailed(payment: any) {
     const { customer, subscription, metadata, attempt_count } = payment;
-    
+
     const customerId = typeof customer === 'string' ? customer : customer?.id;
     const userId = metadata?.userId;
     const subscriptionId = subscription?.id || payment.subscription_id;
-    
+
     return {
       type: 'payment_failed',
       customerId: customerId,

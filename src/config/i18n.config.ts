@@ -1,15 +1,15 @@
-import type { I18nConfig } from "@/types";
+import type { I18nConfig } from '@/types';
 
 export const i18nConfig: I18nConfig = {
   // Supported languages - temporarily commented out Chinese
   locales: ['en'] as const, // 'zh' temporarily commented out
-  
+
   // Default language
   defaultLocale: 'en',
-  
+
   // Fallback language
   fallbackLocale: 'en',
-  
+
   // Language configurations
   languages: {
     en: {
@@ -57,7 +57,7 @@ export const i18nConfig: I18nConfig = {
     'blocks',
     'legal',
     'fileManager',
-    'support'
+    'support',
   ],
 
   // Date and time formats for each locale
@@ -149,4 +149,4 @@ export const i18nConfig: I18nConfig = {
     //   },
     // },
   },
-}; 
+};

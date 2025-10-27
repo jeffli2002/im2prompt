@@ -1,25 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Coins, 
-  ImageIcon, 
-  Video, 
-  TrendingUp, 
-  TrendingDown,
-  RefreshCw,
-  Calendar,
-  ArrowUpRight,
-  ArrowDownRight
-} from 'lucide-react';
+import { creditsConfig } from '@/config/credits.config';
+import type { CreditTransaction } from '@/lib/credits';
 import { getCreditBalance, getCreditHistory, getQuotaUsage } from '@/server/actions/credit-actions';
 import { useAuthInitialized, useAuthLoading, useIsAuthenticated } from '@/store/auth-store';
-import type { CreditTransaction } from '@/lib/credits';
 import { formatDistance } from 'date-fns';
-import { creditsConfig } from '@/config/credits.config';
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  Calendar,
+  Coins,
+  ImageIcon,
+  RefreshCw,
+  TrendingDown,
+  TrendingUp,
+  Video,
+} from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface CreditBalanceData {
   balance: number;
@@ -89,11 +89,12 @@ export function UsagePage() {
   const isAuthLoading = useAuthLoading();
   const isAuthenticated = useIsAuthenticated();
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!isAuthenticated) {
       return;
     }
     setLoading(true);
+    setError(null);
     let encounteredError: string | null = null;
     try {
       const [balanceResult, historyResult, quotaResult] = await Promise.all([
@@ -126,7 +127,7 @@ export function UsagePage() {
       setError(encounteredError);
       setLoading(false);
     }
-  };
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!isAuthInitialized || isAuthLoading) {
@@ -143,7 +144,7 @@ export function UsagePage() {
     }
 
     void loadData();
-  }, [isAuthInitialized, isAuthLoading, isAuthenticated]);
+  }, [isAuthInitialized, isAuthLoading, isAuthenticated, loadData]);
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
@@ -176,7 +177,7 @@ export function UsagePage() {
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    return `${Math.round((bytes / k ** i) * 100) / 100} ${sizes[i]}`;
   };
 
   const imageCredits = creditsConfig.consumption.imageGeneration['nano-banana'];
@@ -190,8 +191,10 @@ export function UsagePage() {
     return (
       <div className="container mx-auto space-y-6 p-6">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Usage & Credits</h1>
-          <p className="text-muted-foreground">Track your credit balance, usage history, and quota consumption</p>
+          <h1 className="font-bold text-3xl tracking-tight">Usage & Credits</h1>
+          <p className="text-muted-foreground">
+            Track your credit balance, usage history, and quota consumption
+          </p>
         </div>
         <Card>
           <CardContent className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
@@ -223,7 +226,7 @@ export function UsagePage() {
   return (
     <div className="container mx-auto space-y-6 p-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Usage & Credits</h1>
+        <h1 className="font-bold text-3xl tracking-tight">Usage & Credits</h1>
         <p className="text-muted-foreground">
           Track your credit balance, usage history, and quota consumption
         </p>
@@ -232,12 +235,12 @@ export function UsagePage() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Available Credits</CardTitle>
+            <CardTitle className="font-medium text-sm">Available Credits</CardTitle>
             <Coins className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{creditBalance?.availableBalance || 0}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="font-bold text-2xl">{creditBalance?.availableBalance || 0}</div>
+            <p className="text-muted-foreground text-xs">
               ~{Math.floor((creditBalance?.availableBalance || 0) / imageCredits)} images or{' '}
               {Math.floor((creditBalance?.availableBalance || 0) / videoCredits)} videos
             </p>
@@ -246,23 +249,23 @@ export function UsagePage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Earned</CardTitle>
+            <CardTitle className="font-medium text-sm">Total Earned</CardTitle>
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{creditBalance?.totalEarned || 0}</div>
-            <p className="text-xs text-muted-foreground">All-time earnings</p>
+            <div className="font-bold text-2xl">{creditBalance?.totalEarned || 0}</div>
+            <p className="text-muted-foreground text-xs">All-time earnings</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
+            <CardTitle className="font-medium text-sm">Total Spent</CardTitle>
             <TrendingDown className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{creditBalance?.totalSpent || 0}</div>
-            <p className="text-xs text-muted-foreground">All-time spending</p>
+            <div className="font-bold text-2xl">{creditBalance?.totalSpent || 0}</div>
+            <p className="text-muted-foreground text-xs">All-time spending</p>
           </CardContent>
         </Card>
       </div>
@@ -281,18 +284,21 @@ export function UsagePage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Used</span>
-                <span className="text-sm font-medium">
-                  {quotaUsage.imageGeneration.daily.used || 0} / {quotaUsage.imageGeneration.daily.isUnlimited ? '∞' : quotaUsage.imageGeneration.daily.limit || 0}
+                <span className="text-muted-foreground text-sm">Used</span>
+                <span className="font-medium text-sm">
+                  {quotaUsage.imageGeneration.daily.used || 0} /{' '}
+                  {quotaUsage.imageGeneration.daily.isUnlimited
+                    ? '∞'
+                    : quotaUsage.imageGeneration.daily.limit || 0}
                 </span>
               </div>
               {!quotaUsage.imageGeneration.daily.isUnlimited &&
                 (quotaUsage.imageGeneration.daily.limit || 0) > 0 && (
-                  <Progress 
-                    value={calculateUsagePercent(quotaUsage.imageGeneration.daily)} 
+                  <Progress
+                    value={calculateUsagePercent(quotaUsage.imageGeneration.daily)}
                     className="h-2"
                   />
-              )}
+                )}
             </CardContent>
           </Card>
         )}
@@ -309,18 +315,21 @@ export function UsagePage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Used</span>
-                <span className="text-sm font-medium">
-                  {quotaUsage.imageGeneration.monthly.used || 0} / {quotaUsage.imageGeneration.monthly.isUnlimited ? '∞' : quotaUsage.imageGeneration.monthly.limit || 0}
+                <span className="text-muted-foreground text-sm">Used</span>
+                <span className="font-medium text-sm">
+                  {quotaUsage.imageGeneration.monthly.used || 0} /{' '}
+                  {quotaUsage.imageGeneration.monthly.isUnlimited
+                    ? '∞'
+                    : quotaUsage.imageGeneration.monthly.limit || 0}
                 </span>
               </div>
               {!quotaUsage.imageGeneration.monthly.isUnlimited &&
                 (quotaUsage.imageGeneration.monthly.limit || 0) > 0 && (
-                  <Progress 
-                    value={calculateUsagePercent(quotaUsage.imageGeneration.monthly)} 
+                  <Progress
+                    value={calculateUsagePercent(quotaUsage.imageGeneration.monthly)}
                     className="h-2"
                   />
-              )}
+                )}
             </CardContent>
           </Card>
         )}
@@ -337,18 +346,21 @@ export function UsagePage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Used</span>
-                <span className="text-sm font-medium">
-                  {quotaUsage.videoGeneration.daily.used || 0} / {quotaUsage.videoGeneration.daily.isUnlimited ? '∞' : quotaUsage.videoGeneration.daily.limit || 0}
+                <span className="text-muted-foreground text-sm">Used</span>
+                <span className="font-medium text-sm">
+                  {quotaUsage.videoGeneration.daily.used || 0} /{' '}
+                  {quotaUsage.videoGeneration.daily.isUnlimited
+                    ? '∞'
+                    : quotaUsage.videoGeneration.daily.limit || 0}
                 </span>
               </div>
               {!quotaUsage.videoGeneration.daily.isUnlimited &&
                 (quotaUsage.videoGeneration.daily.limit || 0) > 0 && (
-                  <Progress 
-                    value={calculateUsagePercent(quotaUsage.videoGeneration.daily)} 
+                  <Progress
+                    value={calculateUsagePercent(quotaUsage.videoGeneration.daily)}
                     className="h-2"
                   />
-              )}
+                )}
             </CardContent>
           </Card>
         )}
@@ -365,18 +377,21 @@ export function UsagePage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Used</span>
-                <span className="text-sm font-medium">
-                  {quotaUsage.videoGeneration.monthly.used || 0} / {quotaUsage.videoGeneration.monthly.isUnlimited ? '∞' : quotaUsage.videoGeneration.monthly.limit || 0}
+                <span className="text-muted-foreground text-sm">Used</span>
+                <span className="font-medium text-sm">
+                  {quotaUsage.videoGeneration.monthly.used || 0} /{' '}
+                  {quotaUsage.videoGeneration.monthly.isUnlimited
+                    ? '∞'
+                    : quotaUsage.videoGeneration.monthly.limit || 0}
                 </span>
               </div>
               {!quotaUsage.videoGeneration.monthly.isUnlimited &&
                 (quotaUsage.videoGeneration.monthly.limit || 0) > 0 && (
-                  <Progress 
-                    value={calculateUsagePercent(quotaUsage.videoGeneration.monthly)} 
+                  <Progress
+                    value={calculateUsagePercent(quotaUsage.videoGeneration.monthly)}
                     className="h-2"
                   />
-              )}
+                )}
             </CardContent>
           </Card>
         )}
@@ -393,18 +408,21 @@ export function UsagePage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Used</span>
-                <span className="text-sm font-medium">
-                  {quotaUsage.imageExtraction.monthly.used || 0} / {quotaUsage.imageExtraction.monthly.isUnlimited ? '∞' : quotaUsage.imageExtraction.monthly.limit || 0}
+                <span className="text-muted-foreground text-sm">Used</span>
+                <span className="font-medium text-sm">
+                  {quotaUsage.imageExtraction.monthly.used || 0} /{' '}
+                  {quotaUsage.imageExtraction.monthly.isUnlimited
+                    ? '∞'
+                    : quotaUsage.imageExtraction.monthly.limit || 0}
                 </span>
               </div>
               {!quotaUsage.imageExtraction.monthly.isUnlimited &&
                 (quotaUsage.imageExtraction.monthly.limit || 0) > 0 && (
-                  <Progress 
-                    value={calculateUsagePercent(quotaUsage.imageExtraction.monthly)} 
+                  <Progress
+                    value={calculateUsagePercent(quotaUsage.imageExtraction.monthly)}
                     className="h-2"
                   />
-              )}
+                )}
             </CardContent>
           </Card>
         )}
@@ -426,15 +444,13 @@ export function UsagePage() {
         </CardHeader>
         <CardContent>
           {transactions.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No transaction history yet
-            </div>
+            <div className="py-8 text-center text-muted-foreground">No transaction history yet</div>
           ) : (
             <div className="space-y-3">
               {transactions.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between rounded-lg border p-4 hover:bg-muted/50 transition-colors"
+                  className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
                 >
                   <div className="flex items-center gap-4">
                     {getTransactionIcon(transaction.type)}
@@ -442,16 +458,19 @@ export function UsagePage() {
                       <p className="font-medium text-sm">
                         {transaction.description || `${transaction.type} - ${transaction.source}`}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDistance(new Date(transaction.createdAt), new Date(), { addSuffix: true })}
+                      <p className="text-muted-foreground text-xs">
+                        {formatDistance(new Date(transaction.createdAt), new Date(), {
+                          addSuffix: true,
+                        })}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className={`font-bold ${getTransactionColor(transaction.type)}`}>
-                      {transaction.type === 'spend' ? '-' : '+'}{transaction.amount}
+                      {transaction.type === 'spend' ? '-' : '+'}
+                      {transaction.amount}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       Balance: {transaction.balanceAfter}
                     </p>
                   </div>

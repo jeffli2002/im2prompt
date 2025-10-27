@@ -6,7 +6,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { LogoImage } from '@/components/ui/logo-image';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -19,13 +21,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { LanguageSwitcher } from '@/components/widget/language-switcher';
 import { ThemeToggle } from '@/components/widget/theme-toggle';
 import { UserAvatarMenu } from '@/components/widget/user-avatar-menu';
-import { Book, Menu, Sunset, Trees, Zap, Sparkles } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
+import type { MenuItem, NavbarProps } from '@/types/navbar';
+import { Book, Menu, Sparkles, Sunset, Trees, Zap } from 'lucide-react';
 import Image from 'next/image';
-import { LogoImage } from '@/components/ui/logo-image';
+import Link from 'next/link';
 import type { JSX } from 'react';
-import type { NavbarProps, MenuItem } from '@/types/navbar';
 
 function DesktopAuthDisplay({
   loginText,
@@ -130,7 +130,7 @@ const Navbar = ({
   // Fallback logo SVG
   const fallbackLogo = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Ctext x='16' y='20' text-anchor='middle' fill='white' font-family='Arial' font-size='16' font-weight='bold'%3EI2P%3C/text%3E%3C/svg%3E`;
 
-      // Render desktop menu items
+  // Render desktop menu items
   const renderMenuItem = (item: MenuItem) => {
     if (item.items && item.items.length > 0) {
       return (
@@ -142,13 +142,15 @@ const Navbar = ({
                 <li key={subItem.title} className="relative">
                   <NavigationMenuLink asChild>
                     <Link
-                      href={subItem.disabled ? '#' : (subItem.url || '#')}
+                      href={subItem.disabled ? '#' : subItem.url || '#'}
                       className={`block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors ${
-                        subItem.disabled 
-                          ? 'opacity-50 cursor-not-allowed pointer-events-none' 
+                        subItem.disabled
+                          ? 'pointer-events-none cursor-not-allowed opacity-50'
                           : 'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground'
                       } ${
-                        subItem.highlight ? 'border-2 border-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-gradient-to-r from-red-500/5 via-orange-500/5 to-yellow-500/5' : ''
+                        subItem.highlight
+                          ? 'border-2 border-gradient-to-r bg-gradient-to-r from-red-500 from-red-500/5 via-orange-500 via-orange-500/5 to-yellow-500 to-yellow-500/5'
+                          : ''
                       }`}
                       onClick={(e) => {
                         if (subItem.disabled) {
@@ -158,15 +160,21 @@ const Navbar = ({
                     >
                       <div className="flex items-center gap-2 font-medium text-sm leading-none">
                         {subItem.icon}
-                        <span className={subItem.highlight ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent' : ''}>
+                        <span
+                          className={
+                            subItem.highlight
+                              ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent'
+                              : ''
+                          }
+                        >
                           {subItem.title}
                         </span>
                         {subItem.badge && (
-                          <Badge 
-                            variant="secondary" 
-                            className={`ml-auto text-[10px] px-1.5 py-0 h-4 border-0 ${
-                              subItem.disabled 
-                                ? 'bg-amber-500 text-white' 
+                          <Badge
+                            variant="secondary"
+                            className={`ml-auto h-4 border-0 px-1.5 py-0 text-[10px] ${
+                              subItem.disabled
+                                ? 'bg-amber-500 text-white'
                                 : 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
                             }`}
                           >
@@ -178,9 +186,9 @@ const Navbar = ({
                         {subItem.description}
                       </p>
                       {subItem.highlight && !subItem.disabled && (
-                        <div className="absolute -top-1 -right-1 flex h-3 w-3">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                          <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
+                        <div className="-top-1 -right-1 absolute flex h-3 w-3">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                          <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
                         </div>
                       )}
                     </Link>
@@ -227,13 +235,15 @@ const Navbar = ({
               {item.items.map((subItem) => (
                 <Link
                   key={subItem.title}
-                  href={subItem.disabled ? '#' : (subItem.url || '#')}
-                  className={`flex items-start gap-2 rounded-md p-2 relative ${
-                    subItem.disabled 
-                      ? 'opacity-50 cursor-not-allowed pointer-events-none' 
+                  href={subItem.disabled ? '#' : subItem.url || '#'}
+                  className={`relative flex items-start gap-2 rounded-md p-2 ${
+                    subItem.disabled
+                      ? 'pointer-events-none cursor-not-allowed opacity-50'
                       : 'hover:bg-accent'
                   } ${
-                    subItem.highlight ? 'bg-gradient-to-r from-red-500/5 via-orange-500/5 to-yellow-500/5 border border-orange-500/30' : ''
+                    subItem.highlight
+                      ? 'border border-orange-500/30 bg-gradient-to-r from-red-500/5 via-orange-500/5 to-yellow-500/5'
+                      : ''
                   }`}
                   onClick={(e) => {
                     if (subItem.disabled) {
@@ -244,15 +254,21 @@ const Navbar = ({
                   {subItem.icon}
                   <div className="flex-1">
                     <div className="flex items-center gap-2 font-medium text-sm">
-                      <span className={subItem.highlight ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent' : ''}>
+                      <span
+                        className={
+                          subItem.highlight
+                            ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent'
+                            : ''
+                        }
+                      >
                         {subItem.title}
                       </span>
                       {subItem.badge && (
-                        <Badge 
-                          variant="secondary" 
-                          className={`text-[10px] px-1.5 py-0 h-4 border-0 ${
-                            subItem.disabled 
-                              ? 'bg-amber-500 text-white' 
+                        <Badge
+                          variant="secondary"
+                          className={`h-4 border-0 px-1.5 py-0 text-[10px] ${
+                            subItem.disabled
+                              ? 'bg-amber-500 text-white'
                               : 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
                           }`}
                         >
@@ -265,9 +281,9 @@ const Navbar = ({
                     )}
                   </div>
                   {subItem.highlight && !subItem.disabled && (
-                    <div className="absolute -top-1 -right-1 flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+                    <div className="-top-1 -right-1 absolute flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
                     </div>
                   )}
                 </Link>
@@ -305,9 +321,9 @@ const Navbar = ({
         <nav className="hidden justify-between lg:flex">
           <div className="flex items-center gap-6">
             <Link href={logo.url} className="flex items-center gap-2">
-              <div className="relative w-8 h-8">
-                <LogoImage 
-                  src={logo.src} 
+              <div className="relative h-8 w-8">
+                <LogoImage
+                  src={logo.src}
                   alt={logo.alt}
                   width={32}
                   height={32}
@@ -343,9 +359,9 @@ const Navbar = ({
         <div className="block lg:hidden">
           <div className="flex items-center justify-between">
             <Link href={logo.url} className="flex items-center gap-2">
-              <div className="relative w-8 h-8">
-                <LogoImage 
-                  src={logo.src} 
+              <div className="relative h-8 w-8">
+                <LogoImage
+                  src={logo.src}
                   alt={logo.alt}
                   width={32}
                   height={32}
@@ -366,9 +382,9 @@ const Navbar = ({
                 <SheetHeader>
                   <SheetTitle>
                     <Link href={logo.url} className="flex items-center gap-2">
-                      <div className="relative w-8 h-8">
-                        <LogoImage 
-                          src={logo.src} 
+                      <div className="relative h-8 w-8">
+                        <LogoImage
+                          src={logo.src}
                           alt={logo.alt}
                           width={32}
                           height={32}

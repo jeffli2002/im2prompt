@@ -1,6 +1,6 @@
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,8 +19,14 @@ const config = {
 };
 
 console.log('Environment Variables:');
-console.log('- CREEM_API_KEY:', config.apiKey ? `${config.apiKey.substring(0, 10)}...` : '❌ NOT SET');
-console.log('- CREEM_WEBHOOK_SECRET:', config.webhookSecret ? `${config.webhookSecret.substring(0, 10)}...` : '❌ NOT SET');
+console.log(
+  '- CREEM_API_KEY:',
+  config.apiKey ? `${config.apiKey.substring(0, 10)}...` : '❌ NOT SET'
+);
+console.log(
+  '- CREEM_WEBHOOK_SECRET:',
+  config.webhookSecret ? `${config.webhookSecret.substring(0, 10)}...` : '❌ NOT SET'
+);
 console.log('- CREEM_PRO_PLAN_PRODUCT_KEY:', config.proProductKey || '❌ NOT SET');
 console.log('- CREEM_PROPLUS_PLAN_PRODUCT_KEY:', config.proplusProductKey || '❌ NOT SET');
 
@@ -37,7 +43,7 @@ const testCustomerCreation = async () => {
     const response = await fetch('https://api.creem.io/v1/customers', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${config.apiKey}`,
+        Authorization: `Bearer ${config.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -55,28 +61,28 @@ const testCustomerCreation = async () => {
     if (!response.ok) {
       console.log('\n❌ Failed to create customer');
       console.log('Error:', responseText);
-      
+
       try {
         const errorData = JSON.parse(responseText);
         console.log('\nParsed Error:', JSON.stringify(errorData, null, 2));
       } catch (e) {
         // Not JSON
       }
-      
+
       return false;
     }
 
     const data = JSON.parse(responseText);
     console.log('\n✅ Customer created successfully!');
     console.log('Customer ID:', data.id);
-    
+
     // Clean up - delete test customer if possible
     if (data.id) {
       try {
         await fetch(`https://api.creem.io/v1/customers/${data.id}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${config.apiKey}`,
+            Authorization: `Bearer ${config.apiKey}`,
           },
         });
         console.log('✅ Test customer deleted');
@@ -84,7 +90,7 @@ const testCustomerCreation = async () => {
         console.log('⚠️  Could not delete test customer:', e.message);
       }
     }
-    
+
     return true;
   } catch (error) {
     console.log('\n❌ Network Error:', error.message);

@@ -4,14 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { cn, isWebView, isMobile } from '@/lib/utils';
-import { useLocale, useTranslations } from 'next-intl';
+import { cn, isMobile, isWebView } from '@/lib/utils';
 import type { LoginFormProps } from '@/types/login';
-import { useState, useEffect } from 'react';
 import { AlertCircle } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 
-export function LoginForm({ 
-  className, 
+export function LoginForm({
+  className,
   formData,
   setFormData,
   isLoading,
@@ -19,7 +19,7 @@ export function LoginForm({
   onEmailLogin,
   onSocialLogin,
   onClearError,
-  ...props 
+  ...props
 }: LoginFormProps & React.ComponentProps<'div'>) {
   const t = useTranslations('auth');
   const locale = useLocale();
@@ -74,12 +74,14 @@ export function LoginForm({
 
               {/* WebView warning */}
               {showWebViewWarning && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 text-sm flex items-start gap-2">
-                  <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 text-sm">
+                  <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
                   <div className="flex-1">
                     <p className="font-semibold">Unable to sign in from this browser</p>
-                    <p className="mt-1">Google sign-in is not supported in embedded browsers. Please:</p>
-                    <ul className="list-disc list-inside mt-1 space-y-1">
+                    <p className="mt-1">
+                      Google sign-in is not supported in embedded browsers. Please:
+                    </p>
+                    <ul className="mt-1 list-inside list-disc space-y-1">
                       <li>Use the "Open in Browser" option from your app's menu</li>
                       <li>Or sign in with email and password below</li>
                     </ul>
@@ -104,7 +106,7 @@ export function LoginForm({
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                  className="w-full transition-colors hover:bg-gray-50 dark:hover:bg-gray-900"
                   onClick={() => handleSocialLogin('google')}
                   disabled={isLoading}
                   data-testid="google-login-button"
@@ -116,10 +118,22 @@ export function LoginForm({
                     role="img"
                     aria-label="Google"
                   >
-                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+                    <path
+                      fill="#FFC107"
+                      d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
+                    />
+                    <path
+                      fill="#FF3D00"
+                      d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
+                    />
+                    <path
+                      fill="#4CAF50"
+                      d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
+                    />
+                    <path
+                      fill="#1976D2"
+                      d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
+                    />
                   </svg>
                   {isLoading ? t('loggingIn') : t('googleSignIn')}
                 </Button>
@@ -131,7 +145,7 @@ export function LoginForm({
                 </span>
               </div>
 
-                              {/* Email password login */}
+              {/* Email password login */}
               <div className="grid gap-6">
                 <div className="grid gap-3">
                   <Label htmlFor="email">{t('email')}</Label>
@@ -192,8 +206,8 @@ export function LoginForm({
         {t('termsAndPrivacy.prefix')}{' '}
         <a href="/terms" className="underline underline-offset-4 hover:text-primary">
           {t('termsOfService')}
-        </a>
-        {' '}{t('termsAndPrivacy.middle')}{' '}
+        </a>{' '}
+        {t('termsAndPrivacy.middle')}{' '}
         <a href="/privacy" className="underline underline-offset-4 hover:text-primary">
           {t('privacyPolicy')}
         </a>

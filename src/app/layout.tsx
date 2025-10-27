@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   authors: appConfig.metadata.authors,
   creator: appConfig.metadata.creator,
   robots: appConfig.metadata.robots,
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     type: appConfig.metadata.openGraph.type as 'website',
     locale: appConfig.metadata.openGraph.locale,

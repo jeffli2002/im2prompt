@@ -1,7 +1,11 @@
-import { contentRepository, type CreateHistoryData, type HistoryFilters } from '@/server/db/repositories/content-repository';
-import { configRepository } from '@/server/db/repositories/config-repository';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import { resolvePlanByIdentifier } from '@/lib/creem/plan-utils';
+import { configRepository } from '@/server/db/repositories/config-repository';
+import {
+  type CreateHistoryData,
+  type HistoryFilters,
+  contentRepository,
+} from '@/server/db/repositories/content-repository';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
 
 export interface GetHistoryParams {
   userId: string;
@@ -22,28 +26,31 @@ export interface HistoryListResponse {
 export class HistoryService {
   async getUserTier(userId: string): Promise<'free' | 'pro' | 'proplus'> {
     const subscription = await paymentRepository.findActiveSubscriptionByUserId(userId);
-    
+
     if (!subscription) return 'free';
-    
-    const resolved = resolvePlanByIdentifier(subscription.priceId, subscription.interval || undefined);
+
+    const resolved = resolvePlanByIdentifier(
+      subscription.priceId,
+      subscription.interval || undefined
+    );
     const plan = resolved?.plan;
-    
+
     return (plan?.id as 'free' | 'pro' | 'proplus') || 'free';
   }
 
   async calculateExpirationDate(userId: string): Promise<Date> {
     const tier = await this.getUserTier(userId);
     const retentionDays = await configRepository.getRetentionDays(tier);
-    
+
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + retentionDays);
-    
+
     return expiresAt;
   }
 
   async createHistory(data: CreateHistoryData) {
     const expiresAt = await this.calculateExpirationDate(data.userId);
-    
+
     return await contentRepository.createHistory({
       ...data,
       expiresAt,
@@ -83,7 +90,7 @@ export class HistoryService {
 
   async getHistoryById(id: string, userId: string) {
     const history = await contentRepository.findHistoryById(id);
-    
+
     if (!history) {
       throw new Error('History not found');
     }
@@ -97,7 +104,7 @@ export class HistoryService {
 
   async deleteHistory(id: string, userId: string): Promise<boolean> {
     const history = await this.getHistoryById(id, userId);
-    
+
     if (!history) {
       throw new Error('History not found');
     }
@@ -114,13 +121,13 @@ export class HistoryService {
   }
 
   async updateHistoryStatus(
-    id: string, 
+    id: string,
     userId: string,
     status: 'processing' | 'completed' | 'failed' | 'expired',
     errorMessage?: string
   ) {
     const history = await this.getHistoryById(id, userId);
-    
+
     if (!history) {
       throw new Error('History not found');
     }
@@ -139,7 +146,7 @@ export class HistoryService {
     thumbnailUrl?: string
   ) {
     const history = await this.getHistoryById(id, userId);
-    
+
     if (!history) {
       throw new Error('History not found');
     }

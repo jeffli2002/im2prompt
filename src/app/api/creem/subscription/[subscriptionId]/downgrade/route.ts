@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { downgradeSubscription } from '@/server/actions/payment/downgrade-subscription';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -19,11 +19,11 @@ export async function POST(
     const body = await request.json();
 
     const validation = downgradeSchema.safeParse(body);
-    
+
     if (!validation.success) {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: 'Invalid request data',
           details: validation.error.flatten().fieldErrors,
         },
@@ -48,7 +48,7 @@ export async function POST(
   } catch (error) {
     console.error('[API] Downgrade subscription error:', error);
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to downgrade subscription',
       },

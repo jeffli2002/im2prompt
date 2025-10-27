@@ -1,6 +1,6 @@
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,14 +25,14 @@ for (const endpoint of endpoints) {
     const response = await fetch(endpoint.url, {
       method: endpoint.method,
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
     });
-    
+
     const text = await response.text();
     console.log(`  Status: ${response.status}`);
-    console.log(`  Response:`, text.slice(0, 200));
+    console.log('  Response:', text.slice(0, 200));
     console.log('');
   } catch (error) {
     console.log(`  Error: ${error.message}\n`);

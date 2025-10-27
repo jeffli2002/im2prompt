@@ -1,27 +1,24 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import { checkForPeopleAndFaces } from '@/lib/google-vision';
+import { getModelCost } from '@/config/credits.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits/credit-service';
-import { getModelCost } from '@/config/credits.config';
+import { checkForPeopleAndFaces } from '@/lib/google-vision';
 import { quotaService } from '@/lib/usage/quota-service';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   console.log('[sora-image-generate] Request received');
-  
+
   try {
     // Authentication check
     const session = await auth.api.getSession({
       headers: request.headers,
     });
-    
+
     if (!session?.user?.id) {
       console.log('[sora-image-generate] Unauthorized - no user session');
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
+
     const userId = session.user.id;
     console.log('[sora-image-generate] User authenticated:', userId);
 
@@ -29,8 +26,8 @@ export async function POST(request: NextRequest) {
     const prompt = formData.get('prompt') as string;
     const imageFile = formData.get('image') as File | null;
     const imageUrl = formData.get('imageUrl') as string | null;
-    const aspect_ratio = formData.get('aspect_ratio') as string || 'landscape';
-    const quality = formData.get('quality') as string || 'standard';
+    const aspect_ratio = (formData.get('aspect_ratio') as string) || 'landscape';
+    const quality = (formData.get('quality') as string) || 'standard';
 
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json(
@@ -41,16 +38,18 @@ export async function POST(request: NextRequest) {
 
     // Quota and credit check
     const creditCost = getModelCost('videoGeneration', 'sora-2');
-    
+
     const quotaCheck = await quotaService.checkVideoGenerationQuota(userId);
-    let shouldChargeCredits = quotaCheck.shouldChargeCredits;
-    
+    const shouldChargeCredits = quotaCheck.shouldChargeCredits;
+
     if (shouldChargeCredits) {
       const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
       if (!hasCredits) {
         const limitType = quotaCheck.quotaRemaining === 0 ? 'daily' : 'monthly';
         return NextResponse.json(
-          { error: `Insufficient credits. You have used your ${limitType} free quota (1/day, 3/month).` },
+          {
+            error: `Insufficient credits. You have used your ${limitType} free quota (1/day, 3/month).`,
+          },
           { status: 402 }
         );
       }
@@ -73,10 +72,7 @@ export async function POST(request: NextRequest) {
 
     const kieApiKey = process.env.KIE_API_KEY;
     if (!kieApiKey) {
-      return NextResponse.json(
-        { error: 'KIE API key not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'KIE API key not configured' }, { status: 500 });
     }
 
     let imageUrls: string[] = [];
@@ -85,12 +81,12 @@ export async function POST(request: NextRequest) {
     if (imageFile) {
       const arrayBuffer = await imageFile.arrayBuffer();
       imageBuffer = Buffer.from(arrayBuffer);
-      
+
       // Check for people and faces using Google Cloud Vision API
       try {
         console.log('[sora-image-generate] Checking image for people/faces with Vision API');
         const visionCheck = await checkForPeopleAndFaces(imageBuffer);
-        
+
         if (!visionCheck.success) {
           // Vision API failed - log warning but continue
           // This prevents service unavailability due to Vision API issues
@@ -100,8 +96,10 @@ export async function POST(request: NextRequest) {
           // Vision API succeeded and detected people/faces - block the request
           console.log('[sora-image-generate] Vision API blocked image:', visionCheck.reason);
           return NextResponse.json(
-            { 
-              error: visionCheck.reason || 'Image contains people or faces. Sora 2 does not support images with people or faces.',
+            {
+              error:
+                visionCheck.reason ||
+                'Image contains people or faces. Sora 2 does not support images with people or faces.',
               details: visionCheck.details,
             },
             { status: 400 }
@@ -115,10 +113,14 @@ export async function POST(request: NextRequest) {
         console.error('[sora-image-generate] Vision API exception:', visionError);
         console.error('[sora-image-generate] Proceeding without face detection');
       }
-      
+
       // Upload image to Cloudinary to get a public URL
-      console.log('[sora-image-generate] Uploading image to Cloudinary, size:', imageBuffer.length, 'bytes');
-      
+      console.log(
+        '[sora-image-generate] Uploading image to Cloudinary, size:',
+        imageBuffer.length,
+        'bytes'
+      );
+
       try {
         const uploadFormData = new FormData();
         uploadFormData.append('image', imageFile);
@@ -130,11 +132,15 @@ export async function POST(request: NextRequest) {
 
         const uploadResponse = await fetch(uploadUrl, {
           method: 'POST',
-          body: uploadFormData
+          body: uploadFormData,
         });
 
         const uploadData = await uploadResponse.json();
-        console.log('[sora-image-generate] Upload response:', { ok: uploadResponse.ok, status: uploadResponse.status, data: uploadData });
+        console.log('[sora-image-generate] Upload response:', {
+          ok: uploadResponse.ok,
+          status: uploadResponse.status,
+          data: uploadData,
+        });
 
         if (!uploadResponse.ok) {
           console.error('[sora-image-generate] Upload failed:', uploadData);
@@ -173,11 +179,11 @@ export async function POST(request: NextRequest) {
     console.log('[sora-image-generate] Creating video generation task');
     console.log('[sora-image-generate] Image URLs:', imageUrls);
     console.log('[sora-image-generate] Prompt:', prompt.substring(0, 100));
-    
+
     const response = await fetch('https://api.kie.ai/api/v1/jobs/createTask', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${kieApiKey}`,
+        Authorization: `Bearer ${kieApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -195,7 +201,7 @@ export async function POST(request: NextRequest) {
 
     const responseText = await response.text();
     console.log('[sora-image-generate] Response text length:', responseText.length);
-    
+
     if (!responseText || responseText.trim() === '') {
       console.error('[sora-image-generate] Empty response from KIE API');
       return NextResponse.json(
@@ -225,7 +231,10 @@ export async function POST(request: NextRequest) {
       console.error('Failed to parse response. Response text:', responseText);
       console.error('Parse error:', error);
       return NextResponse.json(
-        { error: 'Invalid response from video generation service. The service may be experiencing issues.' },
+        {
+          error:
+            'Invalid response from video generation service. The service may be experiencing issues.',
+        },
         { status: 500 }
       );
     }
@@ -239,19 +248,19 @@ export async function POST(request: NextRequest) {
 
     // Update quota and charge credits after successful task creation
     await quotaService.incrementVideoGenerationUsage(userId);
-    
+
     if (shouldChargeCredits) {
       await creditService.spendCredits({
         userId,
         amount: creditCost,
         source: 'api_call',
         description: 'Image-to-video generation with Sora 2',
-        metadata: { 
-          feature: 'video-generation', 
-          model: 'sora-2-image-to-video', 
-          prompt: prompt.substring(0, 100), 
-          taskId: data.data.taskId, 
-          usedFreeQuota: !shouldChargeCredits 
+        metadata: {
+          feature: 'video-generation',
+          model: 'sora-2-image-to-video',
+          prompt: prompt.substring(0, 100),
+          taskId: data.data.taskId,
+          usedFreeQuota: !shouldChargeCredits,
         },
       });
     }
@@ -266,9 +275,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating image-to-video generation task:', error);
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

@@ -1,4 +1,4 @@
-import { PromptCategory, type CategoryMeta, type PromptExample } from '@/types/prompt-library';
+import { type CategoryMeta, PromptCategory, type PromptExample } from '@/types/prompt-library';
 
 export const CATEGORY_METADATA: CategoryMeta[] = [
   {
@@ -56,7 +56,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'runner-001',
     category: PromptCategory.PEOPLE_PORTRAITS,
     title: 'Runner Stretching at Dawn',
-    prompt: 'A runner stretching before sunrise, outdoor path, dawn lighting, determined tone, sports editorial style, side composition, crisp 4K texture.',
+    prompt:
+      'A runner stretching before sunrise, outdoor path, dawn lighting, determined tone, sports editorial style, side composition, crisp 4K texture.',
     cloudinaryPublicId: 'prompt-library/people-portraits/nb-runner-001',
     imageUrl: '',
     tags: ['runner', 'sports', 'fitness', 'dawn', 'editorial'],
@@ -73,7 +74,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'girl-002',
     category: PromptCategory.PEOPLE_PORTRAITS,
     title: 'Girl with Flowers in Garden',
-    prompt: 'A girl holding flowers, in outdoor garden, golden hour light, peaceful and dreamy tone, modern portrait photography, side profile framing, natural color tones.',
+    prompt:
+      'A girl holding flowers, in outdoor garden, golden hour light, peaceful and dreamy tone, modern portrait photography, side profile framing, natural color tones.',
     cloudinaryPublicId: 'prompt-library/people-portraits/nb-girl-002',
     imageUrl: '',
     tags: ['portrait', 'flowers', 'garden', 'golden hour', 'peaceful'],
@@ -90,7 +92,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'businessman-003',
     category: PromptCategory.PEOPLE_PORTRAITS,
     title: 'Business Presentation on Stage',
-    prompt: 'A young man presenting on stage, in conference room, bright spotlight, confident tone, business presentation photography style, front angle, clear composition',
+    prompt:
+      'A young man presenting on stage, in conference room, bright spotlight, confident tone, business presentation photography style, front angle, clear composition',
     cloudinaryPublicId: 'prompt-library/people-portraits/nb-businessman-003',
     imageUrl: '',
     tags: ['business', 'presentation', 'conference', 'professional', 'stage'],
@@ -107,7 +110,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'womancoffee-004',
     category: PromptCategory.PEOPLE_PORTRAITS,
     title: 'Woman with Coffee by Window',
-    prompt: 'A woman holding coffee cup by window, morning light, cozy and thoughtful tone, lifestyle realism, mid composition, warm balance.',
+    prompt:
+      'A woman holding coffee cup by window, morning light, cozy and thoughtful tone, lifestyle realism, mid composition, warm balance.',
     cloudinaryPublicId: 'prompt-library/people-portraits/nb-womancoffee-004',
     imageUrl: '',
     tags: ['woman', 'coffee', 'window', 'lifestyle', 'cozy'],
@@ -124,7 +128,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'polar-bear-001',
     category: PromptCategory.ANIMALS_WILDLIFE,
     title: 'Polar Bear in Arctic Sunset',
-    prompt: 'A polar bear walking across ice floes, in Arctic sunset, cool pastel lighting, tranquil yet grand tone, cinematic nature film style, wide composition, realistic snow texture.',
+    prompt:
+      'A polar bear walking across ice floes, in Arctic sunset, cool pastel lighting, tranquil yet grand tone, cinematic nature film style, wide composition, realistic snow texture.',
     cloudinaryPublicId: 'prompt-library/animals-wildlife/nb-polar-bear-001',
     imageUrl: '',
     tags: ['polar bear', 'arctic', 'sunset', 'wildlife', 'cinematic'],
@@ -141,7 +146,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'lion-002',
     category: PromptCategory.ANIMALS_WILDLIFE,
     title: 'Lion Roaring in Savanna',
-    prompt: 'A lion roaring atop a rock, in golden savanna, sunrise backlight, majestic and powerful mood, National Geographic style, telephoto composition, ultra-detailed fur 8K.',
+    prompt:
+      'A lion roaring atop a rock, in golden savanna, sunrise backlight, majestic and powerful mood, National Geographic style, telephoto composition, ultra-detailed fur 8K.',
     cloudinaryPublicId: 'prompt-library/animals-wildlife/nb-lion-002',
     imageUrl: '',
     tags: ['lion', 'savanna', 'wildlife', 'sunrise', 'majestic'],
@@ -158,7 +164,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'flamingo-003',
     category: PromptCategory.ANIMALS_WILDLIFE,
     title: 'Flamingos at Dawn',
-    prompt: 'A group of flamingos reflected in shallow water, at dawn, warm orange lighting, elegant and serene mood, minimalist photography style, mirror symmetry composition, 8K clarity.',
+    prompt:
+      'A group of flamingos reflected in shallow water, at dawn, warm orange lighting, elegant and serene mood, minimalist photography style, mirror symmetry composition, 8K clarity.',
     cloudinaryPublicId: 'prompt-library/animals-wildlife/nb-flamingo-003',
     imageUrl: '',
     tags: ['flamingo', 'water', 'reflection', 'dawn', 'serene'],
@@ -175,7 +182,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'castle-001',
     category: PromptCategory.SCENERY_ENVIRONMENT,
     title: 'Medieval Castle in Clouds',
-    prompt: 'A medieval castle atop a mountain surrounded by clouds, dawn lighting, epic and timeless tone, fantasy concept art, wide composition, HDR realism.',
+    prompt:
+      'A medieval castle atop a mountain surrounded by clouds, dawn lighting, epic and timeless tone, fantasy concept art, wide composition, HDR realism.',
     cloudinaryPublicId: 'prompt-library/scenery-environment/nb-castle-001',
     imageUrl: '',
     tags: ['castle', 'mountain', 'clouds', 'medieval', 'epic'],
@@ -192,7 +200,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'desertcity-002',
     category: PromptCategory.SCENERY_ENVIRONMENT,
     title: 'Desert City at Sunset',
-    prompt: 'A desert city built with sandstone towers, glowing under sunset light, warm and exotic tone, cinematic adventure style, panoramic view, high detail.',
+    prompt:
+      'A desert city built with sandstone towers, glowing under sunset light, warm and exotic tone, cinematic adventure style, panoramic view, high detail.',
     cloudinaryPublicId: 'prompt-library/scenery-environment/nb-desertcity-002',
     imageUrl: '',
     tags: ['desert', 'city', 'sunset', 'exotic', 'cinematic'],
@@ -209,7 +218,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'town-003',
     category: PromptCategory.SCENERY_ENVIRONMENT,
     title: 'European Town Square at Dusk',
-    prompt: 'A quiet European town square at dusk, golden hour lighting, nostalgic and calm tone, travel photography style, centered framing, high fidelity texture.',
+    prompt:
+      'A quiet European town square at dusk, golden hour lighting, nostalgic and calm tone, travel photography style, centered framing, high fidelity texture.',
     cloudinaryPublicId: 'prompt-library/scenery-environment/nb-town-003',
     imageUrl: '',
     tags: ['town', 'europe', 'dusk', 'nostalgic', 'travel'],
@@ -226,7 +236,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'camera-001',
     category: PromptCategory.OBJECTS_PRODUCTS,
     title: 'Vintage Camera and Coffee',
-    prompt: 'A vintage camera placed beside coffee cup, on wooden table, warm morning light, nostalgic and cozy tone, cinematic lifestyle shot, shallow depth of field, realistic texture.',
+    prompt:
+      'A vintage camera placed beside coffee cup, on wooden table, warm morning light, nostalgic and cozy tone, cinematic lifestyle shot, shallow depth of field, realistic texture.',
     cloudinaryPublicId: 'prompt-library/objects-products/nb-camera-001',
     imageUrl: '',
     tags: ['camera', 'coffee', 'vintage', 'nostalgic', 'lifestyle'],
@@ -243,7 +254,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'phone-002',
     category: PromptCategory.OBJECTS_PRODUCTS,
     title: 'Futuristic Smartphone',
-    prompt: 'A sleek smartphone floating in air, with neon background, modern and futuristic tone, digital advertising style, centered composition, ultra sharp lighting.',
+    prompt:
+      'A sleek smartphone floating in air, with neon background, modern and futuristic tone, digital advertising style, centered composition, ultra sharp lighting.',
     cloudinaryPublicId: 'prompt-library/objects-products/nb-phone-002',
     imageUrl: '',
     tags: ['smartphone', 'technology', 'futuristic', 'neon', 'advertising'],
@@ -260,7 +272,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'perfume-003',
     category: PromptCategory.OBJECTS_PRODUCTS,
     title: 'Luxury Perfume Bottle',
-    prompt: 'A perfume bottle surrounded by mist, in dark luxury studio lighting, mysterious and premium mood, fashion editorial photography, close-up, glossy reflections.',
+    prompt:
+      'A perfume bottle surrounded by mist, in dark luxury studio lighting, mysterious and premium mood, fashion editorial photography, close-up, glossy reflections.',
     cloudinaryPublicId: 'prompt-library/objects-products/nb-perfume-003',
     imageUrl: '',
     tags: ['perfume', 'luxury', 'premium', 'mist', 'editorial'],
@@ -277,7 +290,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'coffee-004',
     category: PromptCategory.OBJECTS_PRODUCTS,
     title: 'Coffee Latte Art',
-    prompt: 'A cup of coffee with latte art, in minimalist cafe table setting, soft daylight, warm and inviting mood, lifestyle realism, top-down composition, realistic foam detail.',
+    prompt:
+      'A cup of coffee with latte art, in minimalist cafe table setting, soft daylight, warm and inviting mood, lifestyle realism, top-down composition, realistic foam detail.',
     cloudinaryPublicId: 'prompt-library/objects-products/nb-coffee-004',
     imageUrl: '',
     tags: ['coffee', 'latte art', 'cafe', 'minimalist', 'warm'],
@@ -294,7 +308,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'spaceship-001',
     category: PromptCategory.SCIENCE_EDU_TECH,
     title: 'Astronaut in Space Station',
-    prompt: 'An astronaut floating inside space station, Earth visible outside, soft blue lighting, calm and awe-inspiring tone, cinematic composition, HDR realism.',
+    prompt:
+      'An astronaut floating inside space station, Earth visible outside, soft blue lighting, calm and awe-inspiring tone, cinematic composition, HDR realism.',
     cloudinaryPublicId: 'prompt-library/science-edu-tech/nb-spaceship-001',
     imageUrl: '',
     tags: ['astronaut', 'space', 'station', 'earth', 'sci-fi'],
@@ -311,7 +326,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: '3Dprinter-002',
     category: PromptCategory.SCIENCE_EDU_TECH,
     title: '3D Printer in Workshop',
-    prompt: 'A 3D printer creating mechanical part, in modern workshop, cool tone, inventive and modern mood, industrial realism style, macro detail, HDR sharpness.',
+    prompt:
+      'A 3D printer creating mechanical part, in modern workshop, cool tone, inventive and modern mood, industrial realism style, macro detail, HDR sharpness.',
     cloudinaryPublicId: 'prompt-library/science-edu-tech/nb-3Dprinter-002',
     imageUrl: '',
     tags: ['3D printer', 'technology', 'workshop', 'industrial', 'modern'],
@@ -328,7 +344,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'robotics-003',
     category: PromptCategory.SCIENCE_EDU_TECH,
     title: 'Robotics Kit on Desk',
-    prompt: 'A robotics kit on desk, daylight tone, innovative and playful mood, educational photography, top-down composition, balanced contrast.',
+    prompt:
+      'A robotics kit on desk, daylight tone, innovative and playful mood, educational photography, top-down composition, balanced contrast.',
     cloudinaryPublicId: 'prompt-library/science-edu-tech/nb-robotics-003',
     imageUrl: '',
     tags: ['robotics', 'education', 'technology', 'desk', 'learning'],
@@ -345,7 +362,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'telescope-004',
     category: PromptCategory.SCIENCE_EDU_TECH,
     title: 'Telescope Aimed at Stars',
-    prompt: 'A telescope aimed at starry sky, night lighting, calm and exploratory tone, astrophotography style, long exposure, detailed starscape.',
+    prompt:
+      'A telescope aimed at starry sky, night lighting, calm and exploratory tone, astrophotography style, long exposure, detailed starscape.',
     cloudinaryPublicId: 'prompt-library/science-edu-tech/nb-telescope-004',
     imageUrl: '',
     tags: ['telescope', 'astronomy', 'stars', 'night', 'exploration'],
@@ -362,7 +380,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'model-001',
     category: PromptCategory.FASHION_LIFESTYLE,
     title: 'Model in Desert Dunes',
-    prompt: 'A model posing in flowing silk dress, in desert dunes, golden hour lighting, elegant and timeless tone, Vogue editorial style, wide shot, ultra detailed 8K.',
+    prompt:
+      'A model posing in flowing silk dress, in desert dunes, golden hour lighting, elegant and timeless tone, Vogue editorial style, wide shot, ultra detailed 8K.',
     cloudinaryPublicId: 'prompt-library/fashion-lifestyle/nb-model-001',
     imageUrl: '',
     tags: ['fashion', 'model', 'desert', 'editorial', 'elegant'],
@@ -379,7 +398,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'coupleparis-002',
     category: PromptCategory.FASHION_LIFESTYLE,
     title: 'Couple in Paris',
-    prompt: 'A couple walking in Paris street, sunset light, romantic and stylish tone, cinematic lifestyle photo, wide composition, film grain finish.',
+    prompt:
+      'A couple walking in Paris street, sunset light, romantic and stylish tone, cinematic lifestyle photo, wide composition, film grain finish.',
     cloudinaryPublicId: 'prompt-library/fashion-lifestyle/nb-coupleparis-002',
     imageUrl: '',
     tags: ['couple', 'paris', 'romantic', 'lifestyle', 'cinematic'],
@@ -396,7 +416,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'mantakephoto-003',
     category: PromptCategory.FASHION_LIFESTYLE,
     title: 'Person Taking Photo with Phone',
-    prompt: 'A person taking photo with phone, sunlight reflections, candid and trendy tone, street realism, dynamic framing, crisp focus.',
+    prompt:
+      'A person taking photo with phone, sunlight reflections, candid and trendy tone, street realism, dynamic framing, crisp focus.',
     cloudinaryPublicId: 'prompt-library/fashion-lifestyle/nb-mantakephoto-003',
     imageUrl: '',
     tags: ['photography', 'street', 'phone', 'candid', 'trendy'],
@@ -413,7 +434,8 @@ export const PROMPT_EXAMPLES: PromptExample[] = [
     id: 'holdingflowers-004',
     category: PromptCategory.FASHION_LIFESTYLE,
     title: 'Person Arranging Flowers',
-    prompt: 'A person arranging flowers in vase, soft indoor lighting, calm and aesthetic tone, lifestyle realism, close-up, clean exposure.',
+    prompt:
+      'A person arranging flowers in vase, soft indoor lighting, calm and aesthetic tone, lifestyle realism, close-up, clean exposure.',
     cloudinaryPublicId: 'prompt-library/fashion-lifestyle/nb-holdingflowers-004',
     imageUrl: '',
     tags: ['flowers', 'lifestyle', 'aesthetic', 'calm', 'arrangement'],

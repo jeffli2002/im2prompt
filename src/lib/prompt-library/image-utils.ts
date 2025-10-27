@@ -1,9 +1,6 @@
 export type ImageSize = 'thumbnail' | 'card' | 'full';
 
-export function getPromptImageUrl(
-  cloudinaryPublicId: string,
-  size: ImageSize = 'card'
-): string {
+export function getPromptImageUrl(cloudinaryPublicId: string, size: ImageSize = 'card'): string {
   const transformations = {
     thumbnail: { width: 640, height: 360, crop: 'fill', quality: 'auto:good' },
     card: { width: 1280, height: 720, crop: 'fill', quality: 'auto:best' },
@@ -12,7 +9,7 @@ export function getPromptImageUrl(
 
   const params = transformations[size];
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dvskpqqvv';
-  
+
   return `https://res.cloudinary.com/${cloudName}/image/upload/w_${params.width},h_${params.height},c_${params.crop},q_${params.quality},f_auto/${cloudinaryPublicId}`;
 }
 

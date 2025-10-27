@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/accordion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { useTranslations, useMessages, useLocale } from 'next-intl';
+import { useLocale, useMessages, useTranslations } from 'next-intl';
 
 interface TranslationFaqItem {
   question: string;
@@ -18,8 +18,6 @@ interface FaqItem {
   question: string;
   answer: string;
 }
-
-
 
 const Faq = () => {
   const faqData = useTranslations('faq');
@@ -35,10 +33,12 @@ const Faq = () => {
 
   // Get FAQ items from i18n
   const faqMessages = messages as { faq?: { items?: TranslationFaqItem[] } };
-  const items: FaqItem[] = (faqMessages?.faq?.items || []).map((item: TranslationFaqItem, index: number) => ({
-    ...item,
-    id: `faq-${index + 1}`,
-  }));
+  const items: FaqItem[] = (faqMessages?.faq?.items || []).map(
+    (item: TranslationFaqItem, index: number) => ({
+      ...item,
+      id: `faq-${index + 1}`,
+    })
+  );
   return (
     <section className="py-16">
       <div className="container space-y-16">
@@ -62,24 +62,28 @@ const Faq = () => {
           <div className="relative mb-4 md:mb-5">
             <Avatar className="-translate-x-[60%] absolute size-16 origin-bottom scale-[80%] border">
               <AvatarImage src="/avatar/2.png" alt="Support" />
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold">S1</AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 font-semibold text-white">
+                S1
+              </AvatarFallback>
             </Avatar>
             <Avatar className="absolute size-16 origin-bottom translate-x-[60%] scale-[80%] border">
               <AvatarImage src="/avatar/4.png" alt="Support" />
-              <AvatarFallback className="bg-gradient-to-br from-purple-500 to-purple-600 text-white font-semibold">S2</AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-br from-purple-500 to-purple-600 font-semibold text-white">
+                S2
+              </AvatarFallback>
             </Avatar>
             <Avatar className="size-16 border">
               <AvatarImage src="/avatar/5.png" alt="Support" />
-              <AvatarFallback className="bg-gradient-to-br from-green-500 to-green-600 text-white font-semibold">S3</AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-br from-green-500 to-green-600 font-semibold text-white">
+                S3
+              </AvatarFallback>
             </Avatar>
           </div>
           <h3 className="mb-2 max-w-3xl font-semibold lg:text-lg">{supportHeading}</h3>
           <p className="mb-8 max-w-3xl text-muted-foreground lg:text-lg">{supportDescription}</p>
           <div className="flex w-full flex-col justify-center gap-2 sm:flex-row">
             <Button className="w-full sm:w-auto" asChild>
-              <a href={supportButtonUrl}>
-                {supportButtonText}
-              </a>
+              <a href={supportButtonUrl}>{supportButtonText}</a>
             </Button>
           </div>
         </div>

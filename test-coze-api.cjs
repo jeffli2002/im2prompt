@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const COZE_FILE_UPLOAD_URL = 'https://api.coze.cn/v1/files/upload';
 const COZE_WORKFLOW_API_URL = 'https://api.coze.cn/v1/workflow/run';
@@ -40,7 +40,7 @@ async function testCozeAPI() {
     const uploadResponse = await fetch(COZE_FILE_UPLOAD_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${COZE_API_KEY}`,
+        Authorization: `Bearer ${COZE_API_KEY}`,
         ...uploadFormData.getHeaders(),
       },
       body: uploadFormData,
@@ -72,14 +72,14 @@ async function testCozeAPI() {
       language: 'english',
       Img: JSON.stringify({
         ...cozeFileData,
-        file_id: cozeFileId
-      })
+        file_id: cozeFileId,
+      }),
     };
 
     const cozePayload = {
       workflow_id: COZE_WORKFLOW_ID,
       parameters: workflowParams,
-      bot_id: COZE_WORKFLOW_ID
+      bot_id: COZE_WORKFLOW_ID,
     };
 
     console.log('Workflow payload:', JSON.stringify(cozePayload, null, 2));
@@ -87,9 +87,9 @@ async function testCozeAPI() {
     const workflowResponse = await fetch(COZE_WORKFLOW_API_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${COZE_API_KEY}`,
+        Authorization: `Bearer ${COZE_API_KEY}`,
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
       body: JSON.stringify(cozePayload),
     });
@@ -106,10 +106,10 @@ async function testCozeAPI() {
 
     console.log('\nStep 3: Extracting prompt from response...');
     let extractedPrompt = '';
-    
+
     if (workflowData.data) {
       const output = workflowData.data.output || workflowData.data;
-      
+
       if (typeof output === 'string') {
         extractedPrompt = output;
       } else if (output.prompt) {
@@ -130,7 +130,6 @@ async function testCozeAPI() {
 
     console.log('\n=== Test Complete ===');
     console.log('✓ All API calls successful');
-
   } catch (error) {
     console.error('❌ Test failed with error:', error.message);
     console.error(error);

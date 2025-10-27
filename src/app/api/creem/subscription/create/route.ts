@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
-import { headers } from 'next/headers';
-import { CreemProvider } from '@/payment/creem/provider';
-import { isCreemConfigured } from '@/payment/creem/client';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { isCreemConfigured } from '@/payment/creem/client';
+import { CreemProvider } from '@/payment/creem/provider';
+import { headers } from 'next/headers';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const errorLogger = new ErrorLogger('creem-subscription-create');
@@ -17,21 +17,16 @@ const subscriptionSchema = z.object({
 export async function POST(request: Request) {
   try {
     if (!isCreemConfigured) {
-      return NextResponse.json(
-        { error: 'Creem is not configured' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Creem is not configured' }, { status: 503 });
     }
 
+    const headersList = await headers();
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -64,9 +59,6 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json(
-      { error: 'Failed to create subscription' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create subscription' }, { status: 500 });
   }
 }

@@ -1,9 +1,9 @@
-import React from 'react';
 import { useTranslations } from 'next-intl';
+import React from 'react';
 
 export function TrustedBy() {
   const t = useTranslations('trustedBy');
-  
+
   // Mock company logos - in production, these would be actual company logos
   const companies = [
     { name: 'Adobe', logo: '/logos/adobe.svg' },
@@ -15,21 +15,21 @@ export function TrustedBy() {
   ];
 
   return (
-    <section className="py-16 border-y bg-muted/30">
+    <section className="border-y bg-muted/30 py-16">
       <div className="container">
-        <p className="text-center text-sm font-medium text-muted-foreground mb-8 animate-in fade-in duration-700">
+        <p className="fade-in mb-8 animate-in text-center font-medium text-muted-foreground text-sm duration-700">
           Trusted by creative teams at leading companies
         </p>
-        <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
+        <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-8">
           {companies.map((company, index) => (
             <div
               key={company.name}
-              className="grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 animate-in fade-in duration-700"
+              className="fade-in animate-in opacity-60 grayscale transition-all duration-300 duration-700 hover:opacity-100 hover:grayscale-0"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               {/* Placeholder for company logos */}
-              <div className="h-8 w-24 bg-muted-foreground/20 rounded flex items-center justify-center">
-                <span className="text-xs font-medium text-muted-foreground">{company.name}</span>
+              <div className="flex h-8 w-24 items-center justify-center rounded bg-muted-foreground/20">
+                <span className="font-medium text-muted-foreground text-xs">{company.name}</span>
               </div>
             </div>
           ))}

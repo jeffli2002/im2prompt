@@ -1,7 +1,7 @@
-import { eq, desc, and, inArray } from 'drizzle-orm';
+import type { PaymentInterval, PaymentRecord, PaymentStatus, PaymentType } from '@/payment/types';
 import db from '@/server/db';
 import { payment, paymentEvent } from '@/server/db/schema';
-import type { PaymentRecord, PaymentStatus, PaymentType, PaymentInterval } from '@/payment/types';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface CreatePaymentData {
@@ -48,7 +48,7 @@ export class PaymentRepository {
    */
   async create(data: CreatePaymentData): Promise<PaymentRecord> {
     const paymentId = data.id || uuidv4();
-    
+
     const [result] = await db
       .insert(payment)
       .values({
@@ -81,11 +81,7 @@ export class PaymentRepository {
    * Get payment record by ID
    */
   async findById(id: string): Promise<PaymentRecord | null> {
-    const result = await db
-      .select()
-      .from(payment)
-      .where(eq(payment.id, id))
-      .limit(1);
+    const result = await db.select().from(payment).where(eq(payment.id, id)).limit(1);
 
     return result[0] ? this.mapToPaymentRecord(result[0]) : null;
   }
@@ -146,21 +142,29 @@ export class PaymentRepository {
       )
       .orderBy(desc(payment.createdAt));
 
-    console.log(`[PaymentRepository] Found ${results.length} active subscriptions for user ${userId}`);
+    console.log(
+      `[PaymentRepository] Found ${results.length} active subscriptions for user ${userId}`
+    );
     results.forEach((sub, i) => {
-      console.log(`[PaymentRepository] ${i + 1}. ${sub.priceId} ${sub.interval} status=${sub.status} cancelAtPeriodEnd=${sub.cancelAtPeriodEnd} created=${sub.createdAt}`);
+      console.log(
+        `[PaymentRepository] ${i + 1}. ${sub.priceId} ${sub.interval} status=${sub.status} cancelAtPeriodEnd=${sub.cancelAtPeriodEnd} created=${sub.createdAt}`
+      );
     });
 
     // Filter out subscriptions that are set to cancel at period end
     // and return the most recent truly active subscription
-    const activeSubscription = results.find(sub => !sub.cancelAtPeriodEnd);
-    
+    const activeSubscription = results.find((sub) => !sub.cancelAtPeriodEnd);
+
     if (activeSubscription) {
-      console.log(`[PaymentRepository] Returning active subscription: ${activeSubscription.priceId} ${activeSubscription.interval}`);
+      console.log(
+        `[PaymentRepository] Returning active subscription: ${activeSubscription.priceId} ${activeSubscription.interval}`
+      );
     } else {
-      console.log(`[PaymentRepository] No active subscription found (all have cancelAtPeriodEnd=true)`);
+      console.log(
+        '[PaymentRepository] No active subscription found (all have cancelAtPeriodEnd=true)'
+      );
     }
-    
+
     return activeSubscription ? this.mapToPaymentRecord(activeSubscription) : null;
   }
 
@@ -182,11 +186,7 @@ export class PaymentRepository {
     if (data.trialEnd !== undefined) updateData.trialEnd = data.trialEnd;
     if (data.interval !== undefined) updateData.interval = data.interval;
 
-    const [result] = await db
-      .update(payment)
-      .set(updateData)
-      .where(eq(payment.id, id))
-      .returning();
+    const [result] = await db.update(payment).set(updateData).where(eq(payment.id, id)).returning();
 
     return result ? this.mapToPaymentRecord(result) : null;
   }
@@ -195,9 +195,7 @@ export class PaymentRepository {
    * 删除支付记录
    */
   async delete(id: string): Promise<boolean> {
-    const result = await db
-      .delete(payment)
-      .where(eq(payment.id, id));
+    const result = await db.delete(payment).where(eq(payment.id, id));
 
     return result.rowCount > 0;
   }
@@ -241,7 +239,7 @@ export class PaymentRepository {
 
     return result.length > 0;
   }
-  
+
   /**
    * Cancel all active subscriptions for a user
    */
@@ -254,20 +252,17 @@ export class PaymentRepository {
         updatedAt: new Date(),
       })
       .where(
-        and(
-          eq(payment.userId, userId),
-          inArray(payment.status, ['active', 'trialing', 'past_due'])
-        )
+        and(eq(payment.userId, userId), inArray(payment.status, ['active', 'trialing', 'past_due']))
       );
-    
+
     return result.rowCount;
   }
-  
+
   /**
    * Find subscription by user and status
    */
   async findSubscriptionByUserAndStatus(
-    userId: string, 
+    userId: string,
     statuses: PaymentStatus[]
   ): Promise<PaymentRecord[]> {
     const results = await db
@@ -281,10 +276,10 @@ export class PaymentRepository {
         )
       )
       .orderBy(desc(payment.createdAt));
-    
+
     return results.map(this.mapToPaymentRecord);
   }
-  
+
   /**
    * Get subscription count by plan
    */
@@ -299,7 +294,7 @@ export class PaymentRepository {
           inArray(payment.status, ['active', 'trialing'])
         )
       );
-    
+
     return result.length;
   }
 
@@ -318,10 +313,10 @@ export class PaymentRepository {
         )
       )
       .limit(1);
-    
+
     return result.length > 0;
   }
-  
+
   /**
    * Update subscription status with state validation
    */
@@ -331,38 +326,38 @@ export class PaymentRepository {
     metadata?: Record<string, any>
   ): Promise<PaymentRecord | null> {
     const current = await this.findBySubscriptionId(subscriptionId);
-    
+
     if (!current) {
       console.error(`[PaymentRepository] Subscription ${subscriptionId} not found`);
       return null;
     }
-    
+
     // Validate state transition
     const validTransitions: Record<PaymentStatus, PaymentStatus[]> = {
-      'incomplete': ['active', 'canceled', 'incomplete_expired'],
-      'incomplete_expired': ['active', 'canceled'],
-      'trialing': ['active', 'canceled', 'past_due'],
-      'active': ['canceled', 'past_due', 'unpaid', 'paused'],
-      'past_due': ['active', 'canceled', 'unpaid'],
-      'canceled': [], // Terminal state
-      'unpaid': ['active', 'canceled'],
-      'paused': ['active', 'canceled'],
+      incomplete: ['active', 'canceled', 'incomplete_expired'],
+      incomplete_expired: ['active', 'canceled'],
+      trialing: ['active', 'canceled', 'past_due'],
+      active: ['canceled', 'past_due', 'unpaid', 'paused'],
+      past_due: ['active', 'canceled', 'unpaid'],
+      canceled: [], // Terminal state
+      unpaid: ['active', 'canceled'],
+      paused: ['active', 'canceled'],
     };
-    
+
     const allowedTransitions = validTransitions[current.status] || [];
-    
+
     if (!allowedTransitions.includes(newStatus) && current.status !== newStatus) {
       console.warn(
         `[PaymentRepository] Invalid status transition: ${current.status} → ${newStatus} for subscription ${subscriptionId}`
       );
     }
-    
+
     return this.update(subscriptionId, {
       status: newStatus,
       ...metadata,
     });
   }
-  
+
   /**
    * 映射数据库记录到 PaymentRecord
    */

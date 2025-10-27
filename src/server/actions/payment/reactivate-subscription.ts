@@ -2,16 +2,16 @@
 
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 import { creemService } from '@/lib/creem/creem-service';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import type { ActionResult } from '@/payment/types';
 import { logger } from '@/lib/monitoring/logger';
+import type { ActionResult } from '@/payment/types';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
 
 export async function reactivateSubscription(
   subscriptionId: string
 ): Promise<ActionResult<{ reactivated: boolean }>> {
   try {
     const session = await getSessionWithAuthBypass();
-    
+
     if (!session?.user?.id) {
       logger.warn('[Reactivate] Unauthorized reactivation attempt', {
         subscriptionId,
@@ -23,7 +23,7 @@ export async function reactivateSubscription(
     }
 
     const subscription = await paymentRepository.findBySubscriptionId(subscriptionId);
-    
+
     if (!subscription) {
       logger.warn('[Reactivate] Subscription not found', {
         subscriptionId,
@@ -113,7 +113,8 @@ export async function reactivateSubscription(
       data: {
         reactivated: true,
       },
-      message: 'Your subscription has been reactivated and will continue at the end of the current billing period',
+      message:
+        'Your subscription has been reactivated and will continue at the end of the current billing period',
     };
   } catch (error) {
     logger.error('[Reactivate] Unexpected error', {

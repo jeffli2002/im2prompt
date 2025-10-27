@@ -1,12 +1,22 @@
 'use client';
 
+import { useHorizontalScroll } from '@/hooks/prompt-library/useHorizontalScroll';
+import { getCategoryColor } from '@/lib/prompt-library/image-utils';
+import type { CategoryMeta, PromptExample } from '@/types/prompt-library';
+import {
+  ArrowRight,
+  Bird,
+  ChevronLeft,
+  ChevronRight,
+  Microscope,
+  Mountain,
+  Package,
+  Sparkles,
+  Users,
+} from 'lucide-react';
 import Link from 'next/link';
-import { ArrowRight, ChevronLeft, ChevronRight, Users, Bird, Mountain, Package, Microscope, Sparkles } from 'lucide-react';
 import { PromptCard } from '../shared/PromptCard';
 import { ViewMoreCard } from './ViewMoreCard';
-import { useHorizontalScroll } from '@/hooks/prompt-library/useHorizontalScroll';
-import type { CategoryMeta, PromptExample } from '@/types/prompt-library';
-import { getCategoryColor } from '@/lib/prompt-library/image-utils';
 
 interface CategorySectionProps {
   category: CategoryMeta;
@@ -24,13 +34,13 @@ const iconMap = {
   Sparkles,
 };
 
-export function CategorySection({ 
-  category, 
-  prompts, 
+export function CategorySection({
+  category,
+  prompts,
   maxVisible = 6,
-  onPromptClick 
+  onPromptClick,
 }: CategorySectionProps) {
-  const { scrollRef, canScrollLeft, canScrollRight, scrollLeft, scrollRight } = 
+  const { scrollRef, canScrollLeft, canScrollRight, scrollLeft, scrollRight } =
     useHorizontalScroll<HTMLDivElement>();
 
   if (prompts.length === 0) return null;
@@ -41,84 +51,83 @@ export function CategorySection({
 
   return (
     <section className="mb-16" id={`category-${category.id}`}>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div 
-            className={`p-3 rounded-xl bg-gradient-to-br ${getCategoryColor(category.color)} shadow-lg`}
+          <div
+            className={`rounded-xl bg-gradient-to-br p-3 ${getCategoryColor(category.color)} shadow-lg`}
           >
-            <Icon className="w-6 h-6 text-white" />
+            <Icon className="h-6 w-6 text-white" />
           </div>
-          
+
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">
+            <h2 className="font-bold text-2xl text-gray-900 md:text-3xl dark:text-gray-100">
               {category.name}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="mt-0.5 text-gray-500 text-sm dark:text-gray-400">
               {prompts.length} {prompts.length === 1 ? 'prompt' : 'prompts'}
             </p>
           </div>
         </div>
 
-        <Link 
+        <Link
           href={`/prompt-library/${category.id}`}
-          className="flex items-center gap-1.5 text-sm font-medium transition-all hover:gap-2 group"
+          className="group flex items-center gap-1.5 font-medium text-sm transition-all hover:gap-2"
         >
-          <span className={`bg-gradient-to-r ${getCategoryColor(category.color)} bg-clip-text text-transparent`}>
+          <span
+            className={`bg-gradient-to-r ${getCategoryColor(category.color)} bg-clip-text text-transparent`}
+          >
             View All
           </span>
-          <ArrowRight className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+          <ArrowRight className="h-4 w-4 text-gray-600 transition-transform group-hover:translate-x-0.5 dark:text-gray-400" />
         </Link>
       </div>
 
-      <div className="relative group/scroll">
+      <div className="group/scroll relative">
         {canScrollLeft && (
           <>
-            <div className="absolute left-0 top-2 bottom-2 w-20 bg-gradient-to-r from-white dark:from-gray-950 to-transparent pointer-events-none z-10" />
+            <div className="pointer-events-none absolute top-2 bottom-2 left-0 z-10 w-20 bg-gradient-to-r from-white to-transparent dark:from-gray-950" />
             <button
               onClick={scrollLeft}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-xl backdrop-blur-sm opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"
+              className="-translate-y-1/2 absolute top-1/2 left-2 z-20 rounded-full bg-white/90 p-2 opacity-0 shadow-xl backdrop-blur-sm transition-all hover:scale-110 group-hover/scroll:opacity-100 dark:bg-gray-800/90"
               aria-label="Scroll left"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="h-5 w-5" />
             </button>
           </>
         )}
 
         {canScrollRight && (
           <>
-            <div className="absolute right-0 top-2 bottom-2 w-20 bg-gradient-to-l from-white dark:from-gray-950 to-transparent pointer-events-none z-10" />
+            <div className="pointer-events-none absolute top-2 right-0 bottom-2 z-10 w-20 bg-gradient-to-l from-white to-transparent dark:from-gray-950" />
             <button
               onClick={scrollRight}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-xl backdrop-blur-sm opacity-0 group-hover/scroll:opacity-100 transition-all hover:scale-110"
+              className="-translate-y-1/2 absolute top-1/2 right-2 z-20 rounded-full bg-white/90 p-2 opacity-0 shadow-xl backdrop-blur-sm transition-all hover:scale-110 group-hover/scroll:opacity-100 dark:bg-gray-800/90"
               aria-label="Scroll right"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="h-5 w-5" />
             </button>
           </>
         )}
 
         <div
           ref={scrollRef}
-          className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory px-1 py-2 -mx-1"
+          className="scrollbar-hide -mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-1 py-2 md:gap-6"
           role="region"
           aria-label={`${category.name} prompts`}
         >
-          {visiblePrompts.map(prompt => (
-            <div key={prompt.id} className="flex-shrink-0 w-[340px] sm:w-[380px] snap-start">
-              <PromptCard 
-                prompt={prompt} 
+          {visiblePrompts.map((prompt) => (
+            <div key={prompt.id} className="w-[340px] flex-shrink-0 snap-start sm:w-[380px]">
+              <PromptCard
+                prompt={prompt}
                 onClick={() => onPromptClick?.(prompt)}
                 categoryColor={category.color}
               />
             </div>
           ))}
-          
+
           {remainingCount > 0 && (
-            <div className="flex-shrink-0 w-[340px] sm:w-[380px] snap-start">
-              <ViewMoreCard
-                category={category}
-                remainingCount={remainingCount}
-              />
+            <div className="w-[340px] flex-shrink-0 snap-start sm:w-[380px]">
+              <ViewMoreCard category={category} remainingCount={remainingCount} />
             </div>
           )}
         </div>

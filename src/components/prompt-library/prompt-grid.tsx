@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import type { PromptExample } from '@/types/prompt-library';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { PromptCard } from './prompt-card';
 import { PromptDetailModal } from './prompt-detail-modal';
-import type { PromptExample } from '@/types/prompt-library';
 
 interface PromptGridProps {
   prompts: PromptExample[];
@@ -16,29 +16,23 @@ export function PromptGrid({ prompts }: PromptGridProps) {
 
   if (prompts.length === 0) {
     return (
-      <div className="text-center py-16">
-        <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+      <div className="py-16 text-center">
+        <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
           <span className="text-4xl">🔍</span>
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+        <h3 className="mb-2 font-semibold text-gray-900 text-xl dark:text-gray-100">
           {t('empty.title')}
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">
-          {t('empty.description')}
-        </p>
+        <p className="text-gray-600 dark:text-gray-400">{t('empty.description')}</p>
       </div>
     );
   }
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
-        {prompts.map(prompt => (
-          <PromptCard
-            key={prompt.id}
-            example={prompt}
-            onClick={() => setSelectedPrompt(prompt)}
-          />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8 xl:grid-cols-3">
+        {prompts.map((prompt) => (
+          <PromptCard key={prompt.id} example={prompt} onClick={() => setSelectedPrompt(prompt)} />
         ))}
       </div>
 

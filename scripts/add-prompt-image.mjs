@@ -5,9 +5,9 @@
  * Usage: node scripts/add-prompt-image.mjs
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,7 +25,7 @@ function loadMetadata() {
       'scenery-environment': [],
       'objects-products': [],
       'science-edu-tech': [],
-      'fashion-lifestyle': []
+      'fashion-lifestyle': [],
     };
   }
 }
@@ -36,13 +36,15 @@ function saveMetadata(metadata) {
 
 function addImage(imageInfo) {
   const metadata = loadMetadata();
-  
+
   if (!metadata[imageInfo.category]) {
     console.error(`Error: Invalid category "${imageInfo.category}"`);
-    console.log('Valid categories: people-portraits, animals-wildlife, scenery-environment, objects-products, science-edu-tech, fashion-lifestyle');
+    console.log(
+      'Valid categories: people-portraits, animals-wildlife, scenery-environment, objects-products, science-edu-tech, fashion-lifestyle'
+    );
     return;
   }
-  
+
   const newImage = {
     filename: imageInfo.filename,
     model: imageInfo.model || 'nano-banana',
@@ -50,10 +52,10 @@ function addImage(imageInfo) {
     prompt: imageInfo.prompt || '',
     settings: imageInfo.settings || {},
   };
-  
+
   metadata[imageInfo.category].push(newImage);
   saveMetadata(metadata);
-  
+
   console.log(`✓ Added image to ${imageInfo.category}:`);
   console.log(JSON.stringify(newImage, null, 2));
 }
@@ -61,11 +63,14 @@ function addImage(imageInfo) {
 function getModelFromFilename(filename) {
   if (filename.includes('nano-banana') || filename.startsWith('nb-')) {
     return 'nano-banana';
-  } else if (filename.includes('flux-pro') || filename.startsWith('fp-')) {
+  }
+  if (filename.includes('flux-pro') || filename.startsWith('fp-')) {
     return 'flux-1.1-pro';
-  } else if (filename.includes('flux-ultra') || filename.startsWith('fu-')) {
+  }
+  if (filename.includes('flux-ultra') || filename.startsWith('fu-')) {
     return 'flux-1.1-ultra';
-  } else if (filename.includes('stable-diffusion') || filename.startsWith('sd-')) {
+  }
+  if (filename.includes('stable-diffusion') || filename.startsWith('sd-')) {
     return 'stable-diffusion';
   }
   return 'nano-banana'; // Default
@@ -74,13 +79,15 @@ function getModelFromFilename(filename) {
 // Example usage
 if (process.argv.length > 2) {
   const [category, filename, prompt] = process.argv.slice(2);
-  
+
   if (!category || !filename) {
     console.log('Usage: node add-prompt-image.mjs <category> <filename> [prompt]');
-    console.log('Example: node add-prompt-image.mjs people-portraits portrait-001.jpg "Professional portrait..."');
+    console.log(
+      'Example: node add-prompt-image.mjs people-portraits portrait-001.jpg "Professional portrait..."'
+    );
     process.exit(1);
   }
-  
+
   addImage({
     filename,
     category,
@@ -90,8 +97,12 @@ if (process.argv.length > 2) {
 } else {
   console.log('Usage: node add-prompt-image.mjs <category> <filename> [prompt]');
   console.log('\nExamples:');
-  console.log('  node scripts/add-prompt-image.mjs people-portraits nb-portrait-001.jpg "Professional portrait"');
-  console.log('  node scripts/add-prompt-image.mjs animals-wildlife animal-001-nano-banana.jpg "Tiger in jungle"');
+  console.log(
+    '  node scripts/add-prompt-image.mjs people-portraits nb-portrait-001.jpg "Professional portrait"'
+  );
+  console.log(
+    '  node scripts/add-prompt-image.mjs animals-wildlife animal-001-nano-banana.jpg "Tiger in jungle"'
+  );
 }
 
 export { addImage, getModelFromFilename, loadMetadata };

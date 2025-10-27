@@ -1,322 +1,338 @@
-'use client'
+'use client';
 
-import { useState, useRef, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Card } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, Image as ImageIcon, Download, AlertCircle, Share2, Upload, Sparkles, X } from 'lucide-react'
-import UpgradePrompt from '@/components/auth/UpgradePrompt'
-import { useAuth } from '@/contexts/AuthContext'
-import { useQuota } from '@/hooks/useQuota'
-import { creditsConfig } from '@/config/credits.config'
+import UpgradePrompt from '@/components/auth/UpgradePrompt';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { creditsConfig } from '@/config/credits.config';
+import { useAuth } from '@/contexts/AuthContext';
+import { useQuota } from '@/hooks/useQuota';
+import {
+  AlertCircle,
+  Download,
+  Image as ImageIcon,
+  Loader2,
+  Share2,
+  Sparkles,
+  Upload,
+  X,
+} from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 interface GenerationResult {
-  imageUrl: string
-  prompt: string
-  model: string
-  error?: string
+  imageUrl: string;
+  prompt: string;
+  model: string;
+  error?: string;
 }
 
-type GenerationMode = 'text-to-image' | 'image-to-image'
+type GenerationMode = 'text-to-image' | 'image-to-image';
 
 export default function ImageGenerator() {
-  const searchParams = useSearchParams()
-  const initialMode = searchParams?.get('mode') as GenerationMode || 'text-to-image'
-  
-  const { user } = useAuth()
-  const { usage, canGenerateImage, trackImageGeneration } = useQuota()
-  const [mode, setMode] = useState<GenerationMode>(initialMode)
-  const [prompt, setPrompt] = useState('')
-  const [enhancedPrompt, setEnhancedPrompt] = useState('')
-  const [isEnhancing, setIsEnhancing] = useState(false)
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [aspectRatio, setAspectRatio] = useState<string>('1:1')
-  const [model, setModel] = useState<string>('nano-banana')
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [result, setResult] = useState<GenerationResult | null>(null)
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const searchParams = useSearchParams();
+  const initialMode = (searchParams?.get('mode') as GenerationMode) || 'text-to-image';
 
-  const maxPromptLength = 2000
-  const imageCreditCost = creditsConfig.consumption.imageGeneration['nano-banana']
-  const textDefaultPrompt = 'A serene Japanese garden with cherry blossoms in full bloom, koi fish swimming in a crystal-clear pond, traditional wooden bridge, soft morning light filtering through maple trees, ultra-realistic, high detail'
-  const imageDefaultPrompt = 'Transform this image into a watercolor painting style, soft pastel colors, artistic brush strokes'
+  const { user } = useAuth();
+  const { usage, canGenerateImage, trackImageGeneration } = useQuota();
+  const [mode, setMode] = useState<GenerationMode>(initialMode);
+  const [prompt, setPrompt] = useState('');
+  const [enhancedPrompt, setEnhancedPrompt] = useState('');
+  const [isEnhancing, setIsEnhancing] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [aspectRatio, setAspectRatio] = useState<string>('1:1');
+  const [model, setModel] = useState<string>('nano-banana');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [result, setResult] = useState<GenerationResult | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const maxPromptLength = 2000;
+  const imageCreditCost = creditsConfig.consumption.imageGeneration['nano-banana'];
+  const textDefaultPrompt =
+    'A serene Japanese garden with cherry blossoms in full bloom, koi fish swimming in a crystal-clear pond, traditional wooden bridge, soft morning light filtering through maple trees, ultra-realistic, high detail';
+  const imageDefaultPrompt =
+    'Transform this image into a watercolor painting style, soft pastel colors, artistic brush strokes';
 
   useEffect(() => {
     if (searchParams?.get('mode')) {
-      setMode(searchParams.get('mode') as GenerationMode)
+      setMode(searchParams.get('mode') as GenerationMode);
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
 
     if (!['image/jpeg', 'image/png', 'image/webp', 'image/jpg'].includes(file.type)) {
-      alert('Please select a valid image file (JPEG, PNG, or WebP)')
-      return
+      alert('Please select a valid image file (JPEG, PNG, or WebP)');
+      return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('Image file must be less than 10MB')
-      return
+      alert('Image file must be less than 10MB');
+      return;
     }
 
-    setImageFile(file)
-    
-    const reader = new FileReader()
+    setImageFile(file);
+
+    const reader = new FileReader();
     reader.onloadend = () => {
-      setImagePreview(reader.result as string)
-    }
-    reader.readAsDataURL(file)
-  }
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleRemoveImage = () => {
-    setImageFile(null)
-    setImagePreview(null)
+    setImageFile(null);
+    setImagePreview(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ''
+      fileInputRef.current.value = '';
     }
-  }
+  };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
 
-    const file = e.dataTransfer.files?.[0]
-    if (!file) return
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
 
     if (!['image/jpeg', 'image/png', 'image/webp', 'image/jpg'].includes(file.type)) {
-      alert('Please select a valid image file (JPEG, PNG, or WebP)')
-      return
+      alert('Please select a valid image file (JPEG, PNG, or WebP)');
+      return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('Image file must be less than 10MB')
-      return
+      alert('Image file must be less than 10MB');
+      return;
     }
 
-    setImageFile(file)
-    
-    const reader = new FileReader()
+    setImageFile(file);
+
+    const reader = new FileReader();
     reader.onloadend = () => {
-      setImagePreview(reader.result as string)
-    }
-    reader.readAsDataURL(file)
-  }
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleEnhancePrompt = async () => {
     if (!prompt.trim()) {
-      alert('Please enter a prompt first')
-      return
+      alert('Please enter a prompt first');
+      return;
     }
 
-    setIsEnhancing(true)
+    setIsEnhancing(true);
     try {
       const response = await fetch('/api/v1/enhance-prompt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           prompt: prompt.trim(),
-          context: 'image'
+          context: 'image',
         }),
-      })
+      });
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to enhance prompt')
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to enhance prompt');
       }
 
-      const data = await response.json()
-      setEnhancedPrompt(data.enhancedPrompt || '')
+      const data = await response.json();
+      setEnhancedPrompt(data.enhancedPrompt || '');
     } catch (error) {
-      console.error('Enhancement error:', error)
-      alert(error instanceof Error ? error.message : 'Failed to enhance prompt')
+      console.error('Enhancement error:', error);
+      alert(error instanceof Error ? error.message : 'Failed to enhance prompt');
     } finally {
-      setIsEnhancing(false)
+      setIsEnhancing(false);
     }
-  }
+  };
 
   const handleGenerate = async () => {
     if (!user) {
-      setShowUpgradeModal(true)
-      return
+      setShowUpgradeModal(true);
+      return;
     }
-    
+
     if (!canGenerateImage()) {
-      setShowUpgradeModal(true)
-      return
+      setShowUpgradeModal(true);
+      return;
     }
-    
+
     if (!prompt.trim()) {
-      alert('Please enter a prompt')
-      return
+      alert('Please enter a prompt');
+      return;
     }
 
     if (mode === 'image-to-image' && !imageFile && !imagePreview) {
-      alert('Please upload an image for image-to-image generation')
-      return
+      alert('Please upload an image for image-to-image generation');
+      return;
     }
 
-    setIsGenerating(true)
-    setResult(null)
+    setIsGenerating(true);
+    setResult(null);
 
     try {
-      let finalPrompt = enhancedPrompt || prompt.trim()
+      let finalPrompt = enhancedPrompt || prompt.trim();
 
       if (mode === 'image-to-image' && imagePreview) {
-        finalPrompt = `${enhancedPrompt || prompt.trim()}\n\n[Image attached: ${imageFile?.name || 'uploaded image'}]`
+        finalPrompt = `${enhancedPrompt || prompt.trim()}\n\n[Image attached: ${imageFile?.name || 'uploaded image'}]`;
       }
 
       const requestBody: any = {
         prompt: finalPrompt,
         model: model,
         aspect_ratio: aspectRatio,
-      }
+      };
 
       if (mode === 'image-to-image' && imagePreview) {
-        requestBody.image = imagePreview
+        requestBody.image = imagePreview;
       }
 
       const response = await fetch('/api/v1/generate-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      })
+        body: JSON.stringify(requestBody),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
         if (response.status === 429 || response.status === 402) {
-          setShowUpgradeModal(true)
-          throw new Error(data.error || 'Image generation limit reached')
+          setShowUpgradeModal(true);
+          throw new Error(data.error || 'Image generation limit reached');
         }
-        
-        throw new Error(data.error || 'Failed to generate image')
+
+        throw new Error(data.error || 'Failed to generate image');
       }
 
       if (!data.imageUrl) {
-        throw new Error('No image URL in response')
+        throw new Error('No image URL in response');
       }
 
       setResult({
         imageUrl: data.imageUrl,
         prompt: prompt,
-        model: data.model
-      })
-      
-      await trackImageGeneration()
-      setIsGenerating(false)
+        model: data.model,
+      });
 
+      await trackImageGeneration();
+      setIsGenerating(false);
     } catch (error) {
       setResult({
         imageUrl: '',
         prompt: prompt,
         model: 'nano-banana',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      })
-      setIsGenerating(false)
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      setIsGenerating(false);
     }
-  }
+  };
 
   const handleDownload = async (imageUrl: string) => {
     try {
-      const response = await fetch(imageUrl)
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `nano-banana-${Date.now()}.png`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      window.URL.revokeObjectURL(url)
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `nano-banana-${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Download failed:', error)
-      window.open(imageUrl, '_blank')
+      console.error('Download failed:', error);
+      window.open(imageUrl, '_blank');
     }
-  }
+  };
 
   const handleShare = async () => {
-    if (!result?.imageUrl) return
-    
+    if (!result?.imageUrl) return;
+
     if (navigator.share) {
       try {
         await navigator.share({
           title: 'Nano Banana Generated Image',
           text: 'Check out this AI-generated image created with Nano Banana!',
-          url: result.imageUrl
-        })
+          url: result.imageUrl,
+        });
       } catch (error) {
-        console.error('Share failed:', error)
+        console.error('Share failed:', error);
       }
     } else {
-      navigator.clipboard.writeText(result.imageUrl)
-      alert('Image URL copied to clipboard!')
+      navigator.clipboard.writeText(result.imageUrl);
+      alert('Image URL copied to clipboard!');
     }
-  }
+  };
 
-  const canGenerate = prompt.trim().length > 0
+  const canGenerate = prompt.trim().length > 0;
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="mx-auto max-w-7xl">
       <Tabs value={mode} onValueChange={(v) => setMode(v as GenerationMode)} className="w-full">
-        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+        <TabsList className="mx-auto mb-8 grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="text-to-image" className="font-light">
-            <Sparkles className="w-4 h-4 mr-2" />
+            <Sparkles className="mr-2 h-4 w-4" />
             Text to Image
           </TabsTrigger>
           <TabsTrigger value="image-to-image" className="font-light">
-            <ImageIcon className="w-4 h-4 mr-2" />
+            <ImageIcon className="mr-2 h-4 w-4" />
             Image to Image
           </TabsTrigger>
         </TabsList>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid gap-8 lg:grid-cols-2">
           <div className="space-y-6">
             <TabsContent value="text-to-image" className="mt-0 space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-700">Image Description</label>
+                <label className="font-light text-gray-700 text-sm">Image Description</label>
                 <div className="relative">
                   <Textarea
                     placeholder={textDefaultPrompt}
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
                     rows={8}
-                    className="resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 font-light pr-24 pb-12"
+                    className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
                   />
                   <Button
                     onClick={handleEnhancePrompt}
                     disabled={isEnhancing || !prompt.trim()}
                     size="sm"
                     variant="outline"
-                    className="absolute bottom-2 right-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 border-purple-500 bg-purple-50 hover:bg-purple-100 text-purple-700 text-sm font-medium transition-all duration-300 shadow-sm"
+                    className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
                   >
                     {isEnhancing ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Sparkles className="w-4 h-4" />
+                      <Sparkles className="h-4 w-4" />
                     )}
                     {isEnhancing ? 'Enhancing...' : 'Enhance'}
                   </Button>
                 </div>
-                <div className="text-xs text-gray-400 text-right font-light">
+                <div className="text-right font-light text-gray-400 text-xs">
                   {prompt.length} / {maxPromptLength}
                 </div>
                 {enhancedPrompt && (
-                  <div className="mt-4 p-4 rounded-xl bg-muted/10 border border-clean shadow-card">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-semibold text-secondary-brand flex items-center gap-2">
-                        <Sparkles className="w-4 h-4" />
+                  <div className="mt-4 rounded-xl border border-clean bg-muted/10 p-4 shadow-card">
+                    <div className="mb-2 flex items-center justify-between">
+                      <h4 className="flex items-center gap-2 font-semibold text-secondary-brand text-sm">
+                        <Sparkles className="h-4 w-4" />
                         Enhanced Prompt
                       </h4>
                       <Button
@@ -325,16 +341,16 @@ export default function ImageGenerator() {
                         variant="ghost"
                         className="h-6 w-6 p-0 text-gray-600 dark:text-gray-400"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="h-4 w-4" />
                       </Button>
                     </div>
                     <Textarea
                       value={enhancedPrompt}
                       onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
-                      className="resize-none bg-background border border-clean text-sm shadow-inner"
+                      className="resize-none border border-clean bg-background text-sm shadow-inner"
                       rows={5}
                     />
-                    <p className="text-xs text-secondary-brand text-right mt-1">
+                    <p className="mt-1 text-right text-secondary-brand text-xs">
                       {enhancedPrompt.length} / {maxPromptLength}
                     </p>
                   </div>
@@ -344,20 +360,20 @@ export default function ImageGenerator() {
 
             <TabsContent value="image-to-image" className="mt-0 space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-700">Source Image</label>
-                
+                <label className="font-light text-gray-700 text-sm">Source Image</label>
+
                 {!imagePreview ? (
                   <div
                     onClick={() => fileInputRef.current?.click()}
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
-                    className="border border-dashed border-clean rounded-xl p-8 text-center cursor-pointer hover-card transition-colors"
+                    className="hover-card cursor-pointer rounded-xl border border-clean border-dashed p-8 text-center transition-colors"
                   >
-                    <Upload className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-                    <p className="text-sm font-light text-gray-600 mb-1">
+                    <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
+                    <p className="mb-1 font-light text-gray-600 text-sm">
                       Click to upload or drag and drop
                     </p>
-                    <p className="text-xs font-light text-gray-400">
+                    <p className="font-light text-gray-400 text-xs">
                       JPEG, PNG, or WebP (max 10MB)
                     </p>
                   </div>
@@ -370,9 +386,9 @@ export default function ImageGenerator() {
                     />
                     <button
                       onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-colors"
+                      className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
                 )}
@@ -387,7 +403,7 @@ export default function ImageGenerator() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-700">
+                <label className="font-light text-gray-700 text-sm">
                   Transformation Prompt <span className="text-error">*</span>
                 </label>
                 <div className="relative">
@@ -396,31 +412,31 @@ export default function ImageGenerator() {
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
                     rows={4}
-                    className="resize-none border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 font-light pr-24 pb-12"
+                    className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
                   />
                   <Button
                     onClick={handleEnhancePrompt}
                     disabled={isEnhancing || !prompt.trim()}
                     size="sm"
                     variant="outline"
-                    className="absolute bottom-2 right-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 border-purple-500 bg-purple-50 hover:bg-purple-100 text-purple-700 text-sm font-medium transition-all duration-300 shadow-sm"
+                    className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
                   >
                     {isEnhancing ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Sparkles className="w-4 h-4" />
+                      <Sparkles className="h-4 w-4" />
                     )}
                     {isEnhancing ? 'Enhancing...' : 'Enhance'}
                   </Button>
                 </div>
-                <div className="text-xs text-gray-400 text-right font-light">
+                <div className="text-right font-light text-gray-400 text-xs">
                   {prompt.length} / {maxPromptLength}
                 </div>
                 {enhancedPrompt && (
-                  <div className="mt-4 p-4 rounded-xl bg-muted/10 border border-clean shadow-card">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-semibold text-secondary-brand flex items-center gap-2">
-                        <Sparkles className="w-4 h-4" />
+                  <div className="mt-4 rounded-xl border border-clean bg-muted/10 p-4 shadow-card">
+                    <div className="mb-2 flex items-center justify-between">
+                      <h4 className="flex items-center gap-2 font-semibold text-secondary-brand text-sm">
+                        <Sparkles className="h-4 w-4" />
                         Enhanced Prompt
                       </h4>
                       <Button
@@ -429,16 +445,16 @@ export default function ImageGenerator() {
                         variant="ghost"
                         className="h-6 w-6 p-0 text-gray-600 dark:text-gray-400"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="h-4 w-4" />
                       </Button>
                     </div>
                     <Textarea
                       value={enhancedPrompt}
                       onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
-                      className="resize-none bg-background border border-clean text-sm shadow-inner"
+                      className="resize-none border border-clean bg-background text-sm shadow-inner"
                       rows={5}
                     />
-                    <p className="text-xs text-secondary-brand text-right mt-1">
+                    <p className="mt-1 text-right text-secondary-brand text-xs">
                       {enhancedPrompt.length} / {maxPromptLength}
                     </p>
                   </div>
@@ -448,21 +464,30 @@ export default function ImageGenerator() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-700">Model</label>
+                <label className="font-light text-gray-700 text-sm">Model</label>
                 <Select value={model} onValueChange={setModel}>
                   <SelectTrigger className="border-gray-200 font-light">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="nano-banana">Nano Banana (Gemini 2.5 Flash) - {creditsConfig.consumption.imageGeneration['nano-banana']} credits</SelectItem>
-                    <SelectItem value="flux-1.1-pro">Flux 1.1 Pro - {creditsConfig.consumption.imageGeneration['flux-1.1-pro']} credits</SelectItem>
-                    <SelectItem value="flux-1.1-ultra">Flux 1.1 Ultra - {creditsConfig.consumption.imageGeneration['flux-1.1-ultra']} credits</SelectItem>
+                    <SelectItem value="nano-banana">
+                      Nano Banana (Gemini 2.5 Flash) -{' '}
+                      {creditsConfig.consumption.imageGeneration['nano-banana']} credits
+                    </SelectItem>
+                    <SelectItem value="flux-1.1-pro">
+                      Flux 1.1 Pro - {creditsConfig.consumption.imageGeneration['flux-1.1-pro']}{' '}
+                      credits
+                    </SelectItem>
+                    <SelectItem value="flux-1.1-ultra">
+                      Flux 1.1 Ultra - {creditsConfig.consumption.imageGeneration['flux-1.1-ultra']}{' '}
+                      credits
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-light text-gray-700">Aspect Ratio</label>
+                <label className="font-light text-gray-700 text-sm">Aspect Ratio</label>
                 <Select value={aspectRatio} onValueChange={setAspectRatio}>
                   <SelectTrigger className="border-gray-200 font-light">
                     <SelectValue />
@@ -478,27 +503,27 @@ export default function ImageGenerator() {
               </div>
             </div>
 
-            <div className="bg-muted/50 border border-border rounded-lg p-3 text-sm">
+            <div className="rounded-lg border border-border bg-muted/50 p-3 text-sm">
               <p className="text-foreground">
-                <strong>Credits:</strong> Dynamic based on model | 
-                Free quota: {usage.imageGeneration.dailyLimit}/day, {usage.imageGeneration.monthlyLimit}/month
+                <strong>Credits:</strong> Dynamic based on model | Free quota:{' '}
+                {usage.imageGeneration.dailyLimit}/day, {usage.imageGeneration.monthlyLimit}/month
               </p>
             </div>
 
             <Button
               onClick={handleGenerate}
               disabled={isGenerating || !canGenerate}
-              className="w-full font-bold text-lg bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 text-white shadow-2xl shadow-purple-500/50 border-0 transform hover:scale-105 transition-all duration-300"
+              className="w-full transform border-0 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 font-bold text-lg text-white shadow-2xl shadow-purple-500/50 transition-all duration-300 hover:scale-105 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700"
               size="lg"
             >
               {isGenerating ? (
                 <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Generating Image...
                 </>
               ) : (
                 <>
-                  <ImageIcon className="w-5 h-5 mr-2" />
+                  <ImageIcon className="mr-2 h-5 w-5" />
                   Generate Image
                 </>
               )}
@@ -506,48 +531,48 @@ export default function ImageGenerator() {
           </div>
 
           <div className="lg:sticky lg:top-24 lg:h-fit">
-            <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
               {!result && (
-                <div className="aspect-square bg-muted/30 rounded-xl flex items-center justify-center">
-                  <div className="text-center space-y-3">
-                    <ImageIcon className="w-16 h-16 mx-auto text-muted-foreground/40" />
-                    <p className="text-sm font-light text-muted-foreground">Your generated image will appear here</p>
+                <div className="flex aspect-square items-center justify-center rounded-xl bg-muted/30">
+                  <div className="space-y-3 text-center">
+                    <ImageIcon className="mx-auto h-16 w-16 text-muted-foreground/40" />
+                    <p className="font-light text-muted-foreground text-sm">
+                      Your generated image will appear here
+                    </p>
                   </div>
                 </div>
               )}
 
               {isGenerating && (
-                <div className="aspect-square bg-muted/30 rounded-xl flex items-center justify-center">
-                  <div className="text-center space-y-4">
-                    <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
-                    <p className="text-base font-light text-foreground">Generating your image...</p>
-                    <p className="text-xs font-light text-muted-foreground">This may take a few moments</p>
+                <div className="flex aspect-square items-center justify-center rounded-xl bg-muted/30">
+                  <div className="space-y-4 text-center">
+                    <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
+                    <p className="font-light text-base text-foreground">Generating your image...</p>
+                    <p className="font-light text-muted-foreground text-xs">
+                      This may take a few moments
+                    </p>
                   </div>
                 </div>
               )}
 
               {result && !result.error && result.imageUrl && (
                 <div className="space-y-4">
-                  <img
-                    src={result.imageUrl}
-                    alt="Generated"
-                    className="w-full rounded-xl"
-                  />
+                  <img src={result.imageUrl} alt="Generated" className="w-full rounded-xl" />
                   <div className="grid grid-cols-2 gap-3">
                     <Button
                       onClick={() => handleDownload(result.imageUrl)}
                       variant="outline"
-                      className="font-light border-gray-200"
+                      className="border-gray-200 font-light"
                     >
-                      <Download className="w-4 h-4 mr-2" />
+                      <Download className="mr-2 h-4 w-4" />
                       Download
                     </Button>
                     <Button
                       onClick={handleShare}
                       variant="outline"
-                      className="font-light border-gray-200"
+                      className="border-gray-200 font-light"
                     >
-                      <Share2 className="w-4 h-4 mr-2" />
+                      <Share2 className="mr-2 h-4 w-4" />
                       Share
                     </Button>
                   </div>
@@ -555,11 +580,11 @@ export default function ImageGenerator() {
               )}
 
               {result?.error && (
-                <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
-                  <AlertCircle className="w-5 h-5 text-error flex-shrink-0" />
+                <div className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+                  <AlertCircle className="h-5 w-5 flex-shrink-0 text-error" />
                   <div>
                     <p className="font-light text-error">Generation Failed</p>
-                    <p className="text-sm font-light text-error">{result.error}</p>
+                    <p className="font-light text-error text-sm">{result.error}</p>
                   </div>
                 </div>
               )}
@@ -569,7 +594,7 @@ export default function ImageGenerator() {
       </Tabs>
 
       {showUpgradeModal && (
-        <UpgradePrompt 
+        <UpgradePrompt
           onClose={() => setShowUpgradeModal(false)}
           creditsUsed={0}
           creditsLimit={0}
@@ -579,5 +604,5 @@ export default function ImageGenerator() {
         />
       )}
     </div>
-  )
+  );
 }

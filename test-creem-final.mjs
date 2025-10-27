@@ -1,9 +1,9 @@
-import { readFileSync, existsSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 function loadEnv() {
   const envContent = readFileSync('.env.local', 'utf-8');
   const env = {};
-  envContent.split('\n').forEach(line => {
+  envContent.split('\n').forEach((line) => {
     line = line.trim();
     if (line && !line.startsWith('#')) {
       const [key, ...valueParts] = line.split('=');
@@ -53,7 +53,7 @@ class FinalCreemTest {
     await this.testImplementation();
     await this.testSecurity();
     await this.testBusinessLogic();
-    
+
     this.printFinalReport();
   }
 
@@ -134,11 +134,13 @@ class FinalCreemTest {
     });
 
     await this.run('✓ Cancel subscription route', async () => {
-      if (!existsSync('./src/app/api/payment/cancel-subscription/route.ts')) throw new Error('Missing');
+      if (!existsSync('./src/app/api/payment/cancel-subscription/route.ts'))
+        throw new Error('Missing');
     });
 
     await this.run('✓ Get subscription route', async () => {
-      if (!existsSync('./src/app/api/payment/get-subscription/route.ts')) throw new Error('Missing');
+      if (!existsSync('./src/app/api/payment/get-subscription/route.ts'))
+        throw new Error('Missing');
     });
 
     await this.run('✓ React hook created', async () => {
@@ -178,7 +180,10 @@ class FinalCreemTest {
     });
 
     await this.run('✓ Authentication required', async () => {
-      const checkoutContent = readFileSync('./src/app/api/payment/create-checkout/route.ts', 'utf-8');
+      const checkoutContent = readFileSync(
+        './src/app/api/payment/create-checkout/route.ts',
+        'utf-8'
+      );
       if (!checkoutContent.includes('auth')) throw new Error('No auth check');
     });
 
@@ -220,9 +225,9 @@ class FinalCreemTest {
         'subscription.created',
         'subscription.canceled',
         'subscription.paid',
-        'checkout.completed'
+        'checkout.completed',
       ];
-      events.forEach(event => {
+      events.forEach((event) => {
         if (!content.includes(event)) throw new Error(`Missing: ${event}`);
       });
     });
@@ -251,7 +256,7 @@ class FinalCreemTest {
     console.log('║                    📊 FINAL REPORT                        ║');
     console.log('╚═══════════════════════════════════════════════════════════╝');
 
-    console.log(`\n📈 Statistics:`);
+    console.log('\n📈 Statistics:');
     console.log(`   Total Tests:     ${total}`);
     console.log(`   Passed:          ${this.passed} ✅`);
     console.log(`   Failed:          ${this.failed} ❌`);
@@ -260,13 +265,15 @@ class FinalCreemTest {
 
     if (this.failed > 0) {
       console.log('\n❌ Failed Tests:');
-      this.results.filter(r => r.status === 'FAIL').forEach(r => {
-        console.log(`   • ${r.name}: ${r.error}`);
-      });
+      this.results
+        .filter((r) => r.status === 'FAIL')
+        .forEach((r) => {
+          console.log(`   • ${r.name}: ${r.error}`);
+        });
     }
 
-    console.log('\n' + '━'.repeat(60));
-    
+    console.log(`\n${'━'.repeat(60)}`);
+
     if (this.failed === 0) {
       console.log('\n🎉 SUCCESS! Creem integration is COMPLETE and READY!\n');
       console.log('📝 Next Steps:');
@@ -279,7 +286,7 @@ class FinalCreemTest {
       console.log('   • Visit: http://localhost:3002/pricing');
       console.log('   • Setup ngrok: ngrok http 3002');
       console.log('   • Test webhooks from Creem dashboard');
-      
+
       console.log('\n💳 Test Payment URLs:');
       console.log(`   Pro:     ${env.CREEM_PRO_PAYMENT_PLAN_URL}`);
       console.log(`   ProPlus: ${env.CREEM_PROPLUS_PAYMENT_PLAN_URL}`);
@@ -287,7 +294,7 @@ class FinalCreemTest {
       console.log('\n⚠️  Some tests failed. Please fix the issues above.');
     }
 
-    console.log('\n' + '━'.repeat(60));
+    console.log(`\n${'━'.repeat(60)}`);
 
     const report = {
       timestamp: new Date().toISOString(),
@@ -299,7 +306,7 @@ class FinalCreemTest {
         duration: totalDuration,
       },
       environment: {
-        apiKey: env.CREEM_API_KEY?.substring(0, 25) + '...',
+        apiKey: `${env.CREEM_API_KEY?.substring(0, 25)}...`,
         webhookUrl: env.CREEM_WEBHOOK_URL,
         testMode: env.CREEM_API_KEY?.includes('test') ?? false,
         proPlan: env.CREEM_PRO_PLAN_PRODUCT_KEY,

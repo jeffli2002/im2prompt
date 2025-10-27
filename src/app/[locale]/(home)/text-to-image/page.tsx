@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { Suspense } from 'react'
-import ImageGenerator from '@/components/image-generator'
+import ImageGenerator from '@/components/image-generator';
+import { Suspense } from 'react';
 
 export default function TextToImagePage() {
   return (
@@ -17,5 +17,5 @@ export default function TextToImagePage() {
         <ImageGenerator />
       </Suspense>
     </div>
-  )
+  );
 }

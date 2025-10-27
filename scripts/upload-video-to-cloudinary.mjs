@@ -1,5 +1,5 @@
+import { readFileSync } from 'node:fs';
 import { v2 as cloudinary } from 'cloudinary';
-import { readFileSync } from 'fs';
 import { config } from 'dotenv';
 
 config({ path: '.env.local' });
@@ -26,18 +26,16 @@ if (cloudinaryUrl) {
 async function uploadVideo() {
   try {
     console.log('Uploading video to Cloudinary...');
-    
+
     const result = await cloudinary.uploader.upload('public/images/text2video.mp4', {
       resource_type: 'video',
       folder: 'homepage-videos',
       public_id: 'text2video-demo',
       eager: [
-        { 
+        {
           format: 'mp4',
-          transformation: [
-            { quality: 'auto', fetch_format: 'auto' }
-          ]
-        }
+          transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+        },
       ],
       eager_async: false,
     });
@@ -48,13 +46,15 @@ async function uploadVideo() {
     console.log('Duration:', result.duration, 'seconds');
     console.log('Format:', result.format);
     console.log('Size:', (result.bytes / 1024 / 1024).toFixed(2), 'MB');
-    
+
     console.log('\nPoster URL (auto-generated):');
-    console.log(cloudinary.url(result.public_id, {
-      resource_type: 'video',
-      format: 'jpg',
-      transformation: [{ quality: 'auto' }]
-    }));
+    console.log(
+      cloudinary.url(result.public_id, {
+        resource_type: 'video',
+        format: 'jpg',
+        transformation: [{ quality: 'auto' }],
+      })
+    );
 
     return result;
   } catch (error) {

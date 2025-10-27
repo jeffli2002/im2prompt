@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,10 +35,7 @@ async function uploadImage(localPath, cloudinaryPath) {
       public_id: cloudinaryPath,
       resource_type: 'image',
       overwrite: true,
-      transformation: [
-        { quality: 'auto:best' },
-        { fetch_format: 'auto' }
-      ],
+      transformation: [{ quality: 'auto:best' }, { fetch_format: 'auto' }],
     });
 
     console.log(`✓ Uploaded: ${result.public_id}`);
@@ -55,82 +52,94 @@ async function uploadPromptLibrary() {
     // People & Portraits
     {
       local: path.join(__dirname, '../public/prompt-library/people-portraits/nb-runner-001.png'),
-      cloudinary: 'prompt-library/people-portraits/runner-001'
+      cloudinary: 'prompt-library/people-portraits/runner-001',
     },
     {
       local: path.join(__dirname, '../public/prompt-library/people-portraits/nb-girl-002.png'),
-      cloudinary: 'prompt-library/people-portraits/girl-002'
+      cloudinary: 'prompt-library/people-portraits/girl-002',
     },
     {
-      local: path.join(__dirname, '../public/prompt-library/people-portraits/nb-businessman-003.png'),
-      cloudinary: 'prompt-library/people-portraits/businessman-003'
+      local: path.join(
+        __dirname,
+        '../public/prompt-library/people-portraits/nb-businessman-003.png'
+      ),
+      cloudinary: 'prompt-library/people-portraits/businessman-003',
     },
-    
+
     // Animals & Wildlife
     {
-      local: path.join(__dirname, '../public/prompt-library/animals-wildlife/nb-polar-bear-001.png'),
-      cloudinary: 'prompt-library/animals-wildlife/polar-bear-001'
+      local: path.join(
+        __dirname,
+        '../public/prompt-library/animals-wildlife/nb-polar-bear-001.png'
+      ),
+      cloudinary: 'prompt-library/animals-wildlife/polar-bear-001',
     },
     {
       local: path.join(__dirname, '../public/prompt-library/animals-wildlife/nb-lion-002.png'),
-      cloudinary: 'prompt-library/animals-wildlife/lion-002'
+      cloudinary: 'prompt-library/animals-wildlife/lion-002',
     },
     {
       local: path.join(__dirname, '../public/prompt-library/animals-wildlife/nb-flamingo-003.png'),
-      cloudinary: 'prompt-library/animals-wildlife/flamingo-003'
+      cloudinary: 'prompt-library/animals-wildlife/flamingo-003',
     },
-    
+
     // Scenery & Environment
     {
       local: path.join(__dirname, '../public/prompt-library/scenery-environment/nb-castle-001.png'),
-      cloudinary: 'prompt-library/scenery-environment/castle-001'
+      cloudinary: 'prompt-library/scenery-environment/castle-001',
     },
     {
-      local: path.join(__dirname, '../public/prompt-library/scenery-environment/nb-desertcity-002.png'),
-      cloudinary: 'prompt-library/scenery-environment/desertcity-002'
+      local: path.join(
+        __dirname,
+        '../public/prompt-library/scenery-environment/nb-desertcity-002.png'
+      ),
+      cloudinary: 'prompt-library/scenery-environment/desertcity-002',
     },
     {
       local: path.join(__dirname, '../public/prompt-library/scenery-environment/nb-town-003.png'),
-      cloudinary: 'prompt-library/scenery-environment/town-003'
+      cloudinary: 'prompt-library/scenery-environment/town-003',
     },
-    
+
     // Objects & Products
     {
       local: path.join(__dirname, '../public/prompt-library/objects-products/nb-camera-001.png'),
-      cloudinary: 'prompt-library/objects-products/camera-001'
+      cloudinary: 'prompt-library/objects-products/camera-001',
     },
     {
       local: path.join(__dirname, '../public/prompt-library/objects-products/nb-phone-002.png'),
-      cloudinary: 'prompt-library/objects-products/phone-002'
+      cloudinary: 'prompt-library/objects-products/phone-002',
     },
     {
       local: path.join(__dirname, '../public/prompt-library/objects-products/nb-perfume-003.png'),
-      cloudinary: 'prompt-library/objects-products/perfume-003'
+      cloudinary: 'prompt-library/objects-products/perfume-003',
     },
     {
       local: path.join(__dirname, '../public/prompt-library/objects-products/nb-coffee-004.png'),
-      cloudinary: 'prompt-library/objects-products/coffee-004'
+      cloudinary: 'prompt-library/objects-products/coffee-004',
     },
-    
+
     // Science, Education & Technology
     {
       local: path.join(__dirname, '../public/prompt-library/science-edu-tech/nb-spaceship-001.png'),
-      cloudinary: 'prompt-library/science-edu-tech/spaceship-001'
+      cloudinary: 'prompt-library/science-edu-tech/spaceship-001',
     },
     {
       local: path.join(__dirname, '../public/prompt-library/science-edu-tech/nb-3Dprinter-002.png'),
-      cloudinary: 'prompt-library/science-edu-tech/3Dprinter-002'
+      cloudinary: 'prompt-library/science-edu-tech/3Dprinter-002',
     },
-    
+
     // Fashion, Lifestyle & Aesthetic Design
     {
       local: path.join(__dirname, '../public/prompt-library/fashion-lifestyle/nb-model-001.png'),
-      cloudinary: 'prompt-library/fashion-lifestyle/model-001'
+      cloudinary: 'prompt-library/fashion-lifestyle/model-001',
     },
     {
-      local: path.join(__dirname, '../public/prompt-library/fashion-lifestyle/nb-coupleparis-002.png'),
-      cloudinary: 'prompt-library/fashion-lifestyle/coupleparis-002'
-    }
+      local: path.join(
+        __dirname,
+        '../public/prompt-library/fashion-lifestyle/nb-coupleparis-002.png'
+      ),
+      cloudinary: 'prompt-library/fashion-lifestyle/coupleparis-002',
+    },
   ];
 
   console.log('Starting Cloudinary upload...\n');

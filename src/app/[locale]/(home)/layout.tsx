@@ -17,4 +17,4 @@ export default function MarketingLayout({ children }: Props) {
       </div>
     </AuthProvider>
   );
-} 
+}

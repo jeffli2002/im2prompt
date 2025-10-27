@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -57,13 +57,15 @@ info(`Environment: ${nodeEnv}`);
 info(`App URL: ${appUrl}`);
 info(`Creem Test Mode: ${testMode}`);
 
-const isProductionUrl = appUrl.includes('yourdomain.com') || (!appUrl.includes('localhost') && !appUrl.includes('vercel.app'));
+const isProductionUrl =
+  appUrl.includes('yourdomain.com') ||
+  (!appUrl.includes('localhost') && !appUrl.includes('vercel.app'));
 
 section('1. ENVIRONMENT MODE VERIFICATION');
 
 if (nodeEnv === 'production') {
   success('NODE_ENV is set to production');
-  
+
   if (isProductionUrl) {
     if (testMode === 'false') {
       success('Production URL with test mode disabled - CORRECT');
@@ -139,7 +141,11 @@ if (!databaseUrl) {
   issues.push('Set DATABASE_URL environment variable');
 } else {
   if (isProductionUrl) {
-    if (databaseUrl.includes('localhost') || databaseUrl.includes('dev') || databaseUrl.includes('test')) {
+    if (
+      databaseUrl.includes('localhost') ||
+      databaseUrl.includes('dev') ||
+      databaseUrl.includes('test')
+    ) {
       error('CRITICAL: Production URL but using dev/test database!');
       issues.push('Use production database for production environment');
     } else {
@@ -215,7 +221,9 @@ if (issues.length === 0 && warnings.length === 0) {
   console.log('Your environment is properly configured for deployment.\n');
   process.exit(0);
 } else if (issues.length === 0) {
-  console.log(`\n${colors.yellow}Configuration has warnings but no critical issues.${colors.reset}\n`);
+  console.log(
+    `\n${colors.yellow}Configuration has warnings but no critical issues.${colors.reset}\n`
+  );
   console.log('Review warnings above before deploying to production.\n');
   process.exit(0);
 } else {

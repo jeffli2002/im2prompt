@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import { config } from 'dotenv';
 
 config({ path: '.env.local' });
@@ -13,12 +13,12 @@ interface TestResult {
 
 class CreemIntegrationTester {
   private results: TestResult[] = [];
-  private testUserId = 'test-user-' + Date.now();
+  private testUserId = `test-user-${Date.now()}`;
   private baseUrl = 'http://localhost:3002';
 
   async runAllTests() {
     console.log('🧪 Starting Creem Payment Integration Tests\n');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     await this.testEnvironmentVariables();
     await this.testCreemServiceInitialization();
@@ -42,12 +42,12 @@ class CreemIntegrationTester {
     } catch (error) {
       const duration = Date.now() - start;
       const message = error instanceof Error ? error.message : 'Unknown error';
-      this.results.push({ 
-        name, 
-        status: 'FAIL', 
-        message: 'Test failed', 
+      this.results.push({
+        name,
+        status: 'FAIL',
+        message: 'Test failed',
         duration,
-        error: message 
+        error: message,
       });
       console.log(`❌ ${name} (${duration}ms)`);
       console.log(`   Error: ${message}`);
@@ -127,11 +127,8 @@ class CreemIntegrationTester {
     await this.runTest('HMAC SHA-256 signature generation', async () => {
       const payload = JSON.stringify({ test: 'data' });
       const secret = process.env.CREEM_WEBHOOK_SECRET!;
-      
-      const signature = crypto
-        .createHmac('sha256', secret)
-        .update(payload)
-        .digest('hex');
+
+      const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
 
       if (!signature || signature.length !== 64) {
         throw new Error('Invalid signature generated');
@@ -140,16 +137,13 @@ class CreemIntegrationTester {
     });
 
     await this.runTest('Signature verification logic', async () => {
-      const payload = JSON.stringify({ 
+      const payload = JSON.stringify({
         event: 'subscription.created',
-        timestamp: Date.now() 
+        timestamp: Date.now(),
       });
       const secret = process.env.CREEM_WEBHOOK_SECRET!;
-      
-      const validSignature = crypto
-        .createHmac('sha256', secret)
-        .update(payload)
-        .digest('hex');
+
+      const validSignature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
 
       const isValid = crypto.timingSafeEqual(
         Buffer.from(validSignature),
@@ -164,11 +158,8 @@ class CreemIntegrationTester {
       const payload = JSON.stringify({ test: 'data' });
       const invalidSignature = 'invalid_signature_123';
       const secret = process.env.CREEM_WEBHOOK_SECRET!;
-      
-      const validSignature = crypto
-        .createHmac('sha256', secret)
-        .update(payload)
-        .digest('hex');
+
+      const validSignature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
 
       try {
         crypto.timingSafeEqual(
@@ -190,7 +181,7 @@ class CreemIntegrationTester {
     await this.runTest('Pro plan checkout session', async () => {
       const { CreemService } = await import('./src/lib/creem/creem-service');
       const service = CreemService.getInstance();
-      
+
       const result = await service.createCheckoutSession({
         userId: this.testUserId,
         planId: 'pro',
@@ -208,7 +199,7 @@ class CreemIntegrationTester {
     await this.runTest('ProPlus plan checkout session', async () => {
       const { CreemService } = await import('./src/lib/creem/creem-service');
       const service = CreemService.getInstance();
-      
+
       const result = await service.createCheckoutSession({
         userId: this.testUserId,
         planId: 'proplus',
@@ -223,7 +214,7 @@ class CreemIntegrationTester {
     await this.runTest('Invalid plan rejection', async () => {
       const { CreemService } = await import('./src/lib/creem/creem-service');
       const service = CreemService.getInstance();
-      
+
       try {
         await service.createCheckoutSession({
           userId: this.testUserId,
@@ -248,7 +239,7 @@ class CreemIntegrationTester {
 
     await this.runTest('Webhook payload structure validation', async () => {
       const webhookPayload = {
-        id: 'evt_test_' + Date.now(),
+        id: `evt_test_${Date.now()}`,
         type: 'subscription.created',
         created: Math.floor(Date.now() / 1000),
         data: {
@@ -327,8 +318,8 @@ class CreemIntegrationTester {
       if (!mapping.pro || !mapping.proplus) {
         throw new Error('Plan mapping incomplete');
       }
-      console.log('   ✓ Pro → ' + mapping.pro);
-      console.log('   ✓ ProPlus → ' + mapping.proplus);
+      console.log(`   ✓ Pro → ${mapping.pro}`);
+      console.log(`   ✓ ProPlus → ${mapping.proplus}`);
     });
 
     await this.runTest('Product key to credits mapping', async () => {
@@ -358,7 +349,7 @@ class CreemIntegrationTester {
     await this.runTest('Credit calculation for Pro plan', async () => {
       const proKey = process.env.CREEM_PRO_PLAN_PRODUCT_KEY;
       const credits = proKey === process.env.CREEM_PRO_PLAN_PRODUCT_KEY ? 500 : 0;
-      
+
       if (credits !== 500) throw new Error('Incorrect credit amount');
       console.log('   ✓ Pro plan grants 500 credits');
     });
@@ -366,7 +357,7 @@ class CreemIntegrationTester {
     await this.runTest('Credit calculation for ProPlus plan', async () => {
       const proplusKey = process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY;
       const credits = proplusKey === process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY ? 900 : 0;
-      
+
       if (credits !== 900) throw new Error('Incorrect credit amount');
       console.log('   ✓ ProPlus plan grants 900 credits');
     });
@@ -412,7 +403,7 @@ class CreemIntegrationTester {
 
     await this.runTest('Payment record structure', async () => {
       const paymentRecord = {
-        id: 'pay_test_' + Date.now(),
+        id: `pay_test_${Date.now()}`,
         userId: this.testUserId,
         customerId: 'cus_test_123',
         subscriptionId: 'sub_test_123',
@@ -434,12 +425,12 @@ class CreemIntegrationTester {
   }
 
   private printReport() {
-    console.log('\n' + '='.repeat(60));
+    console.log(`\n${'='.repeat(60)}`);
     console.log('📊 Test Report');
     console.log('='.repeat(60));
 
-    const passed = this.results.filter(r => r.status === 'PASS').length;
-    const failed = this.results.filter(r => r.status === 'FAIL').length;
+    const passed = this.results.filter((r) => r.status === 'PASS').length;
+    const failed = this.results.filter((r) => r.status === 'FAIL').length;
     const total = this.results.length;
     const passRate = ((passed / total) * 100).toFixed(1);
 
@@ -454,21 +445,21 @@ class CreemIntegrationTester {
     if (failed > 0) {
       console.log('\n❌ Failed Tests:');
       this.results
-        .filter(r => r.status === 'FAIL')
-        .forEach(r => {
+        .filter((r) => r.status === 'FAIL')
+        .forEach((r) => {
           console.log(`\n  • ${r.name}`);
           console.log(`    ${r.error}`);
         });
     }
 
-    console.log('\n' + '='.repeat(60));
-    
+    console.log(`\n${'='.repeat(60)}`);
+
     if (failed === 0) {
       console.log('✅ All tests passed! Creem integration is ready.');
     } else {
       console.log('❌ Some tests failed. Please review the errors above.');
     }
-    console.log('='.repeat(60) + '\n');
+    console.log(`${'='.repeat(60)}\n`);
 
     const summary = {
       timestamp: new Date().toISOString(),
@@ -480,11 +471,8 @@ class CreemIntegrationTester {
       results: this.results,
     };
 
-    const fs = require('fs');
-    fs.writeFileSync(
-      'test-results-creem.json',
-      JSON.stringify(summary, null, 2)
-    );
+    const fs = require('node:fs');
+    fs.writeFileSync('test-results-creem.json', JSON.stringify(summary, null, 2));
     console.log('📄 Detailed results saved to: test-results-creem.json\n');
   }
 }

@@ -29,8 +29,8 @@ export function LogoImage({
 
   if (error && fallbackError) {
     return (
-      <div 
-        className={`${className} flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold rounded-lg`}
+      <div
+        className={`${className} flex items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 font-bold text-white`}
         style={{ width, height }}
       >
         IM

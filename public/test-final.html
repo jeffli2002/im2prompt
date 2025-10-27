@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Feedback Final Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .step h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        button:hover { background: #5568d3; transform: translateY(-2px); }
+        button:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        button.success { background: #10b981; }
+        button.error { background: #ef4444; }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+        .result.show { display: block; }
+        .result.success { background: #d1fae5; border: 2px solid #10b981; color: #065f46; }
+        .result.error { background: #fee2e2; border: 2px solid #ef4444; color: #991b1b; }
+        .result.warning { background: #fef3c7; border: 2px solid #f59e0b; color: #92400e; }
+        .code {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-indicator.green { background: #10b981; }
+        .status-indicator.red { background: #ef4444; }
+        .status-indicator.yellow { background: #f59e0b; }
+        .log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+        .log-entry { padding: 4px 0; }
+        .progress {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .progress-step {
+            flex: 1;
+            padding: 10px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .progress-step.active { background: #667eea; color: white; }
+        .progress-step.complete { background: #10b981; color: white; }
+        .progress-step.failed { background: #ef4444; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🧪 Support Feedback Final Test</h1>
+            <p class="subtitle">Complete diagnostic and testing tool</p>
+
+            <div class="progress">
+                <div class="progress-step" id="step1">1. DB Check</div>
+                <div class="progress-step" id="step2">2. API Test</div>
+                <div class="progress-step" id="step3">3. Submit</div>
+                <div class="progress-step" id="step4">4. Verify</div>
+            </div>
+
+            <button onclick="runFullTest()" id="mainBtn">🚀 Run Complete Test</button>
+            
+            <div id="results"></div>
+            <div id="log" class="log" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            dbCheck: false,
+            tableExists: false,
+            apiTest: false,
+            submission: false
+        };
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            logDiv.style.display = 'block';
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            const time = new Date().toLocaleTimeString();
+            entry.textContent = `[${time}] ${message}`;
+            if (type === 'error') entry.style.color = '#ef4444';
+            if (type === 'success') entry.style.color = '#10b981';
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function setStep(step, status) {
+            const el = document.getElementById(`step${step}`);
+            el.className = 'progress-step ' + status;
+        }
+
+        function showResult(type, title, content) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type} show`;
+            div.innerHTML = `<h3>${title}</h3>${content}`;
+            results.appendChild(div);
+        }
+
+        async function runFullTest() {
+            const btn = document.getElementById('mainBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Testing...';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('log').innerHTML = '';
+            
+            // Step 1: Database Check
+            setStep(1, 'active');
+            log('Step 1: Checking database connection...');
+            
+            try {
+                const dbResponse = await fetch('/api/support/test-db');
+                const dbData = await dbResponse.json();
+                
+                if (dbData.status === 'ok') {
+                    log('✅ Database connected', 'success');
+                    testResults.dbCheck = true;
+                    
+                    if (dbData.tableExists) {
+                        log(`✅ user_feedback table exists (${dbData.rowCount} rows)`, 'success');
+                        testResults.tableExists = true;
+                        setStep(1, 'complete');
+                    } else {
+                        log('❌ user_feedback table NOT FOUND', 'error');
+                        setStep(1, 'failed');
+                        showResult('error', '❌ Table Missing', 
+                            '<p>The user_feedback table does not exist in your Neon database.</p>' +
+                            '<p><strong>Action Required:</strong> Please run the SQL script in Neon Console:</p>' +
+                            '<div class="code">CREATE TABLE user_feedback (...)</div>' +
+                            '<p>See CREATE_TABLE_INSTRUCTIONS.md for the complete script.</p>');
+                        btn.disabled = false;
+                        btn.textContent = '🔄 Retry Test';
+                        return;
+                    }
+                } else {
+                    throw new Error(dbData.error || 'Database check failed');
+                }
+            } catch (error) {
+                log(`❌ Database check failed: ${error.message}`, 'error');
+                setStep(1, 'failed');
+                showResult('error', '❌ Database Error', 
+                    `<p>Failed to connect to database: ${error.message}</p>` +
+                    '<p>Check your DATABASE_URL in .env.local</p>');
+                btn.disabled = false;
+                btn.textContent = '🔄 Retry Test';
+                return;
+            }
+
+            // Step 2: API Endpoint Test
+            setStep(2, 'active');
+            log('Step 2: Testing API endpoint...');
+            
+            try {
+                const optionsResponse = await fetch('/api/support/feedback', { method: 'OPTIONS' });
+                if (optionsResponse.ok) {
+                    log('✅ API endpoint responding', 'success');
+                    testResults.apiTest = true;
+                    setStep(2, 'complete');
+                }
+            } catch (error) {
+                log(`❌ API endpoint failed: ${error.message}`, 'error');
+                setStep(2, 'failed');
+                btn.disabled = false;
+                btn.textContent = '🔄 Retry Test';
+                return;
+            }
+
+            // Step 3: Submit Test Feedback
+            setStep(3, 'active');
+            log('Step 3: Submitting test feedback...');
+            
+            const testData = {
+                name: 'Final Test User',
+                email: 'finaltest@example.com',
+                subject: 'Final Integration Test - ' + new Date().toISOString(),
+                category: 'technical-issue',
+                priority: 'normal',
+                message: 'This is the final integration test to verify the complete feedback system is working correctly.'
+            };
+
+            try {
+                const response = await fetch('/api/support/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+
+                const text = await response.text();
+                log(`Response status: ${response.status}`);
+                log(`Response body: ${text}`);
+
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    throw new Error(`Invalid JSON response: ${text}`);
+                }
+
+                if (response.ok && data.success) {
+                    log('✅ Feedback submitted successfully!', 'success');
+                    log(`Feedback ID: ${data.feedbackId}`, 'success');
+                    testResults.submission = true;
+                    setStep(3, 'complete');
+                    setStep(4, 'complete');
+
+                    showResult('success', '🎉 All Tests Passed!', 
+                        `<p><strong>Feedback successfully written to Neon database!</strong></p>` +
+                        `<p><span class="status-indicator green"></span>Feedback ID: <code>${data.feedbackId}</code></p>` +
+                        `<h4>✅ Test Summary:</h4>` +
+                        `<p><span class="status-indicator green"></span>Database connection: OK</p>` +
+                        `<p><span class="status-indicator green"></span>Table exists: OK</p>` +
+                        `<p><span class="status-indicator green"></span>API endpoint: OK</p>` +
+                        `<p><span class="status-indicator green"></span>Data submission: OK</p>` +
+                        `<h4>🔍 Verify in Neon:</h4>` +
+                        `<div class="code">SELECT * FROM user_feedback WHERE id = '${data.feedbackId}';</div>`
+                    );
+                    
+                    btn.textContent = '✅ Test Completed';
+                    btn.className = 'success';
+                } else {
+                    throw new Error(data.error || data.details || 'Submission failed');
+                }
+            } catch (error) {
+                log(`❌ Submission failed: ${error.message}`, 'error');
+                setStep(3, 'failed');
+                showResult('error', '❌ Submission Failed', 
+                    `<p>${error.message}</p>` +
+                    `<p><strong>Possible causes:</strong></p>` +
+                    `<ul>` +
+                    `<li>Dev server needs restart</li>` +
+                    `<li>Schema changes not picked up</li>` +
+                    `<li>Database permissions issue</li>` +
+                    `</ul>` +
+                    `<p><strong>Try:</strong> Restart the dev server (Ctrl+C, then pnpm dev)</p>`
+                );
+                btn.disabled = false;
+                btn.textContent = '🔄 Retry Test';
+                return;
+            }
+
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>

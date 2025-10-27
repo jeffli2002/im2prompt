@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Feedback Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #0070f3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0051cc;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 6px;
+            display: none;
+        }
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        .result h3 {
+            margin-top: 0;
+        }
+        .result pre {
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status.success {
+            background: #28a745;
+        }
+        .status.error {
+            background: #dc3545;
+        }
+        .test-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0070f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Support Feedback Database Test</h1>
+        <p class="description">This test will submit a support ticket to verify database integration with Neon.</p>
+        
+        <div class="test-info">
+            <strong>Test Details:</strong>
+            <ul>
+                <li>Endpoint: <code>/api/support/feedback</code></li>
+                <li>Method: POST</li>
+                <li>Database: Neon PostgreSQL</li>
+                <li>Table: user_feedback</li>
+            </ul>
+        </div>
+
+        <button id="runTest" onclick="runTest()">▶️ Run Test</button>
+        <button onclick="clearResult()">🗑️ Clear Results</button>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        async function runTest() {
+            const button = document.getElementById('runTest');
+            const resultDiv = document.getElementById('result');
+            
+            button.disabled = true;
+            button.textContent = '⏳ Running test...';
+            resultDiv.className = 'result';
+            resultDiv.style.display = 'none';
+
+            const testData = {
+                name: 'Test User - Automated',
+                email: 'autotest@example.com',
+                subject: 'Automated Database Integration Test',
+                category: 'technical-issue',
+                priority: 'normal',
+                message: `This is an automated test submission at ${new Date().toISOString()} to verify the support feedback is correctly written to Neon database.`
+            };
+
+            try {
+                console.log('📤 Sending test data:', testData);
+
+                const response = await fetch('/api/support/feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const data = await response.json();
+                console.log('📥 Response:', data);
+
+                if (response.ok && data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <h3><span class="status success"></span>✅ Test Passed!</h3>
+                        <p><strong>Support feedback successfully written to Neon database.</strong></p>
+                        <p><strong>Feedback ID:</strong> <code>${data.feedbackId}</code></p>
+                        <p><strong>Message:</strong> ${data.message}</p>
+                        
+                        <h4>📊 Test Summary:</h4>
+                        <ul>
+                            <li>✓ API endpoint responded successfully</li>
+                            <li>✓ Data validation passed</li>
+                            <li>✓ Database write completed</li>
+                            <li>✓ Feedback ID generated</li>
+                        </ul>
+
+                        <h4>🔍 Verification:</h4>
+                        <p>Check your Neon database console with this query:</p>
+                        <pre>SELECT * FROM user_feedback WHERE id = '${data.feedbackId}';</pre>
+                        
+                        <p><strong>Expected values:</strong></p>
+                        <pre>${JSON.stringify(testData, null, 2)}</pre>
+                    `;
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                console.error('❌ Test failed:', error);
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `
+                    <h3><span class="status error"></span>❌ Test Failed</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    
+                    <h4>🔧 Troubleshooting:</h4>
+                    <ul>
+                        <li>Check if the user_feedback table exists in Neon database</li>
+                        <li>Verify DATABASE_URL is correctly configured</li>
+                        <li>Check browser console for detailed error logs</li>
+                        <li>Ensure the API endpoint is accessible</li>
+                    </ul>
+
+                    <h4>📝 Manual Database Check:</h4>
+                    <p>Run this in Neon console to verify table exists:</p>
+                    <pre>SELECT table_name FROM information_schema.tables WHERE table_name = 'user_feedback';</pre>
+                `;
+            } finally {
+                button.disabled = false;
+                button.textContent = '▶️ Run Test';
+            }
+        }
+
+        function clearResult() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result';
+            resultDiv.style.display = 'none';
+            resultDiv.innerHTML = '';
+        }
+
+        // Auto-run test on page load if ?autorun=true
+        if (window.location.search.includes('autorun=true')) {
+            window.addEventListener('load', runTest);
+        }
+    </script>
+</body>
+</html>

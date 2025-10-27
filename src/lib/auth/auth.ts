@@ -1,9 +1,9 @@
 import { env } from '@/env';
+import { ErrorLogger } from '@/lib/logger/logger-utils';
 import db from '@/server/db';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin, apiKey } from 'better-auth/plugins';
-import { ErrorLogger } from '@/lib/logger/logger-utils';
 
 const resetPasswordLogger = new ErrorLogger('auth-reset-password');
 
@@ -13,10 +13,7 @@ export const auth = betterAuth({
   }),
   baseURL: env.NEXT_PUBLIC_APP_URL,
   secret: env.BETTER_AUTH_SECRET,
-  trustedOrigins: [
-    'https://im2prompt.com',
-    'https://www.im2prompt.com',
-  ],
+  trustedOrigins: ['https://im2prompt.com', 'https://www.im2prompt.com'],
   emailAndPassword: {
     enabled: true,
     async sendResetPassword({ user, url }) {
@@ -25,7 +22,7 @@ export const auth = betterAuth({
           const response = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+              Authorization: `Bearer ${env.RESEND_API_KEY}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
@@ -43,10 +40,10 @@ export const auth = betterAuth({
 
           if (!response.ok) {
             const detail = await response.text();
-            resetPasswordLogger.logError(
-              new Error('Failed to send reset password email'),
-              { email: user.email, response: detail },
-            );
+            resetPasswordLogger.logError(new Error('Failed to send reset password email'), {
+              email: user.email,
+              response: detail,
+            });
           }
         } else {
           console.log(`[auth] Password reset link for ${user.email}: ${url}`);
@@ -73,7 +70,7 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24 * 3,
     cookieCache: {
       enabled: true,
-      maxAge: 60 * 60 
+      maxAge: 60 * 60,
     },
   },
   advanced: {
@@ -83,8 +80,5 @@ export const auth = betterAuth({
       domain: '.im2prompt.com',
     },
   },
-  plugins: [
-    admin(),
-    apiKey()
-  ]
+  plugins: [admin(), apiKey()],
 });

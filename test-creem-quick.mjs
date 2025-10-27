@@ -1,10 +1,10 @@
-import crypto from 'crypto';
-import { readFileSync } from 'fs';
+import crypto from 'node:crypto';
+import { readFileSync } from 'node:fs';
 
 function loadEnv() {
   const envContent = readFileSync('.env.local', 'utf-8');
   const env = {};
-  envContent.split('\n').forEach(line => {
+  envContent.split('\n').forEach((line) => {
     line = line.trim();
     if (line && !line.startsWith('#')) {
       const [key, ...valueParts] = line.split('=');
@@ -40,7 +40,7 @@ class CreemTester {
 
   async testAll() {
     console.log('\n🧪 Creem Payment Integration - Quick Test\n');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     console.log('\n📋 Environment Variables');
     console.log('-'.repeat(60));
@@ -94,16 +94,22 @@ class CreemTester {
         .createHmac('sha256', env.CREEM_WEBHOOK_SECRET)
         .update(payload)
         .digest('hex');
-      
+
       if (signature.length !== 64) throw new Error('Invalid signature length');
       console.log(`   ${signature.substring(0, 32)}...`);
     });
 
     await this.run('Timing-safe comparison', async () => {
       const payload = '{"event":"test"}';
-      const sig1 = crypto.createHmac('sha256', env.CREEM_WEBHOOK_SECRET).update(payload).digest('hex');
-      const sig2 = crypto.createHmac('sha256', env.CREEM_WEBHOOK_SECRET).update(payload).digest('hex');
-      
+      const sig1 = crypto
+        .createHmac('sha256', env.CREEM_WEBHOOK_SECRET)
+        .update(payload)
+        .digest('hex');
+      const sig2 = crypto
+        .createHmac('sha256', env.CREEM_WEBHOOK_SECRET)
+        .update(payload)
+        .digest('hex');
+
       if (!crypto.timingSafeEqual(Buffer.from(sig1), Buffer.from(sig2))) {
         throw new Error('Signatures should match');
       }
@@ -129,9 +135,10 @@ class CreemTester {
         [env.CREEM_PROPLUS_PLAN_PRODUCT_KEY]: 900,
       };
       if (credits[env.CREEM_PRO_PLAN_PRODUCT_KEY] !== 500) throw new Error('Pro credits wrong');
-      if (credits[env.CREEM_PROPLUS_PLAN_PRODUCT_KEY] !== 900) throw new Error('ProPlus credits wrong');
-      console.log(`   Pro: 500 credits/month`);
-      console.log(`   ProPlus: 900 credits/month`);
+      if (credits[env.CREEM_PROPLUS_PLAN_PRODUCT_KEY] !== 900)
+        throw new Error('ProPlus credits wrong');
+      console.log('   Pro: 500 credits/month');
+      console.log('   ProPlus: 900 credits/month');
     });
 
     await this.run('Webhook event types', async () => {
@@ -169,12 +176,12 @@ class CreemTester {
   }
 
   printReport() {
-    console.log('\n' + '='.repeat(60));
+    console.log(`\n${'='.repeat(60)}`);
     console.log('📊 Test Summary');
     console.log('='.repeat(60));
 
-    const passed = this.results.filter(r => r.status === 'PASS').length;
-    const failed = this.results.filter(r => r.status === 'FAIL').length;
+    const passed = this.results.filter((r) => r.status === 'PASS').length;
+    const failed = this.results.filter((r) => r.status === 'FAIL').length;
     const total = this.results.length;
     const passRate = ((passed / total) * 100).toFixed(1);
     const totalDuration = this.results.reduce((sum, r) => sum + r.duration, 0);
@@ -185,13 +192,15 @@ class CreemTester {
 
     if (failed > 0) {
       console.log('\n❌ Failed:');
-      this.results.filter(r => r.status === 'FAIL').forEach(r => {
-        console.log(`   • ${r.name}: ${r.error}`);
-      });
+      this.results
+        .filter((r) => r.status === 'FAIL')
+        .forEach((r) => {
+          console.log(`   • ${r.name}: ${r.error}`);
+        });
     }
 
-    console.log('\n' + '='.repeat(60));
-    
+    console.log(`\n${'='.repeat(60)}`);
+
     if (failed === 0) {
       console.log('✅ ALL TESTS PASSED - Creem integration is configured correctly!\n');
       console.log('📝 Next Steps:');
@@ -203,7 +212,7 @@ class CreemTester {
     } else {
       console.log('❌ TESTS FAILED - Please fix configuration issues above.');
     }
-    console.log('='.repeat(60) + '\n');
+    console.log(`${'='.repeat(60)}\n`);
   }
 }
 

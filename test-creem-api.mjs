@@ -1,9 +1,9 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 
 function loadEnv() {
   const envContent = readFileSync('.env.local', 'utf-8');
   const env = {};
-  envContent.split('\n').forEach(line => {
+  envContent.split('\n').forEach((line) => {
     line = line.trim();
     if (line && !line.startsWith('#')) {
       const [key, ...valueParts] = line.split('=');
@@ -42,13 +42,13 @@ class CreemAPITester {
 
   async testAll() {
     console.log('\n🧪 Creem API Implementation Test\n');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     console.log('\n📁 File Structure');
     console.log('-'.repeat(60));
 
     await this.run('CreemService exists', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       if (!fs.existsSync('./src/lib/creem/creem-service.ts')) {
         throw new Error('creem-service.ts not found');
       }
@@ -56,7 +56,7 @@ class CreemAPITester {
     });
 
     await this.run('Creem client exists', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       if (!fs.existsSync('./src/payment/creem/client.ts')) {
         throw new Error('client.ts not found');
       }
@@ -64,7 +64,7 @@ class CreemAPITester {
     });
 
     await this.run('Webhook route exists', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       if (!fs.existsSync('./src/app/api/webhooks/creem/route.ts')) {
         throw new Error('webhook route not found');
       }
@@ -72,7 +72,7 @@ class CreemAPITester {
     });
 
     await this.run('Create checkout route exists', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       if (!fs.existsSync('./src/app/api/payment/create-checkout/route.ts')) {
         throw new Error('create-checkout route not found');
       }
@@ -80,7 +80,7 @@ class CreemAPITester {
     });
 
     await this.run('Cancel subscription route exists', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       if (!fs.existsSync('./src/app/api/payment/cancel-subscription/route.ts')) {
         throw new Error('cancel-subscription route not found');
       }
@@ -88,7 +88,7 @@ class CreemAPITester {
     });
 
     await this.run('Get subscription route exists', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       if (!fs.existsSync('./src/app/api/payment/get-subscription/route.ts')) {
         throw new Error('get-subscription route not found');
       }
@@ -96,7 +96,7 @@ class CreemAPITester {
     });
 
     await this.run('useCreemPayment hook exists', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       if (!fs.existsSync('./src/hooks/useCreemPayment.ts')) {
         throw new Error('useCreemPayment hook not found');
       }
@@ -107,7 +107,7 @@ class CreemAPITester {
     console.log('-'.repeat(60));
 
     await this.run('CreemService imports check', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       const content = fs.readFileSync('./src/lib/creem/creem-service.ts', 'utf-8');
       if (!content.includes('export class CreemService')) {
         throw new Error('CreemService class not exported');
@@ -122,7 +122,7 @@ class CreemAPITester {
     });
 
     await this.run('Webhook handler implementation', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       const content = fs.readFileSync('./src/app/api/webhooks/creem/route.ts', 'utf-8');
       if (!content.includes('export async function POST')) {
         throw new Error('POST handler not exported');
@@ -137,10 +137,10 @@ class CreemAPITester {
     });
 
     await this.run('Environment variable usage', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       const serviceContent = fs.readFileSync('./src/lib/creem/creem-service.ts', 'utf-8');
       const clientContent = fs.readFileSync('./src/payment/creem/client.ts', 'utf-8');
-      
+
       if (!serviceContent.includes('CREEM_') && !clientContent.includes('CREEM_')) {
         throw new Error('Environment variables not used');
       }
@@ -148,7 +148,7 @@ class CreemAPITester {
     });
 
     await this.run('TypeScript types', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       const content = fs.readFileSync('./src/lib/creem/creem-service.ts', 'utf-8');
       if (!content.includes('interface') && !content.includes('type')) {
         throw new Error('TypeScript types not defined');
@@ -157,7 +157,7 @@ class CreemAPITester {
     });
 
     await this.run('Error handling', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       const content = fs.readFileSync('./src/app/api/webhooks/creem/route.ts', 'utf-8');
       if (!content.includes('try') || !content.includes('catch')) {
         throw new Error('Error handling missing');
@@ -169,9 +169,9 @@ class CreemAPITester {
     console.log('-'.repeat(60));
 
     await this.run('package.json check', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf-8'));
-      
+
       const hasCreem = pkg.dependencies?.creem || pkg.devDependencies?.creem;
       if (!hasCreem) {
         console.log('   ⚠️  Creem SDK not installed yet');
@@ -185,7 +185,7 @@ class CreemAPITester {
     console.log('-'.repeat(60));
 
     await this.run('env.ts updated', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       const content = fs.readFileSync('./src/env.ts', 'utf-8');
       if (!content.includes('CREEM_API_KEY')) {
         throw new Error('env.ts not updated with Creem variables');
@@ -194,7 +194,7 @@ class CreemAPITester {
     });
 
     await this.run('payment.config.ts updated', async () => {
-      const fs = await import('fs');
+      const fs = await import('node:fs');
       const content = fs.readFileSync('./src/config/payment.config.ts', 'utf-8');
       if (!content.includes('creem')) {
         throw new Error('payment.config.ts not updated');
@@ -206,12 +206,12 @@ class CreemAPITester {
   }
 
   printReport() {
-    console.log('\n' + '='.repeat(60));
+    console.log(`\n${'='.repeat(60)}`);
     console.log('📊 API Implementation Test Summary');
     console.log('='.repeat(60));
 
-    const passed = this.results.filter(r => r.status === 'PASS').length;
-    const failed = this.results.filter(r => r.status === 'FAIL').length;
+    const passed = this.results.filter((r) => r.status === 'PASS').length;
+    const failed = this.results.filter((r) => r.status === 'FAIL').length;
     const total = this.results.length;
     const passRate = ((passed / total) * 100).toFixed(1);
     const totalDuration = this.results.reduce((sum, r) => sum + r.duration, 0);
@@ -222,13 +222,15 @@ class CreemAPITester {
 
     if (failed > 0) {
       console.log('\n❌ Failed:');
-      this.results.filter(r => r.status === 'FAIL').forEach(r => {
-        console.log(`   • ${r.name}: ${r.error}`);
-      });
+      this.results
+        .filter((r) => r.status === 'FAIL')
+        .forEach((r) => {
+          console.log(`   • ${r.name}: ${r.error}`);
+        });
     }
 
-    console.log('\n' + '='.repeat(60));
-    
+    console.log(`\n${'='.repeat(60)}`);
+
     if (failed === 0) {
       console.log('✅ API IMPLEMENTATION COMPLETE!\n');
       console.log('📝 Ready for Integration Testing:');
@@ -241,7 +243,7 @@ class CreemAPITester {
     } else {
       console.log('⚠️  SOME CHECKS FAILED - Review issues above');
     }
-    console.log('='.repeat(60) + '\n');
+    console.log(`${'='.repeat(60)}\n`);
   }
 }
 

@@ -1,10 +1,10 @@
 'use server';
 
-import { creemService } from '@/lib/creem/creem-service';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import type { ActionResult } from '@/payment/types';
-import { ErrorLogger } from '@/lib/logger/logger-utils';
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
+import { creemService } from '@/lib/creem/creem-service';
+import { ErrorLogger } from '@/lib/logger/logger-utils';
+import type { ActionResult } from '@/payment/types';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
 
 const upgradeErrorLogger = new ErrorLogger('upgrade-subscription');
 
@@ -12,10 +12,10 @@ export async function upgradeSubscription(
   subscriptionId: string,
   newPlanId: 'pro' | 'proplus',
   newInterval: 'month' | 'year',
-  useProration: boolean = false
+  useProration = false
 ): Promise<ActionResult<{ upgraded: boolean }>> {
   let session: { user?: { id: string } } | null = null;
-  
+
   try {
     session = await getSessionWithAuthBypass();
     if (!session?.user) {
@@ -42,7 +42,7 @@ export async function upgradeSubscription(
 
     const currentPlan = paymentRecord.priceId;
     const currentInterval = paymentRecord.interval;
-    
+
     if (currentPlan === newPlanId && currentInterval === newInterval) {
       return {
         success: false,
@@ -50,8 +50,11 @@ export async function upgradeSubscription(
       };
     }
 
-    const newProductKey = `${newPlanId}_${newInterval === 'year' ? 'yearly' : 'monthly'}` as 
-      'pro_monthly' | 'pro_yearly' | 'proplus_monthly' | 'proplus_yearly';
+    const newProductKey = `${newPlanId}_${newInterval === 'year' ? 'yearly' : 'monthly'}` as
+      | 'pro_monthly'
+      | 'pro_yearly'
+      | 'proplus_monthly'
+      | 'proplus_yearly';
 
     const result = await creemService.upgradeSubscription(
       subscriptionId,
@@ -85,7 +88,7 @@ export async function upgradeSubscription(
       }),
     });
 
-    const upgradeMessage = useProration 
+    const upgradeMessage = useProration
       ? 'Subscription upgraded immediately with prorated charge'
       : 'Subscription will be upgraded at the end of current period';
 
@@ -96,7 +99,6 @@ export async function upgradeSubscription(
       },
       message: upgradeMessage,
     };
-
   } catch (error) {
     upgradeErrorLogger.logError(error as Error, {
       operation: 'upgradeSubscription',

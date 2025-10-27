@@ -1,7 +1,7 @@
 'use client';
 
-import { NavbarWrapper } from '@/components/blocks/navbar/navbar-wrapper';
 import { Footer } from '@/components/blocks/footer/footer';
+import { NavbarWrapper } from '@/components/blocks/navbar/navbar-wrapper';
 import { cn } from '@/lib/utils';
 import type { ProtectedContainerProps } from '@/types';
 import { useState } from 'react';
@@ -14,7 +14,7 @@ export function ProtectedContainer({ children, sidebarGroups }: ProtectedContain
     <div className="flex min-h-screen flex-col">
       {/* Main Navbar */}
       <NavbarWrapper />
-      
+
       <div className="flex flex-1">
         {/* Sidebar */}
         <ProtectedSidebar
@@ -32,7 +32,7 @@ export function ProtectedContainer({ children, sidebarGroups }: ProtectedContain
         >
           {/* Page Content */}
           <main className="flex-1 overflow-y-auto p-6">{children}</main>
-          
+
           {/* Footer */}
           <Footer />
         </div>

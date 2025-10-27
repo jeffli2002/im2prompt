@@ -1,7 +1,7 @@
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import vision from '@google-cloud/vision';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,16 +34,15 @@ try {
   const client = new vision.ImageAnnotatorClient({
     credentials,
   });
-  
+
   console.log('✅ Vision API client initialized successfully!\n');
-  
+
   // Optional: Test with a simple API call (uncomment if you want to test actual API)
   // console.log('🧪 Testing Vision API with a simple request...');
   // const [result] = await client.labelDetection('https://picsum.photos/200');
   // console.log('✅ Vision API is working! Detected labels:', result.labelAnnotations?.length || 0);
-  
+
   console.log('✅ All tests passed! Google Vision API is properly configured.\n');
-  
 } catch (error) {
   console.log('❌ Error:', error.message);
   if (error.stack) {

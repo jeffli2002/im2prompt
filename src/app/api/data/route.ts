@@ -1,20 +1,25 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
-import db from "@/server/db";
-import { apiKey, user, userCredits } from "@/server/db/schema";
-import { eq, or, isNull } from "drizzle-orm";
-import bcrypt from "bcryptjs";
-import dataJson from "@/content/data.json";
-import { creditService } from "@/lib/credits/credit-service";
+import dataJson from '@/content/data.json';
+import { creditService } from '@/lib/credits/credit-service';
+import db from '@/server/db';
+import { apiKey, user, userCredits } from '@/server/db/schema';
+import bcrypt from 'bcryptjs';
+import { eq, isNull, or } from 'drizzle-orm';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
     // 从请求头获取API Key
-    const apiKeyValue = request.headers.get("x-api-key") || request.headers.get("authorization")?.replace("Bearer ", "");
-    
+    const apiKeyValue =
+      request.headers.get('x-api-key') ||
+      request.headers.get('authorization')?.replace('Bearer ', '');
+
     if (!apiKeyValue) {
       return NextResponse.json(
-        { error: "API Key is required. Please provide it in the 'x-api-key' header or 'Authorization: Bearer <key>' header." },
+        {
+          error:
+            "API Key is required. Please provide it in the 'x-api-key' header or 'Authorization: Bearer <key>' header.",
+        },
         { status: 401 }
       );
     }
@@ -34,10 +39,11 @@ export async function GET(request: NextRequest) {
       .innerJoin(user, eq(apiKey.userId, user.id))
       .where(or(eq(user.banned, false), isNull(user.banned))); // 确保用户未被封禁
 
-  
     let validApiKey = null;
     for (const key of apiKeys) {
-      console.log(`Checking API key: ${key.id}, hashedKey starts with: ${key.hashedKey.substring(0, 10)}...`);
+      console.log(
+        `Checking API key: ${key.id}, hashedKey starts with: ${key.hashedKey.substring(0, 10)}...`
+      );
       const isValid = await bcrypt.compare(apiKeyValue, key.hashedKey);
       console.log(`API key ${key.id} valid: ${isValid}`);
       if (isValid) {
@@ -48,10 +54,7 @@ export async function GET(request: NextRequest) {
 
     if (!validApiKey) {
       console.log('No valid API key found');
-      return NextResponse.json(
-        { error: "Invalid API Key" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Invalid API Key' }, { status: 401 });
     }
 
     console.log(`Valid API key found: ${validApiKey.id}`);
@@ -60,35 +63,26 @@ export async function GET(request: NextRequest) {
 
     // 检查API Key是否过期
     if (expiresAt && new Date() > expiresAt) {
-      return NextResponse.json(
-        { error: "API Key has expired" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'API Key has expired' }, { status: 401 });
     }
 
     // 获取用户信息和积分信息
     const [userData] = await db
-      .select({ 
+      .select({
         banned: user.banned,
-        balance: userCredits.balance 
+        balance: userCredits.balance,
       })
       .from(user)
       .leftJoin(userCredits, eq(user.id, userCredits.userId))
       .where(eq(user.id, userId));
 
     if (!userData) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // 检查用户是否被封禁
     if (userData.banned === true) {
-      return NextResponse.json(
-        { error: "User is banned" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'User is banned' }, { status: 403 });
     }
 
     const userBalance = userData.balance || 0;
@@ -96,14 +90,14 @@ export async function GET(request: NextRequest) {
     // 检查用户积分是否足够
     if (userBalance < 1) {
       return NextResponse.json(
-        { error: "Insufficient credits. You need at least 1 credit to make this request." },
+        { error: 'Insufficient credits. You need at least 1 credit to make this request.' },
         { status: 402 } // Payment Required
       );
     }
 
     // 获取分页参数
     const url = new URL(request.url);
-    const page = Number.parseInt(url.searchParams.get("page") || "1");
+    const page = Number.parseInt(url.searchParams.get('page') || '1');
     const limit = 10; // 固定每次返回10条数据
     const offset = (page - 1) * limit;
 
@@ -114,7 +108,7 @@ export async function GET(request: NextRequest) {
     // 如果没有更多数据，返回错误
     if (paginatedData.length === 0) {
       return NextResponse.json(
-        { error: "No more data available for the requested page" },
+        { error: 'No more data available for the requested page' },
         { status: 404 }
       );
     }
@@ -125,14 +119,11 @@ export async function GET(request: NextRequest) {
       amount: 1,
       source: 'api_call',
       description: `Data API call - Page ${page}`,
-      referenceId: `data_api_${validApiKey.id}_${Date.now()}`
+      referenceId: `data_api_${validApiKey.id}_${Date.now()}`,
     });
 
     // 更新API Key最后使用时间
-    await db
-      .update(apiKey)
-      .set({ lastUsedAt: new Date() })
-      .where(eq(apiKey.id, validApiKey.id));
+    await db.update(apiKey).set({ lastUsedAt: new Date() }).where(eq(apiKey.id, validApiKey.id));
 
     // 返回数据和分页信息
     return NextResponse.json({
@@ -144,20 +135,16 @@ export async function GET(request: NextRequest) {
         total: totalItems,
         totalPages: Math.ceil(totalItems / limit),
         hasNext: offset + limit < totalItems,
-        hasPrev: page > 1
+        hasPrev: page > 1,
       },
       credits: {
         used: 1,
-        remaining: userBalance - 1
-      }
+        remaining: userBalance - 1,
+      },
     });
-
   } catch (error) {
-    console.error("Data API error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Data API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -166,9 +153,9 @@ export async function OPTIONS(request: NextRequest) {
   return new NextResponse(null, {
     status: 200,
     headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, x-api-key, Authorization",
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, x-api-key, Authorization',
     },
   });
 }

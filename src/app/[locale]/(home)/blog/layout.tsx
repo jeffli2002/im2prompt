@@ -8,7 +8,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props) {
   const { locale } = await params;
-  
+
   const t = await getTranslations('blog');
 
   return {
@@ -17,6 +17,9 @@ export async function generateMetadata({ params }: Props) {
       default: t('title'),
     },
     description: t('description'),
+    alternates: {
+      canonical: 'https://www.im2prompt.com/blog',
+    },
   };
 }
 

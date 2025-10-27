@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from 'cloudinary';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { v2 as cloudinary } from 'cloudinary';
 
 const cloudinaryErrorLogger = new ErrorLogger('cloudinary-service');
 
@@ -34,10 +34,10 @@ export async function uploadImageToCloudinary(
 ): Promise<CloudinaryUploadResult> {
   try {
     console.log('[Cloudinary] Starting image upload...');
-    
+
     // 将 Buffer 转换为 base64 字符串
     const base64Image = `data:image/${options.format || 'auto'};base64,${imageBuffer.toString('base64')}`;
-    
+
     // 上传配置
     const uploadOptions = {
       folder: options.folder || 'sora-video-images',
@@ -51,7 +51,7 @@ export async function uploadImageToCloudinary(
     console.log('[Cloudinary] Upload options:', uploadOptions);
 
     const result = await cloudinary.uploader.upload(base64Image, uploadOptions);
-    
+
     console.log('[Cloudinary] Upload successful:', {
       public_id: result.public_id,
       url: result.secure_url,
@@ -71,7 +71,9 @@ export async function uploadImageToCloudinary(
       operation: 'uploadImageToCloudinary',
       options,
     });
-    throw new Error(`Failed to upload image to Cloudinary: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to upload image to Cloudinary: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -88,9 +90,9 @@ export async function uploadImageWithPreset(
 ): Promise<CloudinaryUploadResult> {
   try {
     console.log('[Cloudinary] Uploading with preset:', uploadPreset);
-    
+
     const base64Image = `data:image/auto;base64,${imageBuffer.toString('base64')}`;
-    
+
     const uploadOptions = {
       upload_preset: uploadPreset,
       public_id: options.public_id,
@@ -99,7 +101,7 @@ export async function uploadImageWithPreset(
     };
 
     const result = await cloudinary.uploader.upload(base64Image, uploadOptions);
-    
+
     console.log('[Cloudinary] Preset upload successful:', {
       public_id: result.public_id,
       url: result.secure_url,
@@ -119,7 +121,9 @@ export async function uploadImageWithPreset(
       uploadPreset,
       options,
     });
-    throw new Error(`Failed to upload image with preset: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to upload image with preset: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -129,16 +133,15 @@ export async function uploadImageWithPreset(
 export async function deleteImageFromCloudinary(publicId: string): Promise<boolean> {
   try {
     console.log('[Cloudinary] Deleting image:', publicId);
-    
+
     const result = await cloudinary.uploader.destroy(publicId);
-    
+
     if (result.result === 'ok') {
       console.log('[Cloudinary] Image deleted successfully:', publicId);
       return true;
-    } else {
-      console.warn('[Cloudinary] Failed to delete image:', result);
-      return false;
     }
+    console.warn('[Cloudinary] Failed to delete image:', result);
+    return false;
   } catch (error) {
     cloudinaryErrorLogger.logError(error as Error, {
       operation: 'deleteImageFromCloudinary',
@@ -151,13 +154,16 @@ export async function deleteImageFromCloudinary(publicId: string): Promise<boole
 /**
  * 获取 Cloudinary 图片的公开 URL
  */
-export function getCloudinaryUrl(publicId: string, options: {
-  format?: string;
-  quality?: string | number;
-  width?: number;
-  height?: number;
-  crop?: string;
-} = {}): string {
+export function getCloudinaryUrl(
+  publicId: string,
+  options: {
+    format?: string;
+    quality?: string | number;
+    width?: number;
+    height?: number;
+    crop?: string;
+  } = {}
+): string {
   try {
     const url = cloudinary.url(publicId, {
       format: options.format || 'auto',
@@ -166,7 +172,7 @@ export function getCloudinaryUrl(publicId: string, options: {
       height: options.height,
       crop: options.crop || 'limit',
     });
-    
+
     return url;
   } catch (error) {
     cloudinaryErrorLogger.logError(error as Error, {
@@ -174,7 +180,9 @@ export function getCloudinaryUrl(publicId: string, options: {
       publicId,
       options,
     });
-    throw new Error(`Failed to generate Cloudinary URL: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to generate Cloudinary URL: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -182,19 +190,14 @@ export function getCloudinaryUrl(publicId: string, options: {
  * 验证 Cloudinary 配置
  */
 export function validateCloudinaryConfig(): boolean {
-  const requiredEnvVars = [
-    'CLOUDINARY_CLOUD_NAME',
-    'CLOUDINARY_UPLOAD_PRESET',
-  ];
-  
-  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-  
+  const requiredEnvVars = ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_UPLOAD_PRESET'];
+
+  const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
+
   if (missingVars.length > 0) {
     console.error('[Cloudinary] Missing required environment variables:', missingVars);
     return false;
   }
-  
+
   return true;
 }
-
-

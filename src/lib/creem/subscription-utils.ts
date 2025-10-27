@@ -1,5 +1,5 @@
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import type { PaymentRecord } from '@/payment/types';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
 
 export interface SubscriptionInfo {
   hasActiveSubscription: boolean;
@@ -11,9 +11,7 @@ export interface SubscriptionInfo {
   provider?: 'stripe' | 'creem';
 }
 
-export async function getCreemSubscriptionStatus(
-  userId: string
-): Promise<SubscriptionInfo> {
+export async function getCreemSubscriptionStatus(userId: string): Promise<SubscriptionInfo> {
   const subscription = await paymentRepository.findActiveSubscriptionByUserId(userId);
 
   if (!subscription || subscription.provider !== 'creem') {
@@ -40,7 +38,7 @@ export async function hasActiveCreemSubscription(userId: string): Promise<boolea
 
 export async function getSubscriptionPlan(userId: string): Promise<string | null> {
   const subscription = await paymentRepository.findActiveSubscriptionByUserId(userId);
-  
+
   if (!subscription || (subscription.provider !== 'creem' && subscription.provider !== 'stripe')) {
     return null;
   }
@@ -50,16 +48,16 @@ export async function getSubscriptionPlan(userId: string): Promise<string | null
 
 export function isSubscriptionActive(subscription: PaymentRecord): boolean {
   if (!subscription) return false;
-  
+
   const activeStatuses = ['active', 'trialing'];
   const isStatusActive = activeStatuses.includes(subscription.status);
-  
+
   if (subscription.periodEnd) {
     const now = new Date();
     const isNotExpired = subscription.periodEnd > now;
     return isStatusActive && isNotExpired;
   }
-  
+
   return isStatusActive;
 }
 

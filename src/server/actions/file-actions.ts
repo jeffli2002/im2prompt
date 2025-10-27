@@ -3,16 +3,16 @@
 import { auth } from '@/lib/auth/auth';
 import { isAdmin } from '@/lib/auth/permissions';
 import {
-  uploadFile,
-  deleteFile,
-  getFileList,
-  getFileInfo,
   type FileInfo,
+  deleteFile,
+  getFileInfo,
+  getFileList,
+  uploadFile,
 } from '@/lib/files/file-service';
-import { headers } from 'next/headers';
-import { getErrorMessage } from './error-messages';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
 import type { User } from 'better-auth/types';
+import { headers } from 'next/headers';
+import { getErrorMessage } from './error-messages';
 
 const fileErrorLogger = new ErrorLogger('file-actions');
 
@@ -42,8 +42,9 @@ export async function uploadFileAction(formData: FormData): Promise<FileUploadRe
   let file: File | null = null;
 
   try {
+    const headersList = await headers();
     session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {
@@ -82,8 +83,9 @@ export async function deleteFileAction(fileId: string): Promise<FileDeleteRespon
   let session: { user?: User } | null = null;
 
   try {
+    const headersList = await headers();
     session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {
@@ -92,7 +94,7 @@ export async function deleteFileAction(fileId: string): Promise<FileDeleteRespon
 
     // Check if user is admin - admins can delete any file
     const userIsAdmin = isAdmin(session.user);
-    
+
     // Pass userId only if user is not admin (to enforce ownership check)
     const success = await deleteFile(fileId, userIsAdmin ? undefined : session.user.id);
 
@@ -127,8 +129,9 @@ export async function getFileListAction(
   let session: { user?: User } | null = null;
 
   try {
+    const headersList = await headers();
     session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {
@@ -167,8 +170,9 @@ export async function getFileInfoAction(fileId: string): Promise<FileInfo> {
   let session: { user?: User } | null = null;
 
   try {
+    const headersList = await headers();
     session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {

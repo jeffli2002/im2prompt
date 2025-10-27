@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import SoraVideoGenerator from '@/components/sora-video-generator'
+import SoraVideoGenerator from '@/components/sora-video-generator';
 
 export default function ImageToVideoPage() {
   return (
@@ -15,5 +15,5 @@ export default function ImageToVideoPage() {
       {/* Video Generator Component - Default to image-to-video mode */}
       <SoraVideoGenerator defaultMode="image-to-video" />
     </div>
-  )
+  );
 }

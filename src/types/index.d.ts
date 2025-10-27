@@ -49,13 +49,16 @@ export interface AppConfig {
 export interface I18nConfig {
   locales: readonly string[];
   defaultLocale: string;
-  languages: Record<string, {
-    name: string;
-    nativeName: string;
-    flag: string;
-    dir: 'ltr' | 'rtl';
-    enabled: boolean;
-  }>;
+  languages: Record<
+    string,
+    {
+      name: string;
+      nativeName: string;
+      flag: string;
+      dir: 'ltr' | 'rtl';
+      enabled: boolean;
+    }
+  >;
   routing: {
     localePrefix: 'always' | 'as-needed' | 'never';
     localeDetection: boolean;
@@ -63,16 +66,22 @@ export interface I18nConfig {
   };
   namespaces: string[];
   fallbackLocale: string;
-  dateTimeFormats: Record<string, {
-    short: Intl.DateTimeFormatOptions;
-    medium: Intl.DateTimeFormatOptions;
-    long: Intl.DateTimeFormatOptions;
-  }>;
-  numberFormats: Record<string, {
-    currency: Intl.NumberFormatOptions;
-    decimal: Intl.NumberFormatOptions;
-    percent: Intl.NumberFormatOptions;
-  }>;
+  dateTimeFormats: Record<
+    string,
+    {
+      short: Intl.DateTimeFormatOptions;
+      medium: Intl.DateTimeFormatOptions;
+      long: Intl.DateTimeFormatOptions;
+    }
+  >;
+  numberFormats: Record<
+    string,
+    {
+      currency: Intl.NumberFormatOptions;
+      decimal: Intl.NumberFormatOptions;
+      percent: Intl.NumberFormatOptions;
+    }
+  >;
 }
 
 export interface FeaturesConfig {
@@ -250,18 +259,18 @@ export interface PaymentPlan {
     batchSize?: number;
     teamMembers?: number;
     // Credit-based generation limits
-    images?: number;          // Monthly image generation limit
-    videos?: number;          // Monthly video generation limit
-    dailyImages?: number;     // Daily image generation limit (-1 = unlimited)
-    dailyVideos?: number;     // Daily video generation limit (-1 = unlimited)
-    quality?: string;         // Quality tier: 'standard', 'hd', 'fullhd'
+    images?: number; // Monthly image generation limit
+    videos?: number; // Monthly video generation limit
+    dailyImages?: number; // Daily image generation limit (-1 = unlimited)
+    dailyVideos?: number; // Daily video generation limit (-1 = unlimited)
+    quality?: string; // Quality tier: 'standard', 'hd', 'fullhd'
   };
   // Credits configuration for subscription-based credit system
   credits?: {
-    monthly?: number;      // Credits granted per month
-    yearly?: number;       // Credits granted per year (for yearly subscriptions)
-    onSubscribe?: number;  // Credits granted immediately on subscription
-    onSignup?: number;     // Credits granted on user signup (for free plans)
+    monthly?: number; // Credits granted per month
+    yearly?: number; // Credits granted per year (for yearly subscriptions)
+    onSubscribe?: number; // Credits granted immediately on subscription
+    onSignup?: number; // Credits granted on user signup (for free plans)
   };
 }
 
@@ -306,7 +315,6 @@ export interface PaymentConfig {
     webhooks: boolean;
   };
 }
-
 
 export interface SidebarItem {
   title: string;
@@ -383,4 +391,3 @@ declare module 'better-auth/types' {
     banExpires?: Date | null;
   }
 }
-

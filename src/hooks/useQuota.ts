@@ -1,38 +1,38 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { creditsConfig } from '@/config/credits.config'
+import { creditsConfig } from '@/config/credits.config';
+import { useAuth } from '@/contexts/AuthContext';
+import { useEffect, useState } from 'react';
 
 interface QuotaUsage {
   imageToText: {
-    daily: number
-    dailyLimit: number
-    monthlyLimit: number
-  }
+    daily: number;
+    dailyLimit: number;
+    monthlyLimit: number;
+  };
   textToPrompt: {
-    unlimited: boolean
-  }
+    unlimited: boolean;
+  };
   imageGeneration: {
-    dailyLimit: number
-    monthlyLimit: number
-  }
+    dailyLimit: number;
+    monthlyLimit: number;
+  };
   videoGeneration: {
-    dailyLimit: number
-    monthlyLimit: number
-  }
+    dailyLimit: number;
+    monthlyLimit: number;
+  };
   credits: {
-    dailyUsed: number
-    monthlyUsed: number
-  }
+    dailyUsed: number;
+    monthlyUsed: number;
+  };
   consumption: {
-    imageGeneration: number
-    videoGeneration: number
-  }
+    imageGeneration: number;
+    videoGeneration: number;
+  };
 }
 
 export function useQuota() {
-  const { user } = useAuth()
+  const { user } = useAuth();
   const [usage, setUsage] = useState<QuotaUsage>({
     imageToText: {
       daily: 0,
@@ -58,48 +58,48 @@ export function useQuota() {
       imageGeneration: creditsConfig.consumption.imageGeneration['nano-banana'],
       videoGeneration: creditsConfig.consumption.videoGeneration['sora-2'],
     },
-  })
-  const [isLoading, setIsLoading] = useState(true)
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadUsage = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
         if (user) {
-          const response = await fetch('/api/v1/usage/status')
+          const response = await fetch('/api/v1/usage/status');
           if (response.ok) {
-            const data = await response.json()
-            setUsage(data)
+            const data = await response.json();
+            setUsage(data);
           }
         } else {
-          const localUsage = getLocalUsage()
-          setUsage(localUsage)
+          const localUsage = getLocalUsage();
+          setUsage(localUsage);
         }
       } catch (error) {
-        console.error('Error loading usage:', error)
+        console.error('Error loading usage:', error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    loadUsage()
-  }, [user])
+    loadUsage();
+  }, [user]);
 
   const canUseImageToText = () => {
-    return usage.imageToText.daily < usage.imageToText.dailyLimit
-  }
+    return usage.imageToText.daily < usage.imageToText.dailyLimit;
+  };
 
   const canUseTextToPrompt = () => {
-    return usage.textToPrompt.unlimited
-  }
+    return usage.textToPrompt.unlimited;
+  };
 
   const canGenerateImage = () => {
-    return true
-  }
+    return true;
+  };
 
   const canGenerateVideo = () => {
-    return true
-  }
+    return true;
+  };
 
   const trackImageToText = async () => {
     if (user) {
@@ -108,82 +108,82 @@ export function useQuota() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ type: 'imageToText' }),
-        })
-        setUsage(prev => ({
+        });
+        setUsage((prev) => ({
           ...prev,
           imageToText: {
             ...prev.imageToText,
             daily: prev.imageToText.daily + 1,
           },
-        }))
+        }));
       } catch (error) {
-        console.error('Error tracking image to text:', error)
+        console.error('Error tracking image to text:', error);
       }
     } else {
-      incrementLocalUsage('imageToText')
+      incrementLocalUsage('imageToText');
     }
-  }
+  };
 
   const trackImageGeneration = async () => {
-    const creditsUsed = usage.consumption.imageGeneration
+    const creditsUsed = usage.consumption.imageGeneration;
     if (user) {
       try {
         await fetch('/api/v1/usage/track', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ type: 'imageGeneration' }),
-        })
-        setUsage(prev => ({
+        });
+        setUsage((prev) => ({
           ...prev,
           credits: {
             ...prev.credits,
             dailyUsed: prev.credits.dailyUsed + creditsUsed,
             monthlyUsed: prev.credits.monthlyUsed + creditsUsed,
           },
-        }))
+        }));
       } catch (error) {
-        console.error('Error tracking image generation:', error)
+        console.error('Error tracking image generation:', error);
       }
     } else {
-      incrementLocalUsage('imageGeneration', creditsUsed)
+      incrementLocalUsage('imageGeneration', creditsUsed);
     }
-  }
+  };
 
   const trackVideoGeneration = async () => {
-    const creditsUsed = usage.consumption.videoGeneration
+    const creditsUsed = usage.consumption.videoGeneration;
     if (user) {
       try {
         await fetch('/api/v1/usage/track', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ type: 'videoGeneration' }),
-        })
-        setUsage(prev => ({
+        });
+        setUsage((prev) => ({
           ...prev,
           credits: {
             ...prev.credits,
             dailyUsed: prev.credits.dailyUsed + creditsUsed,
             monthlyUsed: prev.credits.monthlyUsed + creditsUsed,
           },
-        }))
+        }));
       } catch (error) {
-        console.error('Error tracking video generation:', error)
+        console.error('Error tracking video generation:', error);
       }
     } else {
-      incrementLocalUsage('videoGeneration', creditsUsed)
+      incrementLocalUsage('videoGeneration', creditsUsed);
     }
-  }
+  };
 
   const getLocalUsage = (): QuotaUsage => {
-    const today = new Date().toDateString()
-    const month = new Date().toISOString().slice(0, 7)
-    const stored = localStorage.getItem('im2prompt_usage')
-    
+    const today = new Date().toDateString();
+    const month = new Date().toISOString().slice(0, 7);
+    const stored = localStorage.getItem('im2prompt_usage');
+
     if (!stored) {
-      return usage
+      return usage;
     }
-    
-    const parsed = JSON.parse(stored)
+
+    const parsed = JSON.parse(stored);
     return {
       imageToText: {
         daily: parsed.imageToText?.date === today ? parsed.imageToText?.count || 0 : 0,
@@ -209,50 +209,53 @@ export function useQuota() {
         imageGeneration: creditsConfig.consumption.imageGeneration['nano-banana'],
         videoGeneration: creditsConfig.consumption.videoGeneration['sora-2'],
       },
-    }
-  }
+    };
+  };
 
-  const incrementLocalUsage = (type: 'imageToText' | 'imageGeneration' | 'videoGeneration', credits = 0) => {
-    const today = new Date().toDateString()
-    const month = new Date().toISOString().slice(0, 7)
-    const stored = localStorage.getItem('im2prompt_usage')
-    const usageData = stored ? JSON.parse(stored) : {}
-    
+  const incrementLocalUsage = (
+    type: 'imageToText' | 'imageGeneration' | 'videoGeneration',
+    credits = 0
+  ) => {
+    const today = new Date().toDateString();
+    const month = new Date().toISOString().slice(0, 7);
+    const stored = localStorage.getItem('im2prompt_usage');
+    const usageData = stored ? JSON.parse(stored) : {};
+
     if (type === 'imageToText') {
       if (!usageData.imageToText || usageData.imageToText.date !== today) {
-        usageData.imageToText = { date: today, count: 0 }
+        usageData.imageToText = { date: today, count: 0 };
       }
-      usageData.imageToText.count += 1
-      setUsage(prev => ({
+      usageData.imageToText.count += 1;
+      setUsage((prev) => ({
         ...prev,
         imageToText: {
           ...prev.imageToText,
           daily: usageData.imageToText.count,
         },
-      }))
+      }));
     } else {
       // For image/video generation, track credits
       if (!usageData.credits || usageData.credits.date !== today) {
-        usageData.credits = { date: today, dailyUsed: 0, month, monthlyUsed: 0 }
+        usageData.credits = { date: today, dailyUsed: 0, month, monthlyUsed: 0 };
       }
       if (usageData.credits.month !== month) {
-        usageData.credits.monthlyUsed = 0
-        usageData.credits.month = month
+        usageData.credits.monthlyUsed = 0;
+        usageData.credits.month = month;
       }
-      usageData.credits.dailyUsed += credits
-      usageData.credits.monthlyUsed += credits
-      setUsage(prev => ({
+      usageData.credits.dailyUsed += credits;
+      usageData.credits.monthlyUsed += credits;
+      setUsage((prev) => ({
         ...prev,
         credits: {
           ...prev.credits,
           dailyUsed: usageData.credits.dailyUsed,
           monthlyUsed: usageData.credits.monthlyUsed,
         },
-      }))
+      }));
     }
-    
-    localStorage.setItem('im2prompt_usage', JSON.stringify(usageData))
-  }
+
+    localStorage.setItem('im2prompt_usage', JSON.stringify(usageData));
+  };
 
   return {
     usage,
@@ -264,5 +267,5 @@ export function useQuota() {
     trackImageToText,
     trackImageGeneration,
     trackVideoGeneration,
-  }
+  };
 }

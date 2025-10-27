@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
 import { env } from '@/env';
 import { createChildLogger } from '@/lib/logger/logger';
+import { NextResponse } from 'next/server';
 
 const cronAuthLogger = createChildLogger('cron-auth');
 
@@ -17,24 +17,31 @@ export function validateCronRequest(request: Request): NextResponse | null {
   }
 
   const url = new URL(request.url);
-  const providedSecret = request.headers.get('authorization')?.replace('Bearer ', '') || url.searchParams.get('secret');
-  
+  const providedSecret =
+    request.headers.get('authorization')?.replace('Bearer ', '') || url.searchParams.get('secret');
+
   if (providedSecret !== env.CRON_SECRET) {
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
-    
-    cronAuthLogger.warn({
-      ip,
-      userAgent,
-      hasSecret: !!providedSecret,
-      endpoint: url.pathname,
-    }, 'Unauthorized cron job access attempt');
-    
-    return NextResponse.json({
-      success: false,
-      message: 'Unauthorized: Invalid or missing cron secret',
-      error: 'CRON_AUTH_FAILED',
-    }, { status: 401 });
+
+    cronAuthLogger.warn(
+      {
+        ip,
+        userAgent,
+        hasSecret: !!providedSecret,
+        endpoint: url.pathname,
+      },
+      'Unauthorized cron job access attempt'
+    );
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Unauthorized: Invalid or missing cron secret',
+        error: 'CRON_AUTH_FAILED',
+      },
+      { status: 401 }
+    );
   }
 
   return null;

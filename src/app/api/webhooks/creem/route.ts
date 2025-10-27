@@ -1,21 +1,17 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { paymentConfig } from '@/config/payment.config';
+import { env } from '@/env';
 import { creemService } from '@/lib/creem/creem-service';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
+import { type BillingInterval, formatPlanName, getCreditsForPlan } from '@/lib/creem/plan-utils';
+import { logger } from '@/lib/monitoring/logger';
 import type { CreemWebhookEvent } from '@/payment/types';
 import type { PaymentStatus } from '@/payment/types';
 import db from '@/server/db';
-import { userCredits, creditTransactions } from '@/server/db/schema';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
+import { creditTransactions, userCredits } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-import { logger } from '@/lib/monitoring/logger';
-import { env } from '@/env';
-import { paymentConfig } from '@/config/payment.config';
-import {
-  getCreditsForPlan,
-  formatPlanName,
-  type BillingInterval,
-} from '@/lib/creem/plan-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +39,7 @@ async function grantSubscriptionCredits(
   planIdentifier: string,
   subscriptionId: string,
   interval?: BillingInterval,
-  isRenewal: boolean = false
+  isRenewal = false
 ): Promise<boolean> {
   const creditInfo = getCreditsForPlan(planIdentifier, interval);
 
@@ -70,12 +66,12 @@ async function grantSubscriptionCredits(
         .from(creditTransactions)
         .where(eq(creditTransactions.referenceId, referenceId))
         .limit(1);
-      
+
       if (existingTransaction) {
         console.log(`[Creem Webhook] Credits already granted for reference ${referenceId}`);
         return false;
       }
-      
+
       const [userCredit] = await tx
         .select()
         .from(userCredits)
@@ -83,7 +79,7 @@ async function grantSubscriptionCredits(
         .limit(1);
 
       const newBalance = (userCredit?.balance || 0) + creditsToGrant;
-      
+
       if (userCredit) {
         await tx
           .update(userCredits)
@@ -122,7 +118,7 @@ async function grantSubscriptionCredits(
           isRenewal,
         }),
       });
-      
+
       return true;
     });
 
@@ -131,7 +127,7 @@ async function grantSubscriptionCredits(
         `[Creem Webhook] Granted ${creditsToGrant} credits to user ${userId} for ${normalizedPlanId} ${isRenewal ? 'renewal' : 'subscription'}`
       );
     }
-    
+
     return granted;
   } catch (error) {
     console.error('[Creem Webhook] Error granting subscription credits:', error);
@@ -164,39 +160,45 @@ async function adjustCreditsForPlanChange(
     const oldCredits = oldCreditInfo.amount;
     const newCredits = newCreditInfo.amount;
     const creditDifference = newCredits - oldCredits;
-    
+
     if (creditDifference === 0) {
-      console.log(`[Creem Webhook] No credit adjustment needed for plan change`);
+      console.log('[Creem Webhook] No credit adjustment needed for plan change');
       return;
     }
-    
+
     const referenceId = `creem_${subscriptionId}_plan_change_${Date.now()}`;
-    
+
     await db.transaction(async (tx) => {
       const [userCredit] = await tx
         .select()
         .from(userCredits)
         .where(eq(userCredits.userId, userId))
         .limit(1);
-      
+
       if (!userCredit) {
         console.error(`[Creem Webhook] User credit record not found for ${userId}`);
         return;
       }
-      
+
       const newBalance = Math.max(0, userCredit.balance + creditDifference);
       const transactionType = creditDifference > 0 ? 'earn' : 'spend';
-      
+
       await tx
         .update(userCredits)
         .set({
           balance: newBalance,
-          totalEarned: creditDifference > 0 ? userCredit.totalEarned + creditDifference : userCredit.totalEarned,
-          totalSpent: creditDifference < 0 ? userCredit.totalSpent + Math.abs(creditDifference) : userCredit.totalSpent,
+          totalEarned:
+            creditDifference > 0
+              ? userCredit.totalEarned + creditDifference
+              : userCredit.totalEarned,
+          totalSpent:
+            creditDifference < 0
+              ? userCredit.totalSpent + Math.abs(creditDifference)
+              : userCredit.totalSpent,
           updatedAt: new Date(),
         })
         .where(eq(userCredits.userId, userId));
-      
+
       await tx.insert(creditTransactions).values({
         id: uuidv4(),
         userId,
@@ -217,7 +219,7 @@ async function adjustCreditsForPlanChange(
         }),
       });
     });
-    
+
     console.log(
       `[Creem Webhook] Adjusted credits by ${creditDifference} for user ${userId} (${oldCreditInfo.planId} → ${newCreditInfo.planId})`
     );
@@ -229,12 +231,12 @@ async function adjustCreditsForPlanChange(
 export async function POST(request: NextRequest) {
   const requestId = uuidv4();
   const startTime = Date.now();
-  
+
   try {
     const origin = request.headers.get('origin');
     const forwardedFor = request.headers.get('x-forwarded-for');
     const userAgent = request.headers.get('user-agent');
-    
+
     logger.info('[Creem Webhook] Incoming request', {
       metadata: {
         requestId,
@@ -244,9 +246,10 @@ export async function POST(request: NextRequest) {
         isProduction: env.NODE_ENV === 'production',
       },
     });
-    
+
     const body = await request.text();
-    const signature = request.headers.get('x-creem-signature') || request.headers.get('creem-signature');
+    const signature =
+      request.headers.get('x-creem-signature') || request.headers.get('creem-signature');
 
     if (!signature) {
       logger.warn('[Creem Webhook] Missing signature header', {
@@ -269,14 +272,14 @@ export async function POST(request: NextRequest) {
 
     const isProcessed = await paymentRepository.isCreemEventProcessed(eventId);
     if (isProcessed) {
-      logger.info(`[Creem Webhook] Event already processed`, {
+      logger.info('[Creem Webhook] Event already processed', {
         eventType,
         metadata: { eventId, requestId },
       });
       return NextResponse.json({ received: true });
     }
 
-    logger.info(`[Creem Webhook] Processing event`, {
+    logger.info('[Creem Webhook] Processing event', {
       eventType,
       metadata: { eventId, requestId },
     });
@@ -307,27 +310,27 @@ export async function POST(request: NextRequest) {
       case 'payment_success':
         await handlePaymentSuccess(result);
         break;
-        
+
       case 'subscription_trial_will_end':
         await handleSubscriptionTrialWillEnd(result);
         break;
-        
+
       case 'subscription_trial_ended':
         await handleSubscriptionTrialEnded(result);
         break;
-        
+
       case 'subscription_paused':
         await handleSubscriptionPaused(result);
         break;
-        
+
       case 'refund_created':
         await handleRefundCreated(result);
         break;
-        
+
       case 'dispute_created':
         await handleDisputeCreated(result);
         break;
-        
+
       case 'payment_failed':
         await handlePaymentFailed(result);
         break;
@@ -342,7 +345,7 @@ export async function POST(request: NextRequest) {
       eventType,
       status: 'success',
     });
-    
+
     return NextResponse.json({ received: true });
   } catch (error) {
     const processingTime = Date.now() - startTime;
@@ -353,7 +356,7 @@ export async function POST(request: NextRequest) {
     logger.metric('creem_webhook_processing_time', processingTime, {
       status: 'error',
     });
-    
+
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 }
@@ -371,7 +374,7 @@ async function handleCheckoutComplete(data: any) {
       const existingRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
       if (!existingRecord) {
         const status: PaymentStatus = trialEnd ? 'trialing' : 'active';
-        
+
         await paymentRepository.create({
           id: subscriptionId,
           provider: 'creem',
@@ -383,19 +386,23 @@ async function handleCheckoutComplete(data: any) {
           status,
           trialEnd: trialEnd ? new Date(trialEnd) : undefined,
         });
-        
+
         // Grant credits immediately for non-trial subscriptions
         if (!trialEnd) {
           await grantSubscriptionCredits(userId, planId, subscriptionId, data.interval, false);
         } else {
-          console.log(`[Creem Webhook] Trial subscription - credits will be granted after trial ends`);
+          console.log(
+            '[Creem Webhook] Trial subscription - credits will be granted after trial ends'
+          );
         }
       } else {
         console.log(`[Creem Webhook] Subscription ${subscriptionId} already exists`);
       }
     }
 
-    console.log(`[Creem Webhook] Checkout completed for user ${userId} (${trialEnd ? 'trial' : 'active'})`);
+    console.log(
+      `[Creem Webhook] Checkout completed for user ${userId} (${trialEnd ? 'trial' : 'active'})`
+    );
   } catch (error) {
     console.error('[Creem Webhook] Error in handleCheckoutComplete:', error);
     throw error;
@@ -422,7 +429,7 @@ async function handleSubscriptionCreated(data: any) {
 
   try {
     const existingRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
-    
+
     if (!existingRecord) {
       await paymentRepository.create({
         id: subscriptionId,
@@ -443,11 +450,13 @@ async function handleSubscriptionCreated(data: any) {
       if (planId && userId && status !== 'trialing') {
         await grantSubscriptionCredits(userId, planId, subscriptionId, data.interval, false);
       } else if (status === 'trialing') {
-        console.log(`[Creem Webhook] Trial subscription created - credits will be granted after trial ends`);
+        console.log(
+          '[Creem Webhook] Trial subscription created - credits will be granted after trial ends'
+        );
       }
     } else {
       console.log(`[Creem Webhook] Subscription ${subscriptionId} already exists - updating`);
-      
+
       // Update existing record if status changed
       await paymentRepository.update(subscriptionId, {
         status: (status as PaymentStatus) || existingRecord.status,
@@ -473,12 +482,20 @@ async function handleSubscriptionCreated(data: any) {
 }
 
 async function handleSubscriptionUpdate(data: any) {
-  const { customerId, status, userId, planId, currentPeriodEnd, cancelAtPeriodEnd, subscriptionId } = data;
+  const {
+    customerId,
+    status,
+    userId,
+    planId,
+    currentPeriodEnd,
+    cancelAtPeriodEnd,
+    subscriptionId,
+  } = data;
 
   try {
     let actualUserId = userId;
     let targetSubscription = null;
-    
+
     // Try to find subscription by ID first
     if (subscriptionId) {
       targetSubscription = await paymentRepository.findBySubscriptionId(subscriptionId);
@@ -486,7 +503,7 @@ async function handleSubscriptionUpdate(data: any) {
         actualUserId = targetSubscription.userId;
       }
     }
-    
+
     // Fallback to finding by customer ID
     if (!actualUserId && customerId) {
       const subscription = await paymentRepository.findByCustomerId(customerId);
@@ -504,7 +521,9 @@ async function handleSubscriptionUpdate(data: any) {
     // If no specific subscription found, find the active one
     if (!targetSubscription) {
       const subscriptions = await paymentRepository.findByUserId(actualUserId);
-      targetSubscription = subscriptions.find((s) => s.status === 'active' || s.status === 'trialing');
+      targetSubscription = subscriptions.find(
+        (s) => s.status === 'active' || s.status === 'trialing'
+      );
     }
 
     if (targetSubscription) {
@@ -512,7 +531,7 @@ async function handleSubscriptionUpdate(data: any) {
       const newPlanId = planId || oldPlanId;
       const oldStatus = targetSubscription.status;
       const newStatus = status as PaymentStatus;
-      
+
       // Detect plan change (upgrade/downgrade)
       if (oldPlanId !== newPlanId) {
         console.log(`[Creem Webhook] Plan change detected: ${oldPlanId} → ${newPlanId}`);
@@ -524,7 +543,7 @@ async function handleSubscriptionUpdate(data: any) {
           (targetSubscription.interval || data.interval) === 'year'
         );
       }
-      
+
       // Detect status change from trialing to active (trial ended, grant credits)
       if (oldStatus === 'trialing' && newStatus === 'active') {
         console.log(`[Creem Webhook] Trial ended, granting credits for ${newPlanId}`);
@@ -536,15 +555,17 @@ async function handleSubscriptionUpdate(data: any) {
           false
         );
       }
-      
+
       await paymentRepository.update(targetSubscription.id, {
         status: newStatus,
         periodEnd: currentPeriodEnd,
         cancelAtPeriodEnd: cancelAtPeriodEnd,
         priceId: newPlanId,
       });
-      
-      console.log(`[Creem Webhook] Updated subscription ${targetSubscription.id} for user ${actualUserId} (status: ${newStatus})`);
+
+      console.log(
+        `[Creem Webhook] Updated subscription ${targetSubscription.id} for user ${actualUserId} (status: ${newStatus})`
+      );
     } else {
       console.warn(`[Creem Webhook] No active subscription found for user ${actualUserId}`);
     }
@@ -594,7 +615,7 @@ async function handlePaymentSuccess(data: any) {
       if (paymentRecord.status === 'active' && paymentRecord.userId) {
         const planId = paymentRecord.priceId;
         const isYearly = paymentRecord.interval === 'year';
-        
+
         console.log(`[Creem Webhook] Renewal payment detected for ${planId}`);
         await grantSubscriptionCredits(
           paymentRecord.userId,
@@ -604,7 +625,7 @@ async function handlePaymentSuccess(data: any) {
           true
         );
       }
-      
+
       await paymentRepository.createEvent({
         paymentId: paymentRecord.id,
         eventType: 'payment.succeeded',
@@ -622,7 +643,7 @@ async function handlePaymentSuccess(data: any) {
 
 async function handleSubscriptionTrialWillEnd(data: any) {
   const { customerId, userId, planId, trialEndDate } = data;
-  
+
   try {
     console.log(`[Creem Webhook] Trial will end soon for user ${userId}, plan ${planId}`);
     // TODO: Send email notification to user about trial ending
@@ -634,22 +655,22 @@ async function handleSubscriptionTrialWillEnd(data: any) {
 
 async function handleSubscriptionTrialEnded(data: any) {
   const { customerId, userId, subscriptionId, planId } = data;
-  
+
   try {
     if (!subscriptionId) {
       console.error('[Creem Webhook] Missing subscription ID in trial ended event');
       return;
     }
-    
+
     const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
-    
+
     if (paymentRecord) {
       // Update status from trialing to active
       await paymentRepository.update(subscriptionId, {
         status: 'active',
         trialEnd: new Date(),
       });
-      
+
       // Grant initial credits now that trial has ended and payment succeeded
       if (userId && planId) {
         console.log(`[Creem Webhook] Trial ended, granting credits for ${planId}`);
@@ -662,7 +683,7 @@ async function handleSubscriptionTrialEnded(data: any) {
         );
       }
     }
-    
+
     console.log(`[Creem Webhook] Trial ended for subscription ${subscriptionId}`);
   } catch (error) {
     console.error('[Creem Webhook] Error in handleSubscriptionTrialEnded:', error);
@@ -671,21 +692,21 @@ async function handleSubscriptionTrialEnded(data: any) {
 
 async function handleSubscriptionPaused(data: any) {
   const { subscriptionId, customerId, userId } = data;
-  
+
   try {
     if (!subscriptionId) {
       console.error('[Creem Webhook] Missing subscription ID in paused event');
       return;
     }
-    
+
     const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
-    
+
     if (paymentRecord) {
       await paymentRepository.update(subscriptionId, {
         status: 'paused',
       });
     }
-    
+
     console.log(`[Creem Webhook] Subscription paused: ${subscriptionId}`);
   } catch (error) {
     console.error('[Creem Webhook] Error in handleSubscriptionPaused:', error);
@@ -694,19 +715,21 @@ async function handleSubscriptionPaused(data: any) {
 
 async function handleRefundCreated(data: any) {
   const { customerId, subscriptionId, checkoutId, amount } = data;
-  
+
   try {
-    console.log(`[Creem Webhook] Refund created for ${subscriptionId || checkoutId}, amount: ${amount}`);
-    
+    console.log(
+      `[Creem Webhook] Refund created for ${subscriptionId || checkoutId}, amount: ${amount}`
+    );
+
     if (subscriptionId) {
       const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
-      
+
       if (paymentRecord) {
         // Mark subscription as canceled due to refund
         await paymentRepository.update(subscriptionId, {
           status: 'canceled',
         });
-        
+
         // TODO: Revoke credits if refund within X days
         console.log(`[Creem Webhook] Subscription ${subscriptionId} canceled due to refund`);
       }
@@ -718,13 +741,13 @@ async function handleRefundCreated(data: any) {
 
 async function handleDisputeCreated(data: any) {
   const { customerId, subscriptionId, amount } = data;
-  
+
   try {
     console.log(`[Creem Webhook] Dispute created for ${subscriptionId}, amount: ${amount}`);
-    
+
     if (subscriptionId) {
       const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
-      
+
       if (paymentRecord) {
         // Freeze credits until dispute is resolved
         // TODO: Implement credit freezing logic
@@ -738,22 +761,24 @@ async function handleDisputeCreated(data: any) {
 
 async function handlePaymentFailed(data: any) {
   const { customerId, subscriptionId, userId, attemptCount, amount, currency } = data;
-  
+
   try {
-    console.log(`[Creem Webhook] Payment failed for subscription ${subscriptionId}, attempt ${attemptCount}`);
-    
+    console.log(
+      `[Creem Webhook] Payment failed for subscription ${subscriptionId}, attempt ${attemptCount}`
+    );
+
     if (!subscriptionId) {
       console.error('[Creem Webhook] Missing subscription ID in payment failed event');
       return;
     }
-    
+
     const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
-    
+
     if (paymentRecord) {
       await paymentRepository.update(subscriptionId, {
         status: 'past_due',
       });
-      
+
       await paymentRepository.createEvent({
         paymentId: paymentRecord.id,
         eventType: 'invoice.payment_failed',
@@ -767,14 +792,14 @@ async function handlePaymentFailed(data: any) {
           failedAt: new Date().toISOString(),
         }),
       });
-      
+
       logger.warn('[Creem Webhook] Payment failed, subscription marked as past_due', {
         subscriptionId,
         userId: paymentRecord.userId,
         attemptCount,
         amount,
       });
-      
+
       if (attemptCount >= 3) {
         logger.error('[Creem Webhook] Multiple payment failures detected', {
           subscriptionId,

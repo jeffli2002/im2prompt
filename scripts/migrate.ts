@@ -1,8 +1,8 @@
-import { drizzle } from 'drizzle-orm/neon-http';
+import path from 'node:path';
 import { neon } from '@neondatabase/serverless';
-import { migrate } from 'drizzle-orm/neon-http/migrator';
 import { config } from 'dotenv';
-import path from 'path';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { migrate } from 'drizzle-orm/neon-http/migrator';
 
 // Load environment variables
 config({ path: path.resolve(process.cwd(), '.env.local') });
@@ -16,7 +16,7 @@ const db = drizzle(sql);
 
 async function runMigrations() {
   console.log('Starting migrations...');
-  
+
   try {
     await migrate(db, { migrationsFolder: './drizzle' });
     console.log('Migrations completed successfully!');

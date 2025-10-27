@@ -15,46 +15,29 @@ export async function DELETE(
     });
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { keyId } = await params;
 
     if (!keyId) {
-      return NextResponse.json(
-        { error: 'Key ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Key ID is required' }, { status: 400 });
     }
 
     // 删除API Key（只能删除自己的）
     const result = await db
       .delete(apiKey)
-      .where(
-        and(
-          eq(apiKey.id, keyId),
-          eq(apiKey.userId, session.user.id)
-        )
-      )
+      .where(and(eq(apiKey.id, keyId), eq(apiKey.userId, session.user.id)))
       .returning({ id: apiKey.id });
 
     if (result.length === 0) {
-      return NextResponse.json(
-        { error: 'API Key not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'API Key not found' }, { status: 404 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting API key:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -69,19 +52,13 @@ export async function GET(
     });
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { keyId } = await params;
 
     if (!keyId) {
-      return NextResponse.json(
-        { error: 'Key ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Key ID is required' }, { status: 400 });
     }
 
     const [keyData] = await db
@@ -93,26 +70,15 @@ export async function GET(
         createdAt: apiKey.createdAt,
       })
       .from(apiKey)
-      .where(
-        and(
-          eq(apiKey.id, keyId),
-          eq(apiKey.userId, session.user.id)
-        )
-      );
+      .where(and(eq(apiKey.id, keyId), eq(apiKey.userId, session.user.id)));
 
     if (!keyData) {
-      return NextResponse.json(
-        { error: 'API Key not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'API Key not found' }, { status: 404 });
     }
 
     return NextResponse.json({ apiKey: keyData });
   } catch (error) {
     console.error('Error fetching API key:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

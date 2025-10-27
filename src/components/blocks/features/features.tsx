@@ -1,25 +1,18 @@
 import { cn } from '@/lib/utils';
-import {
-  Sparkles,
-  Image,
-  Wand2,
-  Layers,
-  Globe,
-  Zap,
-  Shield,
-  Users,
-} from 'lucide-react';
+import { Globe, Image, Layers, Shield, Sparkles, Users, Wand2, Zap } from 'lucide-react';
 
 export function Features() {
   const features = [
     {
       title: 'AI Prompt Extraction',
-      description: 'Advanced AI models analyze images and extract the prompts that created them with high accuracy.',
+      description:
+        'Advanced AI models analyze images and extract the prompts that created them with high accuracy.',
       icon: <Sparkles className="h-6 w-6" />,
     },
     {
       title: 'Multiple AI Models',
-      description: 'Support for Midjourney, Stable Diffusion, FLUX, DALL-E 3, and more AI generation models.',
+      description:
+        'Support for Midjourney, Stable Diffusion, FLUX, DALL-E 3, and more AI generation models.',
       icon: <Layers className="h-6 w-6" />,
     },
     {
@@ -29,12 +22,14 @@ export function Features() {
     },
     {
       title: 'Smart Variations',
-      description: 'AI generates multiple prompt variations and negative prompts for better results.',
+      description:
+        'AI generates multiple prompt variations and negative prompts for better results.',
       icon: <Wand2 className="h-6 w-6" />,
     },
     {
       title: 'Batch Processing',
-      description: 'Upload and extract prompts from multiple images at once for efficient workflows.',
+      description:
+        'Upload and extract prompts from multiple images at once for efficient workflows.',
       icon: <Image className="h-6 w-6" />,
     },
     {
@@ -54,27 +49,29 @@ export function Features() {
     },
   ];
   return (
-    <section className="py-32 relative">
+    <section className="relative py-32">
       {/* Subtle background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/98 to-muted/20" />
-      
+
       <div className="container relative">
         {/* Enhanced section header */}
-        <div className="text-center max-w-4xl mx-auto mb-20">
-          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="mx-auto mb-20 max-w-4xl text-center">
+          <h2 className="fade-in slide-in-from-bottom-4 mb-6 animate-in font-bold text-5xl duration-700 sm:text-6xl lg:text-7xl">
             <span className="bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
               Everything You Need
             </span>
           </h2>
-          <p className="text-xl sm:text-2xl text-muted-foreground/80 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 max-w-3xl mx-auto leading-relaxed">
-            Professional tools to extract, enhance, and regenerate AI prompts at scale. 
+          <p className="fade-in slide-in-from-bottom-4 mx-auto max-w-3xl animate-in text-muted-foreground/80 text-xl leading-relaxed delay-100 duration-700 sm:text-2xl">
+            Professional tools to extract, enhance, and regenerate AI prompts at scale.
             <br className="hidden sm:block" />
-            <span className="text-muted-foreground/70">Built for creators who demand excellence.</span>
+            <span className="text-muted-foreground/70">
+              Built for creators who demand excellence.
+            </span>
           </p>
         </div>
 
         {/* Enhanced features grid - Apple-style cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           {features.map((feature, index) => (
             <Feature key={feature.title} {...feature} index={index} />
           ))}
@@ -97,27 +94,27 @@ const Feature = ({
 }) => {
   return (
     <div
-      className="group relative p-8 rounded-3xl bg-background/80 backdrop-blur-sm border border-border/50 hover:border-border hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4 hover:-translate-y-2"
+      className="group fade-in slide-in-from-bottom-4 hover:-translate-y-2 relative animate-in rounded-3xl border border-border/50 bg-background/80 p-8 backdrop-blur-sm transition-all duration-500 hover:border-border hover:shadow-2xl hover:shadow-primary/10"
       style={{
         animationDelay: `${index * 100}ms`,
         animationDuration: '700ms',
       }}
     >
       {/* Enhanced icon with gradient background */}
-      <div className="mb-6 inline-flex p-4 rounded-2xl bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 group-hover:from-primary/25 group-hover:via-primary/20 group-hover:to-primary/10 transition-all duration-300 shadow-lg group-hover:shadow-xl">
-        <div className="text-primary group-hover:scale-110 transition-transform duration-300">{icon}</div>
+      <div className="mb-6 inline-flex rounded-2xl bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 p-4 shadow-lg transition-all duration-300 group-hover:from-primary/25 group-hover:via-primary/20 group-hover:to-primary/10 group-hover:shadow-xl">
+        <div className="text-primary transition-transform duration-300 group-hover:scale-110">
+          {icon}
+        </div>
       </div>
 
       {/* Enhanced content */}
-      <h3 className="font-bold text-xl mb-3 group-hover:text-primary transition-colors">
-        {title}
-      </h3>
-      <p className="text-base text-muted-foreground/80 leading-relaxed group-hover:text-muted-foreground transition-colors">
+      <h3 className="mb-3 font-bold text-xl transition-colors group-hover:text-primary">{title}</h3>
+      <p className="text-base text-muted-foreground/80 leading-relaxed transition-colors group-hover:text-muted-foreground">
         {description}
       </p>
 
       {/* Subtle hover effect overlay */}
-      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
     </div>
   );
 };

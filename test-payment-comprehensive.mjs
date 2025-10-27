@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import postgres from 'postgres';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import postgres from 'postgres';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -72,8 +72,14 @@ info('Testing Environment Configuration');
 console.log('Database URL:', process.env.DATABASE_URL ? '✓ Set' : '✗ Not set');
 console.log('Creem API Key:', process.env.CREEM_API_KEY ? '✓ Set' : '✗ Not set');
 console.log('Creem Webhook Secret:', process.env.CREEM_WEBHOOK_SECRET ? '✓ Set' : '✗ Not set');
-console.log('Creem Pro Product Key:', process.env.CREEM_PRO_PLAN_PRODUCT_KEY ? '✓ Set' : '✗ Not set');
-console.log('Creem Pro+ Product Key:', process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY ? '✓ Set' : '✗ Not set');
+console.log(
+  'Creem Pro Product Key:',
+  process.env.CREEM_PRO_PLAN_PRODUCT_KEY ? '✓ Set' : '✗ Not set'
+);
+console.log(
+  'Creem Pro+ Product Key:',
+  process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY ? '✓ Set' : '✗ Not set'
+);
 
 async function testDatabaseSchema() {
   section('TEST 1: Database Schema Verification');
@@ -87,8 +93,14 @@ async function testDatabaseSchema() {
       ORDER BY table_name;
     `;
 
-    const requiredTables = ['payment', 'credit_transactions', 'user_credits', 'payment_event', 'user'];
-    const existingTables = tables.map(t => t.table_name);
+    const requiredTables = [
+      'payment',
+      'credit_transactions',
+      'user_credits',
+      'payment_event',
+      'user',
+    ];
+    const existingTables = tables.map((t) => t.table_name);
 
     for (const table of requiredTables) {
       const exists = existingTables.includes(table);
@@ -113,8 +125,12 @@ async function testDatabaseSchema() {
     `;
     info(`Credit transactions table has ${creditColumns.length} columns`);
 
-    const hasReferenceId = creditColumns.some(c => c.column_name === 'reference_id');
-    recordTest('credit_transactions.reference_id', hasReferenceId, hasReferenceId ? 'exists' : 'missing');
+    const hasReferenceId = creditColumns.some((c) => c.column_name === 'reference_id');
+    recordTest(
+      'credit_transactions.reference_id',
+      hasReferenceId,
+      hasReferenceId ? 'exists' : 'missing'
+    );
 
     info('Checking indexes...');
     const indexes = await sql`
@@ -125,7 +141,6 @@ async function testDatabaseSchema() {
       ORDER BY tablename, indexname;
     `;
     info(`Found ${indexes.length} indexes`);
-    
   } catch (err) {
     error(`Database schema test failed: ${err.message}`);
     recordTest('Database Schema', false, err.message);
@@ -141,10 +156,18 @@ async function testCreditCalculation() {
   };
 
   info('Verifying credit calculations...');
-  
+
   for (const [plan, credits] of Object.entries(expectedCredits)) {
-    recordTest(`${plan.toUpperCase()} Monthly Credits`, credits.monthly === expectedCredits[plan].monthly, `Expected: ${credits.monthly}`);
-    recordTest(`${plan.toUpperCase()} Yearly Credits`, credits.yearly === expectedCredits[plan].yearly, `Expected: ${credits.yearly}`);
+    recordTest(
+      `${plan.toUpperCase()} Monthly Credits`,
+      credits.monthly === expectedCredits[plan].monthly,
+      `Expected: ${credits.monthly}`
+    );
+    recordTest(
+      `${plan.toUpperCase()} Yearly Credits`,
+      credits.yearly === expectedCredits[plan].yearly,
+      `Expected: ${credits.yearly}`
+    );
   }
 }
 
@@ -173,10 +196,10 @@ async function testSubscriptionRecords() {
 
     if (activeSubscriptions.length > 0) {
       success('Active subscriptions found in database');
-      
+
       for (const sub of activeSubscriptions) {
         info(`  - User: ${sub.userId}, Plan: ${sub.plan}, Status: ${sub.status}`);
-        
+
         if (sub.trialEnd) {
           const trialEndDate = new Date(sub.trialEnd);
           const now = new Date();
@@ -205,7 +228,6 @@ async function testSubscriptionRecords() {
     for (const stat of allSubscriptions) {
       info(`  - ${stat.status}: ${stat.count}`);
     }
-
   } catch (err) {
     error(`Subscription records test failed: ${err.message}`);
     recordTest('Subscription Records', false, err.message);
@@ -259,9 +281,15 @@ async function testCreditIntegrity() {
     } else {
       error(`Found ${creditConsistency.length} inconsistent credit balances!`);
       for (const inc of creditConsistency) {
-        error(`  - User ${inc.user_id}: Balance=${inc.balance}, Earned=${inc.total_earned} (calc: ${inc.calculated_earned}), Spent=${inc.total_spent} (calc: ${inc.calculated_spent})`);
+        error(
+          `  - User ${inc.user_id}: Balance=${inc.balance}, Earned=${inc.total_earned} (calc: ${inc.calculated_earned}), Spent=${inc.total_spent} (calc: ${inc.calculated_spent})`
+        );
       }
-      recordTest('Credit Balance Consistency', false, `${creditConsistency.length} inconsistencies found`);
+      recordTest(
+        'Credit Balance Consistency',
+        false,
+        `${creditConsistency.length} inconsistencies found`
+      );
     }
 
     info('Checking for negative balances...');
@@ -279,9 +307,12 @@ async function testCreditIntegrity() {
       for (const neg of negativeBalances) {
         error(`  - User ${neg.user_id}: Balance=${neg.balance}`);
       }
-      recordTest('No Negative Balances', false, `${negativeBalances.length} negative balances found`);
+      recordTest(
+        'No Negative Balances',
+        false,
+        `${negativeBalances.length} negative balances found`
+      );
     }
-
   } catch (err) {
     error(`Credit integrity test failed: ${err.message}`);
     recordTest('Credit Integrity', false, err.message);
@@ -306,7 +337,9 @@ async function testWebhookEventTracking() {
     if (eventStats.length > 0) {
       info(`Found ${eventStats.length} different event types`);
       for (const stat of eventStats) {
-        info(`  - ${stat.event_type}: ${stat.count} events (last: ${new Date(stat.last_event).toISOString()})`);
+        info(
+          `  - ${stat.event_type}: ${stat.count} events (last: ${new Date(stat.last_event).toISOString()})`
+        );
       }
       recordTest('Webhook Events Logged', true, `${eventStats.length} event types tracked`);
     } else {
@@ -350,10 +383,11 @@ async function testWebhookEventTracking() {
     if (recentEvents.length > 0) {
       info('Recent webhook events:');
       for (const event of recentEvents) {
-        info(`  - ${event.event_type} (${new Date(event.created_at).toISOString()}) - ${event.plan || 'N/A'}`);
+        info(
+          `  - ${event.event_type} (${new Date(event.created_at).toISOString()}) - ${event.plan || 'N/A'}`
+        );
       }
     }
-
   } catch (err) {
     error(`Webhook event tracking test failed: ${err.message}`);
     recordTest('Webhook Event Tracking', false, err.message);
@@ -385,22 +419,28 @@ async function testTrialSubscriptions() {
 
     if (trialSubs.length > 0) {
       info(`Found ${trialSubs.length} active trial subscriptions`);
-      
+
       let correctTrialHandling = true;
       for (const trial of trialSubs) {
         const trialEndDate = new Date(trial.trial_end);
         const now = new Date();
         const daysLeft = Math.ceil((trialEndDate - now) / (1000 * 60 * 60 * 24));
-        
-        info(`  - User: ${trial.user_id}, Plan: ${trial.plan}, Days left: ${daysLeft}, Credits granted: ${trial.credit_grants}`);
-        
+
+        info(
+          `  - User: ${trial.user_id}, Plan: ${trial.plan}, Days left: ${daysLeft}, Credits granted: ${trial.credit_grants}`
+        );
+
         if (trial.credit_grants > 0) {
           error(`    ERROR: Credits granted during trial! Should be 0, got ${trial.credit_grants}`);
           correctTrialHandling = false;
         }
       }
 
-      recordTest('Trial Credits Not Granted', correctTrialHandling, correctTrialHandling ? 'No credits granted during trial' : 'Some trials have credits!');
+      recordTest(
+        'Trial Credits Not Granted',
+        correctTrialHandling,
+        correctTrialHandling ? 'No credits granted during trial' : 'Some trials have credits!'
+      );
     } else {
       info('No active trial subscriptions found');
       recordTest('Trial Subscriptions', true, 'No active trials (may be expected)');
@@ -425,7 +465,7 @@ async function testTrialSubscriptions() {
 
     if (completedTrials.length > 0) {
       info(`Found ${completedTrials.length} completed trials (now active)`);
-      
+
       for (const trial of completedTrials) {
         const creditGrant = await sql`
           SELECT COUNT(*) as count, SUM(amount) as total
@@ -434,18 +474,21 @@ async function testTrialSubscriptions() {
             AND source = 'subscription'
             AND created_at >= ${trial.trial_end};
         `;
-        
+
         const expectedCredits = trial.plan === 'pro' ? 500 : 900;
-        const actualCredits = parseInt(creditGrant[0]?.total || 0);
-        
+        const actualCredits = Number.parseInt(creditGrant[0]?.total || 0);
+
         if (actualCredits >= expectedCredits) {
-          success(`  - User ${trial.user_id} (${trial.plan}): Received ${actualCredits} credits after trial`);
+          success(
+            `  - User ${trial.user_id} (${trial.plan}): Received ${actualCredits} credits after trial`
+          );
         } else {
-          warning(`  - User ${trial.user_id} (${trial.plan}): Only ${actualCredits} credits (expected ${expectedCredits})`);
+          warning(
+            `  - User ${trial.user_id} (${trial.plan}): Only ${actualCredits} credits (expected ${expectedCredits})`
+          );
         }
       }
     }
-
   } catch (err) {
     error(`Trial subscription test failed: ${err.message}`);
     recordTest('Trial Subscriptions', false, err.message);
@@ -457,7 +500,7 @@ async function testSubscriptionRenewals() {
 
   try {
     info('Analyzing subscription renewals...');
-    
+
     const renewalPattern = await sql`
       SELECT 
         ct.user_id,
@@ -474,12 +517,18 @@ async function testSubscriptionRenewals() {
 
     if (renewalPattern.length > 0) {
       info(`Found ${renewalPattern.length} users with renewals`);
-      
+
       for (const renewal of renewalPattern) {
-        info(`  - User ${renewal.user_id}: ${renewal.renewal_count} renewals, ${renewal.total_renewal_credits} total credits`);
+        info(
+          `  - User ${renewal.user_id}: ${renewal.renewal_count} renewals, ${renewal.total_renewal_credits} total credits`
+        );
       }
-      
-      recordTest('Subscription Renewals Tracked', true, `${renewalPattern.length} users with renewals`);
+
+      recordTest(
+        'Subscription Renewals Tracked',
+        true,
+        `${renewalPattern.length} users with renewals`
+      );
     } else {
       info('No renewal transactions found (subscriptions may be too new)');
       recordTest('Subscription Renewals', true, 'No renewals yet (expected for new system)');
@@ -505,7 +554,6 @@ async function testSubscriptionRenewals() {
         info(`  - User ${grant.user_id}: ${grant.grant_count} grants`);
       }
     }
-
   } catch (err) {
     error(`Subscription renewal test failed: ${err.message}`);
     recordTest('Subscription Renewals', false, err.message);
@@ -536,25 +584,26 @@ async function testCancelledSubscriptions() {
 
     if (cancelledSubs.length > 0) {
       info(`Found ${cancelledSubs.length} cancelled subscriptions`);
-      
+
       for (const sub of cancelledSubs) {
         const periodEnd = new Date(sub.period_end);
         const now = new Date();
         const hasEnded = periodEnd < now;
-        
-        info(`  - User ${sub.user_id} (${sub.plan}): ${hasEnded ? 'Period ended' : 'Active until period end'}, Credits: ${sub.current_credits}`);
-        
+
+        info(
+          `  - User ${sub.user_id} (${sub.plan}): ${hasEnded ? 'Period ended' : 'Active until period end'}, Credits: ${sub.current_credits}`
+        );
+
         if (sub.cancel_at_period_end) {
           info(`    Will cancel at period end: ${periodEnd.toISOString()}`);
         }
       }
-      
+
       recordTest('Cancelled Subscriptions', true, `${cancelledSubs.length} found`);
     } else {
       info('No cancelled subscriptions found');
       recordTest('Cancelled Subscriptions', true, 'No cancellations (expected for new system)');
     }
-
   } catch (err) {
     error(`Cancelled subscription test failed: ${err.message}`);
     recordTest('Cancelled Subscriptions', false, err.message);
@@ -608,12 +657,19 @@ async function testDataIntegrity() {
     `;
 
     if (missingCredits.length === 0) {
-      recordTest('All Active Subscriptions Have Credits', true, 'Credit records exist for all active subs');
+      recordTest(
+        'All Active Subscriptions Have Credits',
+        true,
+        'Credit records exist for all active subs'
+      );
     } else {
       warning(`Found ${missingCredits.length} active subscriptions without credit records`);
-      recordTest('All Active Subscriptions Have Credits', false, `${missingCredits.length} missing credit records`);
+      recordTest(
+        'All Active Subscriptions Have Credits',
+        false,
+        `${missingCredits.length} missing credit records`
+      );
     }
-
   } catch (err) {
     error(`Data integrity test failed: ${err.message}`);
     recordTest('Data Integrity', false, err.message);
@@ -676,7 +732,7 @@ async function runAllTests() {
     await testSubscriptionRenewals();
     await testCancelledSubscriptions();
     await testDataIntegrity();
-    
+
     await generateSummaryReport();
   } catch (err) {
     error(`Test suite failed: ${err.message}`);

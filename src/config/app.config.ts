@@ -1,4 +1,4 @@
-import type { AppConfig } from "@/types";
+import type { AppConfig } from '@/types';
 
 export const appConfig: AppConfig = {
   // Application basic information
@@ -16,8 +16,18 @@ export const appConfig: AppConfig = {
       default: 'im2Prompt - AI Image to Prompt Extraction',
       template: '%s | im2Prompt',
     },
-    description: 'Extract AI prompts from images, refine them, and generate new visuals. Support for Midjourney, Stable Diffusion, and FLUX. Start free today!',
-    keywords: ['AI', 'Image to Prompt', 'Midjourney', 'Stable Diffusion', 'FLUX', 'AI Art', 'Prompt Engineering', 'Creative AI'],
+    description:
+      'Extract AI prompts from images, refine them, and generate new visuals. Support for Midjourney, Stable Diffusion, and FLUX. Start free today!',
+    keywords: [
+      'AI',
+      'Image to Prompt',
+      'Midjourney',
+      'Stable Diffusion',
+      'FLUX',
+      'AI Art',
+      'Prompt Engineering',
+      'Creative AI',
+    ],
     authors: [{ name: 'im2Prompt Team' }],
     creator: 'im2Prompt Team',
     robots: {
@@ -38,13 +48,16 @@ export const appConfig: AppConfig = {
 
   // Administrator configuration
   admin: {
-    emails: process.env.ADMIN_EMAILS?.split(',').map(email => email.trim()).filter(Boolean) || [],
+    emails:
+      process.env.ADMIN_EMAILS?.split(',')
+        .map((email) => email.trim())
+        .filter(Boolean) || [],
   },
 
   // File upload configuration
   upload: {
     maxFileSize: 10 * 1024 * 1024, // 10MB
-    allowedTypes: ['image/jpeg', 'image/png','image/gif'], // 支持JPEG,PNG和GIF格式
+    allowedTypes: ['image/jpeg', 'image/png', 'image/gif'], // 支持JPEG,PNG和GIF格式
     maxFiles: 5,
   },
 
@@ -53,4 +66,4 @@ export const appConfig: AppConfig = {
     defaultPageSize: 10,
     maxPageSize: 100,
   },
-}; 
+};

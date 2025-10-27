@@ -18,7 +18,13 @@ export interface PromptExample {
   imageUrl: string;
   cloudinaryPublicId: string;
   tags: string[];
-  model?: 'nano-banana' | 'flux-1.1-pro' | 'flux-1.1-ultra' | 'stable-diffusion' | 'dall-e' | 'sora';
+  model?:
+    | 'nano-banana'
+    | 'flux-1.1-pro'
+    | 'flux-1.1-ultra'
+    | 'stable-diffusion'
+    | 'dall-e'
+    | 'sora';
   featured?: boolean;
   order: number;
   metadata?: {

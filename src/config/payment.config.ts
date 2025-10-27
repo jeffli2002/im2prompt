@@ -3,9 +3,9 @@ import type { PaymentConfig } from '@/types';
 
 export const paymentConfig: PaymentConfig = {
   provider: 'stripe',
-  
+
   currency: 'usd',
-  
+
   stripe: {
     secretKey: process.env.STRIPE_SECRET_KEY || '',
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
@@ -133,7 +133,8 @@ export const paymentConfig: PaymentConfig = {
   },
 
   invoice: {
-    footer: 'Thank you for your business! If you have any questions, please contact our support team.',
+    footer:
+      'Thank you for your business! If you have any questions, please contact our support team.',
     logo: '/images/logo3.png',
     supportEmail: 'support@im2prompt.com',
   },

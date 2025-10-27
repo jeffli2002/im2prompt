@@ -11,7 +11,7 @@ interface VideoResult {
 
 interface VideoState {
   videos: Record<string, VideoResult>;
-  
+
   setVideo: (taskId: string, result: Omit<VideoResult, 'timestamp'>) => void;
   getVideo: (taskId: string) => VideoResult | null;
   clearVideo: (taskId: string) => void;
@@ -23,7 +23,7 @@ export const useVideoStore = create<VideoState>()(
   persist(
     (set, get): VideoState => ({
       videos: {},
-      
+
       setVideo: (taskId, result) => {
         set((state) => ({
           videos: {
@@ -36,27 +36,27 @@ export const useVideoStore = create<VideoState>()(
           },
         }));
       },
-      
+
       getVideo: (taskId) => {
         return get().videos[taskId] || null;
       },
-      
+
       clearVideo: (taskId) => {
         set((state) => {
           const { [taskId]: _, ...rest } = state.videos;
           return { videos: rest };
         });
       },
-      
+
       clearAll: () => {
         set({ videos: {} });
       },
-      
+
       getLatestVideo: () => {
         const videos = Object.values(get().videos);
         if (videos.length === 0) return null;
-        
-        return videos.reduce((latest, current) => 
+
+        return videos.reduce((latest, current) =>
           current.timestamp > latest.timestamp ? current : latest
         );
       },

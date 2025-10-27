@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import SoraVideoGenerator from '@/components/sora-video-generator'
+import SoraVideoGenerator from '@/components/sora-video-generator';
 
 export default function TextToVideoPage() {
   return (
@@ -15,5 +15,5 @@ export default function TextToVideoPage() {
       {/* Video Generator Component */}
       <SoraVideoGenerator />
     </div>
-  )
+  );
 }

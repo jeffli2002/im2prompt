@@ -1,18 +1,18 @@
 'use server';
 
+import { env } from '@/env';
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 import { creemService } from '@/lib/creem/creem-service';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import type { ActionResult } from '@/payment/types';
 import { logger } from '@/lib/monitoring/logger';
-import { env } from '@/env';
+import type { ActionResult } from '@/payment/types';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
 
 export async function generateCustomerPortalLink(
   returnUrl?: string
 ): Promise<ActionResult<{ url: string }>> {
   try {
     const session = await getSessionWithAuthBypass();
-    
+
     if (!session?.user?.id) {
       logger.warn('[Customer Portal] Unauthorized portal access attempt');
       return {
@@ -22,14 +22,15 @@ export async function generateCustomerPortalLink(
     }
 
     const subscription = await paymentRepository.findActiveSubscriptionByUserId(session.user.id);
-    
+
     if (!subscription) {
       logger.warn('[Customer Portal] No active subscription found', {
         userId: session.user.id,
       });
       return {
         success: false,
-        error: 'No active subscription found. You must have an active subscription to access the customer portal.',
+        error:
+          'No active subscription found. You must have an active subscription to access the customer portal.',
       };
     }
 

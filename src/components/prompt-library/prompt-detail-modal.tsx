@@ -1,19 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { useTranslations } from 'next-intl';
-import { X, Copy, Check, ExternalLink } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import type { PromptExample } from '@/types/prompt-library';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { getPromptImageUrl } from '@/lib/prompt-library/image-utils';
+import type { PromptExample } from '@/types/prompt-library';
+import { Check, Copy, ExternalLink, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface PromptDetailModalProps {
   prompt: PromptExample | null;
@@ -35,11 +30,9 @@ export function PromptDetailModal({ prompt, isOpen, onClose }: PromptDetailModal
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold pr-8">
-            {prompt.title}
-          </DialogTitle>
+          <DialogTitle className="pr-8 font-bold text-2xl">{prompt.title}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -54,7 +47,7 @@ export function PromptDetailModal({ prompt, isOpen, onClose }: PromptDetailModal
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {prompt.tags.map(tag => (
+            {prompt.tags.map((tag) => (
               <Badge key={tag} variant="secondary">
                 {tag}
               </Badge>
@@ -68,11 +61,11 @@ export function PromptDetailModal({ prompt, isOpen, onClose }: PromptDetailModal
 
           <div className="space-y-4">
             <div>
-              <h3 className="font-semibold text-sm text-gray-600 dark:text-gray-400 mb-2">
+              <h3 className="mb-2 font-semibold text-gray-600 text-sm dark:text-gray-400">
                 Prompt
               </h3>
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
+                <p className="whitespace-pre-wrap text-gray-800 text-sm leading-relaxed dark:text-gray-200">
                   {prompt.prompt}
                 </p>
               </div>
@@ -80,11 +73,11 @@ export function PromptDetailModal({ prompt, isOpen, onClose }: PromptDetailModal
 
             {prompt.negativePrompt && (
               <div>
-                <h3 className="font-semibold text-sm text-gray-600 dark:text-gray-400 mb-2">
+                <h3 className="mb-2 font-semibold text-gray-600 text-sm dark:text-gray-400">
                   Negative Prompt
                 </h3>
-                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                  <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
+                  <p className="text-gray-800 text-sm leading-relaxed dark:text-gray-200">
                     {prompt.negativePrompt}
                   </p>
                 </div>
@@ -92,22 +85,24 @@ export function PromptDetailModal({ prompt, isOpen, onClose }: PromptDetailModal
             )}
 
             {prompt.metadata && (
-              <div className="grid grid-cols-3 gap-4 p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+              <div className="grid grid-cols-3 gap-4 rounded-lg bg-blue-50 p-4 dark:bg-blue-950/30">
                 {prompt.metadata.style && (
                   <div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Style</div>
+                    <div className="mb-1 text-gray-600 text-xs dark:text-gray-400">Style</div>
                     <div className="font-medium text-sm">{prompt.metadata.style}</div>
                   </div>
                 )}
                 {prompt.metadata.aspectRatio && (
                   <div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Aspect Ratio</div>
+                    <div className="mb-1 text-gray-600 text-xs dark:text-gray-400">
+                      Aspect Ratio
+                    </div>
                     <div className="font-medium text-sm">{prompt.metadata.aspectRatio}</div>
                   </div>
                 )}
                 {prompt.metadata.quality && (
                   <div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Quality</div>
+                    <div className="mb-1 text-gray-600 text-xs dark:text-gray-400">Quality</div>
                     <div className="font-medium text-sm">{prompt.metadata.quality}</div>
                   </div>
                 )}
@@ -122,12 +117,12 @@ export function PromptDetailModal({ prompt, isOpen, onClose }: PromptDetailModal
             >
               {copied ? (
                 <>
-                  <Check className="w-4 h-4 mr-2" />
+                  <Check className="mr-2 h-4 w-4" />
                   {t('actions.copied')}
                 </>
               ) : (
                 <>
-                  <Copy className="w-4 h-4 mr-2" />
+                  <Copy className="mr-2 h-4 w-4" />
                   {t('actions.copyPrompt')}
                 </>
               )}

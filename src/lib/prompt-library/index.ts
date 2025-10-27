@@ -1,23 +1,21 @@
-import { PromptCategory, type PromptExample, type PromptLibraryFilters } from '@/types/prompt-library';
-import { PROMPT_EXAMPLES, CATEGORY_METADATA } from '@/config/prompt-library.config';
+import { CATEGORY_METADATA, PROMPT_EXAMPLES } from '@/config/prompt-library.config';
+import type { PromptCategory, PromptExample, PromptLibraryFilters } from '@/types/prompt-library';
 import { getPromptImageUrl } from './image-utils';
 
 export function getPromptsByCategory(category: PromptCategory): PromptExample[] {
-  return PROMPT_EXAMPLES
-    .filter(prompt => prompt.category === category)
+  return PROMPT_EXAMPLES.filter((prompt) => prompt.category === category)
     .sort((a, b) => a.order - b.order)
-    .map(prompt => ({
+    .map((prompt) => ({
       ...prompt,
       imageUrl: getPromptImageUrl(prompt.cloudinaryPublicId, 'card'),
     }));
 }
 
-export function getFeaturedPrompts(limit: number = 6): PromptExample[] {
-  return PROMPT_EXAMPLES
-    .filter(prompt => prompt.featured)
+export function getFeaturedPrompts(limit = 6): PromptExample[] {
+  return PROMPT_EXAMPLES.filter((prompt) => prompt.featured)
     .sort((a, b) => a.order - b.order)
     .slice(0, limit)
-    .map(prompt => ({
+    .map((prompt) => ({
       ...prompt,
       imageUrl: getPromptImageUrl(prompt.cloudinaryPublicId, 'card'),
     }));
@@ -27,33 +25,31 @@ export function getAllPrompts(filters?: PromptLibraryFilters): PromptExample[] {
   let prompts = [...PROMPT_EXAMPLES];
 
   if (filters?.category && filters.category !== 'all') {
-    prompts = prompts.filter(p => p.category === filters.category);
+    prompts = prompts.filter((p) => p.category === filters.category);
   }
 
   if (filters?.model) {
-    prompts = prompts.filter(p => p.model === filters.model);
+    prompts = prompts.filter((p) => p.model === filters.model);
   }
 
   if (filters?.tags && filters.tags.length > 0) {
-    prompts = prompts.filter(p => 
-      filters.tags!.some(tag => p.tags.includes(tag))
-    );
+    prompts = prompts.filter((p) => filters.tags?.some((tag) => p.tags.includes(tag)));
   }
 
   if (filters?.featured !== undefined) {
-    prompts = prompts.filter(p => p.featured === filters.featured);
+    prompts = prompts.filter((p) => p.featured === filters.featured);
   }
 
   return prompts
     .sort((a, b) => a.order - b.order)
-    .map(prompt => ({
+    .map((prompt) => ({
       ...prompt,
       imageUrl: getPromptImageUrl(prompt.cloudinaryPublicId, 'card'),
     }));
 }
 
 export function getPromptById(id: string): PromptExample | undefined {
-  const prompt = PROMPT_EXAMPLES.find(p => p.id === id);
+  const prompt = PROMPT_EXAMPLES.find((p) => p.id === id);
   if (!prompt) return undefined;
 
   return {
@@ -63,7 +59,7 @@ export function getPromptById(id: string): PromptExample | undefined {
 }
 
 export function getCategoryMetadata(category: PromptCategory) {
-  return CATEGORY_METADATA.find(c => c.id === category);
+  return CATEGORY_METADATA.find((c) => c.id === category);
 }
 
 export function getAllCategories() {
@@ -71,13 +67,13 @@ export function getAllCategories() {
 }
 
 export function getPromptCountByCategory(category: PromptCategory): number {
-  return PROMPT_EXAMPLES.filter(p => p.category === category).length;
+  return PROMPT_EXAMPLES.filter((p) => p.category === category).length;
 }
 
 export function getAllTags(): string[] {
   const tags = new Set<string>();
-  PROMPT_EXAMPLES.forEach(prompt => {
-    prompt.tags.forEach(tag => tags.add(tag));
+  PROMPT_EXAMPLES.forEach((prompt) => {
+    prompt.tags.forEach((tag) => tags.add(tag));
   });
   return Array.from(tags).sort();
 }

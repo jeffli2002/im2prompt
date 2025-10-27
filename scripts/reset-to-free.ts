@@ -7,21 +7,21 @@
  *   pnpm tsx scripts/reset-to-free.ts --email 994235892@qq.com
  */
 
-import { config } from 'dotenv';
-import { resolve, dirname } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { config } from 'dotenv';
 import { desc, eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/neon-http';
 import { v4 as uuidv4 } from 'uuid';
 
 import { createChildLogger } from '../src/lib/logger/logger';
 import {
-  user,
+  creditTransactions,
   payment,
   paymentEvent,
+  user,
   userCredits,
-  creditTransactions,
 } from '../src/server/db/schema';
 
 const __filename = fileURLToPath(import.meta.url);

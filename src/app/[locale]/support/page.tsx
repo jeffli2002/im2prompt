@@ -1,7 +1,7 @@
+import { SupportPage } from '@/components/support/support-page';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
-import { SupportPage } from '@/components/support/support-page';
 
 interface SupportPageProps {
   params: Promise<{ locale: string }>;
@@ -10,7 +10,7 @@ interface SupportPageProps {
 export async function generateMetadata({ params }: SupportPageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'support' });
-  
+
   return {
     title: `${t('title')} | im2Prompt - Customer Support`,
     description: t('subtitle'),

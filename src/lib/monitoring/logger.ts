@@ -23,7 +23,7 @@ export enum LogLevel {
 class ProductionLogger {
   private isProduction = env.NODE_ENV === 'production';
   private appUrl = env.NEXT_PUBLIC_APP_URL || '';
-  
+
   error(message: string, context: LogContext = {}) {
     const timestamp = new Date().toISOString();
     const logData = {
@@ -31,21 +31,24 @@ class ProductionLogger {
       message,
       timestamp,
       ...context,
-      error: context.error instanceof Error ? {
-        message: context.error.message,
-        stack: context.error.stack,
-      } : context.error,
+      error:
+        context.error instanceof Error
+          ? {
+              message: context.error.message,
+              stack: context.error.stack,
+            }
+          : context.error,
     };
-    
+
     console.error(`[ERROR] ${message}`, logData);
-    
+
     if (this.isProduction && this.shouldAlert(LogLevel.ERROR)) {
-      this.sendAlert(message, logData).catch(err => {
+      this.sendAlert(message, logData).catch((err) => {
         console.error('Failed to send error alert:', err);
       });
     }
   }
-  
+
   warn(message: string, context: LogContext = {}) {
     const timestamp = new Date().toISOString();
     const logData = {
@@ -54,16 +57,16 @@ class ProductionLogger {
       timestamp,
       ...context,
     };
-    
+
     console.warn(`[WARN] ${message}`, logData);
-    
+
     if (this.isProduction && this.shouldAlert(LogLevel.WARN)) {
-      this.sendAlert(message, logData).catch(err => {
+      this.sendAlert(message, logData).catch((err) => {
         console.error('Failed to send warning alert:', err);
       });
     }
   }
-  
+
   info(message: string, context: LogContext = {}) {
     const timestamp = new Date().toISOString();
     const logData = {
@@ -72,62 +75,66 @@ class ProductionLogger {
       timestamp,
       ...context,
     };
-    
+
     console.log(`[INFO] ${message}`, logData);
   }
-  
+
   debug(message: string, context: LogContext = {}) {
     if (!this.isProduction) {
       const timestamp = new Date().toISOString();
       console.log(`[DEBUG] ${message}`, { timestamp, ...context });
     }
   }
-  
+
   metric(name: string, value: number, tags: Record<string, string> = {}) {
-    this.info(`[METRIC] ${name}`, { 
-      metric: name, 
-      value, 
+    this.info(`[METRIC] ${name}`, {
+      metric: name,
+      value,
       tags,
     });
-    
+
     if (this.isProduction) {
       // TODO: Send to metrics service (Datadog, CloudWatch, etc.)
     }
   }
-  
+
   private shouldAlert(level: LogLevel): boolean {
     return level === LogLevel.ERROR;
   }
-  
+
   private async sendAlert(message: string, context: any) {
     const slackWebhook = process.env.SLACK_WEBHOOK_URL;
-    
+
     if (!slackWebhook) {
       return;
     }
-    
+
     try {
       const emoji = context.level === LogLevel.ERROR ? '🚨' : '⚠️';
       const color = context.level === LogLevel.ERROR ? 'danger' : 'warning';
-      
+
       const fields: any[] = [
-        { title: 'Environment', value: this.isProduction ? 'Production' : 'Development', short: true },
+        {
+          title: 'Environment',
+          value: this.isProduction ? 'Production' : 'Development',
+          short: true,
+        },
         { title: 'App URL', value: this.appUrl, short: true },
         { title: 'Timestamp', value: context.timestamp, short: true },
       ];
-      
+
       if (context.userId) {
         fields.push({ title: 'User ID', value: context.userId, short: true });
       }
-      
+
       if (context.subscriptionId) {
         fields.push({ title: 'Subscription ID', value: context.subscriptionId, short: true });
       }
-      
+
       if (context.eventType) {
         fields.push({ title: 'Event Type', value: context.eventType, short: true });
       }
-      
+
       if (context.error) {
         fields.push({
           title: 'Error Details',
@@ -135,18 +142,20 @@ class ProductionLogger {
           short: false,
         });
       }
-      
+
       await fetch(slackWebhook, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: `${emoji} ${context.level.toUpperCase()}: ${message}`,
-          attachments: [{
-            color,
-            fields,
-            footer: 'Payment System Monitor',
-            ts: Math.floor(Date.now() / 1000).toString(),
-          }],
+          attachments: [
+            {
+              color,
+              fields,
+              footer: 'Payment System Monitor',
+              ts: Math.floor(Date.now() / 1000).toString(),
+            },
+          ],
         }),
       });
     } catch (error) {

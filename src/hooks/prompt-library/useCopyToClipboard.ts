@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 export function useCopyToClipboard() {
   const [copied, setCopied] = useState(false);
@@ -11,7 +11,7 @@ export function useCopyToClipboard() {
       setCopied(true);
 
       setTimeout(() => setCopied(false), 2000);
-      
+
       return true;
     } catch (error) {
       console.error('Copy failed:', error);

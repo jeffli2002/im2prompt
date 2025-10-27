@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
-import { CreemProvider } from '@/payment/creem/provider';
-import { isCreemConfigured } from '@/payment/creem/client';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { isCreemConfigured } from '@/payment/creem/client';
+import { CreemProvider } from '@/payment/creem/provider';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const errorLogger = new ErrorLogger('creem-checkout');
@@ -17,19 +17,13 @@ const checkoutSchema = z.object({
 export async function POST(request: Request) {
   try {
     if (!isCreemConfigured) {
-      return NextResponse.json(
-        { error: 'Creem is not configured' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Creem is not configured' }, { status: 503 });
     }
 
     const session = await getSessionWithAuthBypass();
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -62,9 +56,6 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json(
-      { error: 'Failed to create checkout session' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

@@ -1,25 +1,28 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { getModelCost } from '@/config/credits.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits/credit-service';
-import { getModelCost } from '@/config/credits.config';
 import { quotaService } from '@/lib/usage/quota-service';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
     const session = await auth.api.getSession({
       headers: request.headers,
     });
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
+
     const userId = session.user.id;
-    
-    const { mode, prompt, image_url, aspect_ratio = 'landscape', quality = 'standard' } = await request.json();
+
+    const {
+      mode,
+      prompt,
+      image_url,
+      aspect_ratio = 'landscape',
+      quality = 'standard',
+    } = await request.json();
 
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json(
@@ -27,25 +30,27 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     if (mode === 'image-to-video' && !image_url) {
       return NextResponse.json(
         { error: 'Image URL is required for image-to-video mode' },
         { status: 400 }
       );
     }
-    
+
     const creditCost = getModelCost('videoGeneration', 'sora-2');
-    
+
     const quotaCheck = await quotaService.checkVideoGenerationQuota(userId);
-    let shouldChargeCredits = quotaCheck.shouldChargeCredits;
-    
+    const shouldChargeCredits = quotaCheck.shouldChargeCredits;
+
     if (shouldChargeCredits) {
       const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
       if (!hasCredits) {
         const limitType = quotaCheck.quotaRemaining === 0 ? 'daily' : 'monthly';
         return NextResponse.json(
-          { error: `Insufficient credits. You have used your ${limitType} free quota (1/day, 3/month).` },
+          {
+            error: `Insufficient credits. You have used your ${limitType} free quota (1/day, 3/month).`,
+          },
           { status: 402 }
         );
       }
@@ -68,26 +73,28 @@ export async function POST(request: NextRequest) {
 
     const kieApiKey = process.env.KIE_API_KEY;
     if (!kieApiKey) {
-      return NextResponse.json(
-        { error: 'KIE API key not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'KIE API key not configured' }, { status: 500 });
     }
 
     if (mode === 'image-to-video') {
       const imageResponse = await fetch(image_url);
       const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-      
+
       try {
         const { checkForPeopleAndFaces } = await import('@/lib/google-vision');
         const visionCheck = await checkForPeopleAndFaces(imageBuffer);
-        
+
         if (!visionCheck.success) {
-          console.warn('Vision API check failed, proceeding without face detection:', visionCheck.error);
+          console.warn(
+            'Vision API check failed, proceeding without face detection:',
+            visionCheck.error
+          );
         } else if (visionCheck.blocked) {
           return NextResponse.json(
-            { 
-              error: visionCheck.reason || 'Image contains people or faces. Please use an image without people (landscapes, objects, scenes, etc.)',
+            {
+              error:
+                visionCheck.reason ||
+                'Image contains people or faces. Please use an image without people (landscapes, objects, scenes, etc.)',
               details: visionCheck.details,
             },
             { status: 400 }
@@ -101,32 +108,36 @@ export async function POST(request: NextRequest) {
     const response = await fetch('https://api.kie.ai/api/v1/jobs/createTask', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${kieApiKey}`,
+        Authorization: `Bearer ${kieApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model: mode === 'image-to-video' ? 'sora-2-image-to-video' : 'sora-2-text-to-video',
-        input: mode === 'image-to-video' 
-          ? {
-              prompt,
-              image_urls: [image_url],
-              aspect_ratio,
-              quality,
-            }
-          : {
-              prompt,
-              aspect_ratio,
-              quality,
-            },
+        input:
+          mode === 'image-to-video'
+            ? {
+                prompt,
+                image_urls: [image_url],
+                aspect_ratio,
+                quality,
+              }
+            : {
+                prompt,
+                aspect_ratio,
+                quality,
+              },
       }),
     });
 
     const responseText = await response.text();
-    
+
     if (!responseText || responseText.trim() === '') {
       console.error('Empty response from KIE API');
       return NextResponse.json(
-        { error: 'Empty response from video generation service. The service may be experiencing issues. Please try again.' },
+        {
+          error:
+            'Empty response from video generation service. The service may be experiencing issues. Please try again.',
+        },
         { status: 500 }
       );
     }
@@ -152,7 +163,10 @@ export async function POST(request: NextRequest) {
       console.error('Failed to parse response. Response text:', responseText);
       console.error('Parse error:', error);
       return NextResponse.json(
-        { error: 'Invalid response from video generation service. The service may be experiencing issues. Please try again.' },
+        {
+          error:
+            'Invalid response from video generation service. The service may be experiencing issues. Please try again.',
+        },
         { status: 500 }
       );
     }
@@ -163,16 +177,22 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     await quotaService.incrementVideoGenerationUsage(userId);
-    
+
     if (shouldChargeCredits) {
       await creditService.spendCredits({
         userId,
         amount: creditCost,
         source: 'api_call',
         description: 'Video generation with Sora 2',
-        metadata: { feature: 'video-generation', model: 'sora-2', prompt: prompt.substring(0, 100), taskId: data.data.taskId, usedFreeQuota: !shouldChargeCredits },
+        metadata: {
+          feature: 'video-generation',
+          model: 'sora-2',
+          prompt: prompt.substring(0, 100),
+          taskId: data.data.taskId,
+          usedFreeQuota: !shouldChargeCredits,
+        },
       });
     }
 
@@ -185,10 +205,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error creating video generation task:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred while creating the video generation task. Please try again.';
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : 'An unexpected error occurred while creating the video generation task. Please try again.';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

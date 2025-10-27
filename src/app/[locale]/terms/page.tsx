@@ -1,27 +1,27 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { setRequestLocale } from 'next-intl/server';
 import { paymentConfig } from '@/config';
-import { 
-  ArrowLeft, 
-  FileText, 
-  Shield, 
-  Users, 
-  AlertTriangle, 
-  RefreshCw, 
-  Mail, 
-  Scale, 
-  CreditCard, 
-  Server, 
-  Ban, 
-  AlertCircle, 
-  FileWarning,
+import {
+  AlertCircle,
+  AlertTriangle,
+  ArrowLeft,
+  Ban,
   CheckCircle2,
+  CreditCard,
+  FileText,
+  FileWarning,
   Globe,
-  MapPin
+  Mail,
+  MapPin,
+  RefreshCw,
+  Scale,
+  Server,
+  Shield,
+  Users,
 } from 'lucide-react';
-import Link from 'next/link';
 import type { Metadata } from 'next';
+import { setRequestLocale } from 'next-intl/server';
+import Link from 'next/link';
 
 interface TermsPageProps {
   params: Promise<{ locale: string }>;
@@ -29,7 +29,8 @@ interface TermsPageProps {
 
 export const metadata: Metadata = {
   title: 'Terms of Service - im2Prompt',
-  description: 'Terms of service for im2Prompt AI platform. Read our terms and conditions for using our AI-powered prompt generation and image/video creation services.',
+  description:
+    'Terms of service for im2Prompt AI platform. Read our terms and conditions for using our AI-powered prompt generation and image/video creation services.',
   keywords: [
     'terms of service',
     'terms and conditions',
@@ -38,17 +39,19 @@ export const metadata: Metadata = {
     'service agreement',
     'usage terms',
     'sora 2 terms',
-    'ai service terms'
+    'ai service terms',
   ],
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 export default async function TermsPage({ params }: TermsPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return (
-    <TermsPageContent />
-  );
+  return <TermsPageContent />;
 }
 
 function TermsPageContent() {
@@ -58,7 +61,7 @@ function TermsPageContent() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
       {/* Header */}
-      <div className="bg-background/95 backdrop-blur-lg border-b border-border/50 sticky top-0 z-10">
+      <div className="sticky top-0 z-10 border-border/50 border-b bg-background/95 backdrop-blur-lg">
         <div className="container mx-auto max-w-6xl px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/">
@@ -66,60 +69,103 @@ function TermsPageContent() {
                 Back to Home
               </Button>
             </Link>
-            <Badge variant="secondary" className="text-xs bg-muted text-muted-foreground">
+            <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">
               Legal Document
             </Badge>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16 max-w-5xl">
+      <div className="container mx-auto max-w-5xl px-4 py-16">
         {/* Hero Section */}
-        <div className="text-center mb-16">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <FileText className="w-10 h-10 text-white" />
+        <div className="mb-16 text-center">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg dark:from-blue-600 dark:to-blue-700">
+            <FileText className="h-10 w-10 text-white" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent mb-4">
+          <h1 className="mb-4 bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text font-bold text-4xl text-transparent md:text-5xl">
             Terms of Service
           </h1>
           <div className="flex items-center justify-center gap-2 text-muted-foreground">
-            <CheckCircle2 className="w-5 h-5 text-green-500" />
+            <CheckCircle2 className="h-5 w-5 text-green-500" />
             <p className="text-lg">Effective Date: {effectiveDate}</p>
           </div>
         </div>
 
         {/* Quick Navigation */}
-        <div className="bg-blue-50 dark:bg-blue-950/30 rounded-2xl p-6 mb-12 border border-blue-100 dark:border-blue-900">
-          <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        <div className="mb-12 rounded-2xl border border-blue-100 bg-blue-50 p-6 dark:border-blue-900 dark:bg-blue-950/30">
+          <h2 className="mb-4 flex items-center gap-2 font-semibold text-foreground text-xl">
+            <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             Quick Navigation
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <a href="#accounts" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">User Accounts</a>
-            <a href="#subscription" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Subscription & Payment</a>
-            <a href="#content" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Content & Licensing</a>
-            <a href="#acceptable-use" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Acceptable Use</a>
-            <a href="#privacy" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Privacy</a>
-            <a href="#liability" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Liability</a>
-            <a href="#termination" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Termination</a>
-            <a href="#contact" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline text-sm">Contact Us</a>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <a
+              href="#accounts"
+              className="text-blue-600 text-sm hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              User Accounts
+            </a>
+            <a
+              href="#subscription"
+              className="text-blue-600 text-sm hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Subscription & Payment
+            </a>
+            <a
+              href="#content"
+              className="text-blue-600 text-sm hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Content & Licensing
+            </a>
+            <a
+              href="#acceptable-use"
+              className="text-blue-600 text-sm hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Acceptable Use
+            </a>
+            <a
+              href="#privacy"
+              className="text-blue-600 text-sm hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Privacy
+            </a>
+            <a
+              href="#liability"
+              className="text-blue-600 text-sm hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Liability
+            </a>
+            <a
+              href="#termination"
+              className="text-blue-600 text-sm hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Termination
+            </a>
+            <a
+              href="#contact"
+              className="text-blue-600 text-sm hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Contact Us
+            </a>
           </div>
         </div>
 
         {/* Main Content */}
         <div className="space-y-8">
           {/* Section 1: Agreement to Terms */}
-          <section className="bg-card rounded-2xl shadow-sm border border-border p-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-4">1. Agreement to Terms</h2>
+          <section className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+            <h2 className="mb-4 font-semibold text-2xl text-foreground">1. Agreement to Terms</h2>
             <div className="prose prose-gray dark:prose-invert max-w-none">
               <p className="text-muted-foreground leading-relaxed">
-                By accessing or using im2Prompt ("Service", "Platform", or "We"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you do not have permission to access our Service.
+                By accessing or using im2Prompt ("Service", "Platform", or "We"), you agree to be
+                bound by these Terms of Service ("Terms"). If you disagree with any part of these
+                terms, you do not have permission to access our Service.
               </p>
-              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg p-4 mt-4">
+              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-amber-800 dark:text-amber-200">
-                    <strong>Important:</strong> These Terms constitute a legally binding agreement between you and im2Prompt. Please read them carefully.
+                  <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+                  <p className="text-amber-800 text-sm dark:text-amber-200">
+                    <strong>Important:</strong> These Terms constitute a legally binding agreement
+                    between you and im2Prompt. Please read them carefully.
                   </p>
                 </div>
               </div>
@@ -127,14 +173,14 @@ function TermsPageContent() {
           </section>
 
           {/* Section 2: Service Description */}
-          <section className="bg-card rounded-2xl shadow-sm border border-border p-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-4">2. Our Service</h2>
-            <p className="text-muted-foreground mb-6">
+          <section className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+            <h2 className="mb-4 font-semibold text-2xl text-foreground">2. Our Service</h2>
+            <p className="mb-6 text-muted-foreground">
               im2Prompt is an AI-powered platform that enables users to:
             </p>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-muted/50 rounded-lg p-4">
-                <h4 className="text-lg font-medium text-foreground mb-2">Core Features</h4>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-lg bg-muted/50 p-4">
+                <h4 className="mb-2 font-medium text-foreground text-lg">Core Features</h4>
                 <ul className="space-y-1 text-muted-foreground text-sm">
                   <li>• Image to Prompt generation</li>
                   <li>• Text to Prompt conversion</li>
@@ -144,8 +190,8 @@ function TermsPageContent() {
                   <li>• Free users: Credit-based generation only</li>
                 </ul>
               </div>
-              <div className="bg-muted/50 rounded-lg p-4">
-                <h4 className="text-lg font-medium text-foreground mb-2">AI Models</h4>
+              <div className="rounded-lg bg-muted/50 p-4">
+                <h4 className="mb-2 font-medium text-foreground text-lg">AI Models</h4>
                 <ul className="space-y-1 text-muted-foreground text-sm">
                   <li>• OpenAI Sora 2</li>
                   <li>• Nano Banana</li>
@@ -156,37 +202,41 @@ function TermsPageContent() {
           </section>
 
           {/* Section 3: User Accounts - Following CoverImage format */}
-          <section id="accounts" className="bg-card rounded-2xl shadow-sm border border-border p-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-6 flex items-center gap-3">
-              <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <section id="accounts" className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+            <h2 className="mb-6 flex items-center gap-3 font-semibold text-2xl text-foreground">
+              <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               3. User Accounts
             </h2>
-            
+
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-medium text-foreground mb-3">3.1 Account Registration</h3>
+                <h3 className="mb-3 font-medium text-foreground text-xl">
+                  3.1 Account Registration
+                </h3>
                 <ul className="space-y-2 text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span>You must provide accurate and complete information during registration</span>
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
+                    <span>
+                      You must provide accurate and complete information during registration
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span>You must be at least 18 years old (or age of majority in your jurisdiction)</span>
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
+                    <span>
+                      You must be at least 18 years old (or age of majority in your jurisdiction)
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
                     <span>One person or legal entity may maintain only one free account</span>
                   </li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-xl font-medium text-foreground mb-3">3.2 Account Security</h3>
-                <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-4">
-                  <p className="text-muted-foreground">
-                    You are responsible for:
-                  </p>
+                <h3 className="mb-3 font-medium text-foreground text-xl">3.2 Account Security</h3>
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30">
+                  <p className="text-muted-foreground">You are responsible for:</p>
                   <ul className="mt-2 space-y-1 text-muted-foreground text-sm">
                     <li>• Maintaining the confidentiality of your account credentials</li>
                     <li>• All activities that occur under your account</li>
@@ -198,29 +248,45 @@ function TermsPageContent() {
           </section>
 
           {/* Subscription & Payment Section - Based on CoverImage comprehensive format */}
-          <section id="subscription" className="bg-card rounded-2xl shadow-sm border border-border p-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-6 flex items-center gap-3">
-              <CreditCard className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <section
+            id="subscription"
+            className="rounded-2xl border border-border bg-card p-8 shadow-sm"
+          >
+            <h2 className="mb-6 flex items-center gap-3 font-semibold text-2xl text-foreground">
+              <CreditCard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               4. Subscription Plans & Payment
             </h2>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-medium text-foreground mb-4">4.1 Available Plans</h3>
-                <div className="grid md:grid-cols-3 gap-4">
+                <h3 className="mb-4 font-medium text-foreground text-xl">4.1 Available Plans</h3>
+                <div className="grid gap-4 md:grid-cols-3">
                   {plans.map((plan, index) => {
                     const isFree = plan.id === 'free';
                     const isPro = plan.id === 'pro';
                     const isProPlus = plan.id === 'proplus';
-                    const borderColor = isFree ? 'border-border' : isPro ? 'border-blue-200 dark:border-blue-800' : 'border-purple-200 dark:border-purple-800';
-                    const bgColor = isFree ? '' : isPro ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-purple-50 dark:bg-purple-950/30';
+                    const borderColor = isFree
+                      ? 'border-border'
+                      : isPro
+                        ? 'border-blue-200 dark:border-blue-800'
+                        : 'border-purple-200 dark:border-purple-800';
+                    const bgColor = isFree
+                      ? ''
+                      : isPro
+                        ? 'bg-blue-50 dark:bg-blue-950/30'
+                        : 'bg-purple-50 dark:bg-purple-950/30';
                     const priceDisplay = isFree ? '$0/forever' : `$${plan.price}/month`;
-                    
+
                     return (
-                      <div key={plan.id} className={`border ${borderColor} ${bgColor} rounded-lg p-4`}>
-                        <h4 className="text-lg font-medium text-foreground mb-2">{plan.name} Plan</h4>
-                        <p className="text-sm font-medium text-foreground mb-2">{priceDisplay}</p>
-                        <ul className="space-y-1 text-sm text-muted-foreground">
+                      <div
+                        key={plan.id}
+                        className={`border ${borderColor} ${bgColor} rounded-lg p-4`}
+                      >
+                        <h4 className="mb-2 font-medium text-foreground text-lg">
+                          {plan.name} Plan
+                        </h4>
+                        <p className="mb-2 font-medium text-foreground text-sm">{priceDisplay}</p>
+                        <ul className="space-y-1 text-muted-foreground text-sm">
                           {plan.features.map((feature, idx) => (
                             <li key={idx}>✓ {feature}</li>
                           ))}
@@ -232,65 +298,119 @@ function TermsPageContent() {
               </div>
 
               <div>
-                <h3 className="text-xl font-medium text-foreground mb-3">4.2 Billing & Payment Terms</h3>
-                <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                  <p className="text-muted-foreground">• <strong>Billing Cycles:</strong> Monthly subscriptions are billed monthly in advance; Yearly subscriptions are billed annually in advance</p>
-                  <p className="text-muted-foreground">• <strong>Yearly Plans:</strong> Save 20% with annual billing. Pro: $143.04/year ($11.92/mo), Pro+: $239.04/year ($19.92/mo)</p>
-                  <p className="text-muted-foreground">• <strong>Yearly Credits:</strong> Annual plans receive 12x monthly credits allocation (Pro: 6,000 credits/year, Pro+: 10,800 credits/year)</p>
-                  <p className="text-muted-foreground">• <strong>Payment Methods:</strong> We accept credit cards via Creem payment service</p>
-                  <p className="text-muted-foreground">• <strong>Currency:</strong> Prices displayed in USD</p>
-                  <p className="text-muted-foreground">• <strong>Failed Payments:</strong> Service may be suspended if payment fails</p>
+                <h3 className="mb-3 font-medium text-foreground text-xl">
+                  4.2 Billing & Payment Terms
+                </h3>
+                <div className="space-y-2 rounded-lg bg-muted/50 p-4">
+                  <p className="text-muted-foreground">
+                    • <strong>Billing Cycles:</strong> Monthly subscriptions are billed monthly in
+                    advance; Yearly subscriptions are billed annually in advance
+                  </p>
+                  <p className="text-muted-foreground">
+                    • <strong>Yearly Plans:</strong> Save 20% with annual billing. Pro: $143.04/year
+                    ($11.92/mo), Pro+: $239.04/year ($19.92/mo)
+                  </p>
+                  <p className="text-muted-foreground">
+                    • <strong>Yearly Credits:</strong> Annual plans receive 12x monthly credits
+                    allocation (Pro: 6,000 credits/year, Pro+: 10,800 credits/year)
+                  </p>
+                  <p className="text-muted-foreground">
+                    • <strong>Payment Methods:</strong> We accept credit cards via Creem payment
+                    service
+                  </p>
+                  <p className="text-muted-foreground">
+                    • <strong>Currency:</strong> Prices displayed in USD
+                  </p>
+                  <p className="text-muted-foreground">
+                    • <strong>Failed Payments:</strong> Service may be suspended if payment fails
+                  </p>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xl font-medium text-foreground mb-3">4.3 Cancellation Policy</h3>
-                <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                  <p className="text-muted-foreground">• <strong>Cancel Anytime:</strong> You can cancel your subscription at any time</p>
-                  <p className="text-muted-foreground">• <strong>Access Until End of Period:</strong> You'll retain access until the end of your current billing period</p>
-                  <p className="text-muted-foreground">• <strong>No Partial Refunds:</strong> We don't offer refunds for partial billing periods</p>
-                  <p className="text-muted-foreground">• <strong>See Refund Policy:</strong> For detailed refund information, see our <Link href="/refund" className="text-blue-600 hover:underline">Refund Policy</Link></p>
+                <h3 className="mb-3 font-medium text-foreground text-xl">
+                  4.3 Cancellation Policy
+                </h3>
+                <div className="space-y-2 rounded-lg bg-muted/50 p-4">
+                  <p className="text-muted-foreground">
+                    • <strong>Cancel Anytime:</strong> You can cancel your subscription at any time
+                  </p>
+                  <p className="text-muted-foreground">
+                    • <strong>Access Until End of Period:</strong> You'll retain access until the
+                    end of your current billing period
+                  </p>
+                  <p className="text-muted-foreground">
+                    • <strong>No Partial Refunds:</strong> We don't offer refunds for partial
+                    billing periods
+                  </p>
+                  <p className="text-muted-foreground">
+                    • <strong>See Refund Policy:</strong> For detailed refund information, see our{' '}
+                    <Link href="/refund" className="text-blue-600 hover:underline">
+                      Refund Policy
+                    </Link>
+                  </p>
                 </div>
               </div>
             </div>
           </section>
 
           {/* Content & Licensing - Following CoverImage structure */}
-          <section id="content" className="bg-card rounded-2xl shadow-sm border border-border p-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-6">5. Content Rights & Licensing</h2>
+          <section id="content" className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+            <h2 className="mb-6 font-semibold text-2xl text-foreground">
+              5. Content Rights & Licensing
+            </h2>
 
             <div className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid gap-6 md:grid-cols-2">
                 <div>
-                  <h3 className="text-xl font-medium text-foreground mb-3">5.1 Your Content</h3>
-                  <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 rounded-lg p-4">
+                  <h3 className="mb-3 font-medium text-foreground text-xl">5.1 Your Content</h3>
+                  <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950/30">
                     <p className="text-muted-foreground text-sm">
-                      <strong>You retain all rights</strong> to content you upload. We only use your content to provide our services to you.
+                      <strong>You retain all rights</strong> to content you upload. We only use your
+                      content to provide our services to you.
                     </p>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-medium text-foreground mb-3">5.2 Generated Content</h3>
-                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-4">
+                  <h3 className="mb-3 font-medium text-foreground text-xl">
+                    5.2 Generated Content
+                  </h3>
+                  <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30">
                     <p className="text-muted-foreground text-sm">
-                      <strong>You own all generated content</strong>, subject to compliance with applicable laws and these Terms.
+                      <strong>You own all generated content</strong>, subject to compliance with
+                      applicable laws and these Terms.
                     </p>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xl font-medium text-foreground mb-3">5.3 AI Generation Disclaimer</h3>
-                <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg p-4 space-y-3">
+                <h3 className="mb-3 font-medium text-foreground text-xl">
+                  5.3 AI Generation Disclaimer
+                </h3>
+                <div className="space-y-3 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950/30">
                   <p className="text-muted-foreground">
-                    <strong>Important:</strong> im2Prompt uses advanced AI models. Please understand:
+                    <strong>Important:</strong> im2Prompt uses advanced AI models. Please
+                    understand:
                   </p>
                   <ul className="space-y-2 text-muted-foreground text-sm">
-                    <li>• <strong>Quality Variance:</strong> Results depend on prompt quality and AI model capabilities</li>
-                    <li>• <strong>No Guarantee:</strong> We cannot guarantee every generation meets your expectations</li>
-                    <li>• <strong>Network Dependencies:</strong> Service quality affected by connectivity and server availability</li>
-                    <li>• <strong>AI Limitations:</strong> AI may produce unexpected or unsuitable results</li>
+                    <li>
+                      • <strong>Quality Variance:</strong> Results depend on prompt quality and AI
+                      model capabilities
+                    </li>
+                    <li>
+                      • <strong>No Guarantee:</strong> We cannot guarantee every generation meets
+                      your expectations
+                    </li>
+                    <li>
+                      • <strong>Network Dependencies:</strong> Service quality affected by
+                      connectivity and server availability
+                    </li>
+                    <li>
+                      • <strong>AI Limitations:</strong> AI may produce unexpected or unsuitable
+                      results
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -298,38 +418,83 @@ function TermsPageContent() {
           </section>
 
           {/* Acceptable Use */}
-          <section id="acceptable-use" className="bg-card rounded-2xl shadow-sm border border-border p-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-6">6. Acceptable Use Policy</h2>
-            
-            <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg p-6 mb-6">
-              <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-3">Prohibited Content</h3>
-              <p className="text-muted-foreground mb-3">You may NOT create, upload, or generate content that contains:</p>
+          <section
+            id="acceptable-use"
+            className="rounded-2xl border border-border bg-card p-8 shadow-sm"
+          >
+            <h2 className="mb-6 font-semibold text-2xl text-foreground">
+              6. Acceptable Use Policy
+            </h2>
+
+            <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-900 dark:bg-red-950/30">
+              <h3 className="mb-3 font-semibold text-lg text-red-900 dark:text-red-200">
+                Prohibited Content
+              </h3>
+              <p className="mb-3 text-muted-foreground">
+                You may NOT create, upload, or generate content that contains:
+              </p>
               <ul className="space-y-2 text-muted-foreground">
-                <li>❌ <strong>Adult/Sexual Content:</strong> Pornography, nudity, or sexually explicit material</li>
-                <li>❌ <strong>Violence:</strong> Graphic violence, gore, or content promoting harm to others</li>
-                <li>❌ <strong>Hate Speech:</strong> Racism, discrimination, or content targeting protected groups</li>
-                <li>❌ <strong>Copyright Infringement:</strong> Unauthorized use of copyrighted images, characters, or trademarks</li>
-                <li>❌ <strong>Illegal Activities:</strong> Content promoting illegal activities or substances</li>
-                <li>❌ <strong>Harmful Content:</strong> Self-harm, dangerous activities, or abuse</li>
-                <li>❌ <strong>Misleading Content:</strong> Deepfakes, misinformation, or deceptive materials</li>
+                <li>
+                  ❌ <strong>Adult/Sexual Content:</strong> Pornography, nudity, or sexually
+                  explicit material
+                </li>
+                <li>
+                  ❌ <strong>Violence:</strong> Graphic violence, gore, or content promoting harm to
+                  others
+                </li>
+                <li>
+                  ❌ <strong>Hate Speech:</strong> Racism, discrimination, or content targeting
+                  protected groups
+                </li>
+                <li>
+                  ❌ <strong>Copyright Infringement:</strong> Unauthorized use of copyrighted
+                  images, characters, or trademarks
+                </li>
+                <li>
+                  ❌ <strong>Illegal Activities:</strong> Content promoting illegal activities or
+                  substances
+                </li>
+                <li>
+                  ❌ <strong>Harmful Content:</strong> Self-harm, dangerous activities, or abuse
+                </li>
+                <li>
+                  ❌ <strong>Misleading Content:</strong> Deepfakes, misinformation, or deceptive
+                  materials
+                </li>
               </ul>
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-6 mb-6">
-              <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-200 mb-3">Content Safety Requirements</h3>
-              <p className="text-muted-foreground mb-3">All content must be:</p>
+            <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-6 dark:border-blue-900 dark:bg-blue-950/30">
+              <h3 className="mb-3 font-semibold text-blue-900 text-lg dark:text-blue-200">
+                Content Safety Requirements
+              </h3>
+              <p className="mb-3 text-muted-foreground">All content must be:</p>
               <ul className="space-y-2 text-muted-foreground">
-                <li>✓ <strong>Safe for Work (SFW):</strong> Appropriate for general audiences</li>
-                <li>✓ <strong>User-Friendly:</strong> Respectful and non-offensive</li>
-                <li>✓ <strong>Legal:</strong> Compliant with applicable laws and regulations</li>
-                <li>✓ <strong>Original or Licensed:</strong> You must own rights or have permission to use uploaded content</li>
-                <li>✓ <strong>Non-Harmful:</strong> Does not promote violence, hate, or dangerous activities</li>
+                <li>
+                  ✓ <strong>Safe for Work (SFW):</strong> Appropriate for general audiences
+                </li>
+                <li>
+                  ✓ <strong>User-Friendly:</strong> Respectful and non-offensive
+                </li>
+                <li>
+                  ✓ <strong>Legal:</strong> Compliant with applicable laws and regulations
+                </li>
+                <li>
+                  ✓ <strong>Original or Licensed:</strong> You must own rights or have permission to
+                  use uploaded content
+                </li>
+                <li>
+                  ✓ <strong>Non-Harmful:</strong> Does not promote violence, hate, or dangerous
+                  activities
+                </li>
               </ul>
             </div>
 
-            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-200 mb-3">Prohibited Actions</h3>
-              <p className="text-muted-foreground mb-3">You may NOT:</p>
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 dark:border-amber-900 dark:bg-amber-950/30">
+              <h3 className="mb-3 font-semibold text-amber-900 text-lg dark:text-amber-200">
+                Prohibited Actions
+              </h3>
+              <p className="mb-3 text-muted-foreground">You may NOT:</p>
               <ul className="space-y-2 text-muted-foreground">
                 <li>❌ Bypass service limitations or security measures</li>
                 <li>❌ Use automated systems without permission</li>
@@ -339,28 +504,38 @@ function TermsPageContent() {
               </ul>
             </div>
 
-            <div className="mt-6 p-4 bg-red-100 dark:bg-red-900/40 rounded-lg">
-              <p className="text-sm text-red-900 dark:text-red-200 font-medium">
-                ⚠️ Violation of this policy may result in immediate account suspension or termination without refund. We reserve the right to monitor content and remove materials that violate these guidelines.
+            <div className="mt-6 rounded-lg bg-red-100 p-4 dark:bg-red-900/40">
+              <p className="font-medium text-red-900 text-sm dark:text-red-200">
+                ⚠️ Violation of this policy may result in immediate account suspension or termination
+                without refund. We reserve the right to monitor content and remove materials that
+                violate these guidelines.
               </p>
             </div>
           </section>
 
           {/* Liability */}
-          <section id="liability" className="bg-card rounded-2xl shadow-sm border border-border p-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-6">7. Disclaimers & Limitations</h2>
-            
+          <section
+            id="liability"
+            className="rounded-2xl border border-border bg-card p-8 shadow-sm"
+          >
+            <h2 className="mb-6 font-semibold text-2xl text-foreground">
+              7. Disclaimers & Limitations
+            </h2>
+
             <div className="space-y-6">
-              <div className="bg-muted/50 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-foreground mb-3">7.1 Service Disclaimer</h3>
+              <div className="rounded-lg bg-muted/50 p-6">
+                <h3 className="mb-3 font-medium text-foreground text-lg">7.1 Service Disclaimer</h3>
                 <p className="text-muted-foreground">
-                  The Service is provided "AS IS" and "AS AVAILABLE". We do not guarantee uninterrupted, error-free operation or consistent AI generation quality.
+                  The Service is provided "AS IS" and "AS AVAILABLE". We do not guarantee
+                  uninterrupted, error-free operation or consistent AI generation quality.
                 </p>
               </div>
 
-              <div className="bg-muted/50 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-foreground mb-3">7.2 Limitation of Liability</h3>
-                <p className="text-muted-foreground mb-3">
+              <div className="rounded-lg bg-muted/50 p-6">
+                <h3 className="mb-3 font-medium text-foreground text-lg">
+                  7.2 Limitation of Liability
+                </h3>
+                <p className="mb-3 text-muted-foreground">
                   To the fullest extent permitted by law, im2Prompt shall not be liable for:
                 </p>
                 <ul className="space-y-2 text-muted-foreground text-sm">
@@ -374,29 +549,38 @@ function TermsPageContent() {
           </section>
 
           {/* Privacy */}
-          <section id="privacy" className="bg-card rounded-2xl shadow-sm border border-border p-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-4">8. Privacy & Data Protection</h2>
-            <p className="text-muted-foreground mb-4">
-              Your privacy is important to us. Our use of your personal information is governed by our Privacy Policy.
+          <section id="privacy" className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+            <h2 className="mb-4 font-semibold text-2xl text-foreground">
+              8. Privacy & Data Protection
+            </h2>
+            <p className="mb-4 text-muted-foreground">
+              Your privacy is important to us. Our use of your personal information is governed by
+              our Privacy Policy.
             </p>
-            <Link href="/privacy" className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+            <Link
+              href="/privacy"
+              className="inline-flex items-center gap-2 font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            >
               View Privacy Policy
               <span className="text-sm">→</span>
             </Link>
           </section>
 
           {/* Termination */}
-          <section id="termination" className="bg-card rounded-2xl shadow-sm border border-border p-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-4">9. Termination</h2>
-            <div className="grid md:grid-cols-2 gap-6">
+          <section
+            id="termination"
+            className="rounded-2xl border border-border bg-card p-8 shadow-sm"
+          >
+            <h2 className="mb-4 font-semibold text-2xl text-foreground">9. Termination</h2>
+            <div className="grid gap-6 md:grid-cols-2">
               <div>
-                <h3 className="text-lg font-medium text-foreground mb-2">By You</h3>
+                <h3 className="mb-2 font-medium text-foreground text-lg">By You</h3>
                 <p className="text-muted-foreground text-sm">
                   You may terminate your account at any time through account settings.
                 </p>
               </div>
               <div>
-                <h3 className="text-lg font-medium text-foreground mb-2">By Us</h3>
+                <h3 className="mb-2 font-medium text-foreground text-lg">By Us</h3>
                 <p className="text-muted-foreground text-sm">
                   We may suspend or terminate accounts for violations of these Terms.
                 </p>
@@ -405,49 +589,58 @@ function TermsPageContent() {
           </section>
 
           {/* Governing Law */}
-          <section className="bg-card rounded-2xl shadow-sm border border-border p-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-4 flex items-center gap-3">
-              <Scale className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <section className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+            <h2 className="mb-4 flex items-center gap-3 font-semibold text-2xl text-foreground">
+              <Scale className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               10. Governing Law & Disputes
             </h2>
-            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-6">
-              <p className="text-muted-foreground mb-3">
-                These Terms are governed by applicable laws. Any disputes shall be subject to the jurisdiction of competent courts.
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-6 dark:border-blue-900 dark:bg-blue-950/30">
+              <p className="mb-3 text-muted-foreground">
+                These Terms are governed by applicable laws. Any disputes shall be subject to the
+                jurisdiction of competent courts.
               </p>
             </div>
           </section>
 
           {/* Contact Information */}
-          <section id="contact" className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-2xl shadow-sm border border-blue-100 dark:border-blue-900 p-8">
-            <h2 className="text-2xl font-semibold text-foreground mb-6">11. Contact Us</h2>
-            
-            <div className="bg-card rounded-lg p-6">
+          <section
+            id="contact"
+            className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 p-8 shadow-sm dark:border-blue-900 dark:from-blue-950/30 dark:to-indigo-950/30"
+          >
+            <h2 className="mb-6 font-semibold text-2xl text-foreground">11. Contact Us</h2>
+
+            <div className="rounded-lg bg-card p-6">
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <Mail className="mt-0.5 h-5 w-5 flex-shrink-0 text-muted-foreground" />
                   <div>
-                    <p className="text-sm text-muted-foreground">Email</p>
-                    <a href="mailto:support@im2prompt.com" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+                    <p className="text-muted-foreground text-sm">Email</p>
+                    <a
+                      href="mailto:support@im2prompt.com"
+                      className="font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
                       support@im2prompt.com
                     </a>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0 text-muted-foreground" />
                   <div>
-                    <p className="text-sm text-muted-foreground mb-2">Address</p>
+                    <p className="mb-2 text-muted-foreground text-sm">Address</p>
                     <div className="space-y-3">
                       <div>
-                        <p className="text-sm font-medium text-foreground mb-1">English Address</p>
-                        <p className="text-sm text-muted-foreground">im2Prompt, Legal Department</p>
-                        <p className="text-sm text-muted-foreground">Datun Road, Chaoyang District</p>
-                        <p className="text-sm text-muted-foreground">Beijing, China</p>
+                        <p className="mb-1 font-medium text-foreground text-sm">English Address</p>
+                        <p className="text-muted-foreground text-sm">im2Prompt, Legal Department</p>
+                        <p className="text-muted-foreground text-sm">
+                          Datun Road, Chaoyang District
+                        </p>
+                        <p className="text-muted-foreground text-sm">Beijing, China</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-foreground mb-1">Chinese Address</p>
-                        <p className="text-sm text-muted-foreground">im2Prompt 法务部门</p>
-                        <p className="text-sm text-muted-foreground">中国北京市朝阳区大屯路</p>
+                        <p className="mb-1 font-medium text-foreground text-sm">Chinese Address</p>
+                        <p className="text-muted-foreground text-sm">im2Prompt 法务部门</p>
+                        <p className="text-muted-foreground text-sm">中国北京市朝阳区大屯路</p>
                       </div>
                     </div>
                   </div>
@@ -459,9 +652,7 @@ function TermsPageContent() {
 
         {/* Footer */}
         <div className="mt-12 text-center">
-          <p className="text-muted-foreground">
-            © 2025 im2Prompt. All rights reserved.
-          </p>
+          <p className="text-muted-foreground">© 2025 im2Prompt. All rights reserved.</p>
         </div>
       </div>
     </div>

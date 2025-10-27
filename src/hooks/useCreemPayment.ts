@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { env } from '@/env';
+import { useState } from 'react';
 
 interface CreateCheckoutParams {
   planId: 'pro' | 'proplus';

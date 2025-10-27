@@ -2,19 +2,19 @@
 
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 import { creemService } from '@/lib/creem/creem-service';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import type { ActionResult } from '@/payment/types';
 import { logger } from '@/lib/monitoring/logger';
+import type { ActionResult } from '@/payment/types';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
 
 export async function downgradeSubscription(
   subscriptionId: string,
   newPlanId: 'pro' | 'free',
   newInterval: 'month' | 'year',
-  scheduleAtPeriodEnd: boolean = true
+  scheduleAtPeriodEnd = true
 ): Promise<ActionResult<{ downgraded: boolean; scheduledAtPeriodEnd?: boolean }>> {
   try {
     const session = await getSessionWithAuthBypass();
-    
+
     if (!session?.user?.id) {
       logger.warn('[Downgrade] Unauthorized downgrade attempt', {
         subscriptionId,
@@ -26,7 +26,7 @@ export async function downgradeSubscription(
     }
 
     const subscription = await paymentRepository.findBySubscriptionId(subscriptionId);
-    
+
     if (!subscription) {
       logger.warn('[Downgrade] Subscription not found', {
         subscriptionId,
@@ -63,7 +63,7 @@ export async function downgradeSubscription(
 
     const currentPlan = subscription.priceId;
     const currentInterval = subscription.interval;
-    
+
     if (currentPlan === newPlanId && currentInterval === newInterval) {
       return {
         success: false,
@@ -71,7 +71,7 @@ export async function downgradeSubscription(
       };
     }
 
-    const isDowngrade = 
+    const isDowngrade =
       (currentPlan === 'proplus' && newPlanId === 'pro') ||
       (currentPlan === 'pro' && newPlanId === 'free') ||
       (currentInterval === 'year' && newInterval === 'month');
@@ -98,7 +98,7 @@ export async function downgradeSubscription(
         await paymentRepository.update(subscription.id, {
           cancelAtPeriodEnd: true,
         });
-        
+
         await paymentRepository.createEvent({
           paymentId: subscription.id,
           eventType: 'updated',
@@ -123,52 +123,54 @@ export async function downgradeSubscription(
           },
           message: 'Your subscription will be canceled at the end of the current billing period',
         };
-      } else {
-        const result = await creemService.cancelSubscription(subscription.subscriptionId!);
+      }
+      const result = await creemService.cancelSubscription(subscription.subscriptionId!);
 
-        if (!result.success) {
-          logger.error('[Downgrade] Failed to cancel subscription', {
-            subscriptionId,
-            error: result.error,
-          });
-          return {
-            success: false,
-            error: result.error || 'Failed to cancel subscription',
-          };
-        }
-
-        await paymentRepository.update(subscription.id, {
-          status: 'canceled',
-          cancelAtPeriodEnd: false,
-        });
-
-        await paymentRepository.createEvent({
-          paymentId: subscription.id,
-          eventType: 'canceled',
-          eventData: JSON.stringify({
-            action: 'downgrade_to_free_immediate',
-            userId: session.user.id,
-            canceledAt: new Date().toISOString(),
-          }),
-        });
-
-        logger.info('[Downgrade] Subscription canceled immediately', {
+      if (!result.success) {
+        logger.error('[Downgrade] Failed to cancel subscription', {
           subscriptionId,
+          error: result.error,
         });
-
         return {
-          success: true,
-          data: {
-            downgraded: true,
-            scheduledAtPeriodEnd: false,
-          },
-          message: 'Your subscription has been canceled',
+          success: false,
+          error: result.error || 'Failed to cancel subscription',
         };
       }
+
+      await paymentRepository.update(subscription.id, {
+        status: 'canceled',
+        cancelAtPeriodEnd: false,
+      });
+
+      await paymentRepository.createEvent({
+        paymentId: subscription.id,
+        eventType: 'canceled',
+        eventData: JSON.stringify({
+          action: 'downgrade_to_free_immediate',
+          userId: session.user.id,
+          canceledAt: new Date().toISOString(),
+        }),
+      });
+
+      logger.info('[Downgrade] Subscription canceled immediately', {
+        subscriptionId,
+      });
+
+      return {
+        success: true,
+        data: {
+          downgraded: true,
+          scheduledAtPeriodEnd: false,
+        },
+        message: 'Your subscription has been canceled',
+      };
     }
 
-    const newProductKey = `${newPlanId}_${newInterval === 'year' ? 'yearly' : 'monthly'}` as 
-      'pro_monthly' | 'pro_yearly' | 'proplus_monthly' | 'proplus_yearly';
+    const newProductKey = `${newPlanId}_${newInterval === 'year' ? 'yearly' : 'monthly'}` as
+      | 'pro_monthly'
+      | 'pro_yearly'
+      | 'proplus_monthly'
+      | 'proplus_yearly';
 
     const result = await creemService.downgradeSubscription(
       subscription.subscriptionId!,
@@ -192,7 +194,7 @@ export async function downgradeSubscription(
         priceId: newPlanId,
         interval: newInterval,
       });
-      
+
       await paymentRepository.createEvent({
         paymentId: subscription.id,
         eventType: 'updated',
@@ -223,39 +225,39 @@ export async function downgradeSubscription(
         },
         message: `Your subscription will be downgraded to ${newPlanId.toUpperCase()} ${newInterval === 'year' ? 'yearly' : 'monthly'} at the end of the current billing period`,
       };
-    } else {
-      await paymentRepository.update(subscription.id, {
-        status: 'canceled',
-      });
-      
-      await paymentRepository.createEvent({
-        paymentId: subscription.id,
-        eventType: 'canceled',
-        eventData: JSON.stringify({
-          action: 'downgrade_immediate',
-          oldPlan: currentPlan,
-          oldInterval: currentInterval,
-          newPlan: newPlanId,
-          newInterval: newInterval,
-          userId: session.user.id,
-        }),
-      });
-
-      logger.info('[Downgrade] Old subscription canceled, new subscription needs to be created', {
-        subscriptionId,
-        newPlanId,
-        newInterval,
-      });
-
-      return {
-        success: true,
-        data: {
-          downgraded: true,
-          scheduledAtPeriodEnd: false,
-        },
-        message: 'Your subscription has been downgraded. Please complete the checkout for the new plan.',
-      };
     }
+    await paymentRepository.update(subscription.id, {
+      status: 'canceled',
+    });
+
+    await paymentRepository.createEvent({
+      paymentId: subscription.id,
+      eventType: 'canceled',
+      eventData: JSON.stringify({
+        action: 'downgrade_immediate',
+        oldPlan: currentPlan,
+        oldInterval: currentInterval,
+        newPlan: newPlanId,
+        newInterval: newInterval,
+        userId: session.user.id,
+      }),
+    });
+
+    logger.info('[Downgrade] Old subscription canceled, new subscription needs to be created', {
+      subscriptionId,
+      newPlanId,
+      newInterval,
+    });
+
+    return {
+      success: true,
+      data: {
+        downgraded: true,
+        scheduledAtPeriodEnd: false,
+      },
+      message:
+        'Your subscription has been downgraded. Please complete the checkout for the new plan.',
+    };
   } catch (error) {
     logger.error('[Downgrade] Unexpected error', {
       error,

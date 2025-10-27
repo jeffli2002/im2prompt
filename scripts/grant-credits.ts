@@ -8,16 +8,16 @@
  *   pnpm tsx scripts/grant-credits.ts --email user@example.com --amount 900 --reason "Pro+ monthly grant"
  */
 
-import { config } from 'dotenv';
-import { resolve, dirname } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { config } from 'dotenv';
 import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/neon-http';
 import { v4 as uuidv4 } from 'uuid';
 
 import { createChildLogger } from '../src/lib/logger/logger';
-import { user, userCredits, creditTransactions } from '../src/server/db/schema';
+import { creditTransactions, user, userCredits } from '../src/server/db/schema';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -126,7 +126,9 @@ async function main() {
   const now = new Date();
 
   if (existingAccount) {
-    grantLogger.info(`📈 Updating existing credit account (current balance: ${existingAccount.balance})`);
+    grantLogger.info(
+      `📈 Updating existing credit account (current balance: ${existingAccount.balance})`
+    );
     await db
       .update(userCredits)
       .set({
@@ -198,7 +200,9 @@ async function main() {
     grantLogger.info(`   Total earned: ${updatedAccount.totalEarned}`);
   }
 
-  grantLogger.info('You can verify the balance via the usage dashboard or by querying the user_credits table.');
+  grantLogger.info(
+    'You can verify the balance via the usage dashboard or by querying the user_credits table.'
+  );
 }
 
 main().catch((error) => {

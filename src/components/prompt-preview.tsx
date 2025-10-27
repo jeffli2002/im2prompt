@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Eye, FileText, Check } from 'lucide-react';
+import { Check, Eye, FileText } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 interface PromptPreviewProps {
@@ -36,53 +36,53 @@ export function PromptPreview({ prompt, negativePrompt, modelStyle }: PromptPrev
   const parsePromptSections = (text: string): ParsedSection[] => {
     const realText = extractRealContent(text);
     const sections: ParsedSection[] = [];
-    
+
     const sectionRegex = /\*\*([^:*]+?):\*\*\s*\n([\s\S]*?)(?=\n\n\*\*|$)/g;
     let match;
-    
+
     while ((match = sectionRegex.exec(realText)) !== null) {
       const title = match[1]?.trim() || '';
       const rawContent = match[2]?.trim();
-      
+
       const bracketMatch = rawContent?.match(/^\[(.*?)\]$/s);
-      
-      if (bracketMatch && bracketMatch[1]) {
+
+      if (bracketMatch?.[1]) {
         const tags = bracketMatch[1]
           .split(',')
-          .map(tag => tag.trim())
-          .filter(tag => tag.length > 0);
-        
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0);
+
         sections.push({
           title,
           content: '',
-          tags
+          tags,
         });
       } else {
         sections.push({
           title,
-          content: rawContent || ''
+          content: rawContent || '',
         });
       }
     }
-    
+
     if (sections.length === 0) {
       sections.push({
         title: 'Prompt',
-        content: realText
+        content: realText,
       });
     }
-    
+
     return sections;
   };
 
   const getPlainTextOutput = () => {
     const sections = parsePromptSections(prompt);
     let output = '';
-    
-    sections.forEach(section => {
+
+    sections.forEach((section) => {
       output += `**${section.title}:**\n`;
       if (section.tags && section.tags.length > 0) {
-        section.tags.forEach(tag => {
+        section.tags.forEach((tag) => {
           output += `• ${tag}\n`;
         });
       } else {
@@ -90,14 +90,14 @@ export function PromptPreview({ prompt, negativePrompt, modelStyle }: PromptPrev
       }
       output += '\n';
     });
-    
+
     return output.trim();
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copied!", {
-      description: "Prompt copied to clipboard",
+    toast.success('Copied!', {
+      description: 'Prompt copied to clipboard',
     });
   };
 
@@ -113,7 +113,7 @@ export function PromptPreview({ prompt, negativePrompt, modelStyle }: PromptPrev
             onClick={() => setViewMode('text')}
             className="h-8 text-xs"
           >
-            <FileText className="h-3 w-3 mr-1" />
+            <FileText className="mr-1 h-3 w-3" />
             Text
           </Button>
           <Button
@@ -122,35 +122,37 @@ export function PromptPreview({ prompt, negativePrompt, modelStyle }: PromptPrev
             onClick={() => setViewMode('preview')}
             className="h-8 text-xs"
           >
-            <Eye className="h-3 w-3 mr-1" />
+            <Eye className="mr-1 h-3 w-3" />
             Preview
           </Button>
         </div>
-        
+
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => copyToClipboard(viewMode === 'text' ? getPlainTextOutput() : extractRealContent(prompt))}
+          onClick={() =>
+            copyToClipboard(viewMode === 'text' ? getPlainTextOutput() : extractRealContent(prompt))
+          }
           className="h-8 px-2 text-xs"
         >
-          <Check className="h-3 w-3 mr-1" />
+          <Check className="mr-1 h-3 w-3" />
           Copy All
         </Button>
       </div>
 
       {viewMode === 'text' ? (
         <div className="relative">
-          <div className="w-full min-h-[300px] p-4 text-sm border rounded-lg bg-muted/30 overflow-auto whitespace-pre-wrap font-sans">
+          <div className="min-h-[300px] w-full overflow-auto whitespace-pre-wrap rounded-lg border bg-muted/30 p-4 font-sans text-sm">
             {sections.map((section, index) => (
               <div key={index} className="mb-4">
-                <div className="font-semibold text-primary mb-1">
-                  {section.title}:
-                </div>
+                <div className="mb-1 font-semibold text-primary">{section.title}:</div>
                 <div className="pl-4">
                   {section.tags && section.tags.length > 0 ? (
                     <ul className="space-y-1">
                       {section.tags.map((tag, i) => (
-                        <li key={i} className="text-foreground/80">• {tag}</li>
+                        <li key={i} className="text-foreground/80">
+                          • {tag}
+                        </li>
                       ))}
                     </ul>
                   ) : (
@@ -166,72 +168,68 @@ export function PromptPreview({ prompt, negativePrompt, modelStyle }: PromptPrev
           </div>
         </div>
       ) : (
-        <div className="border rounded-lg bg-gradient-to-br from-muted/30 to-muted/10 overflow-hidden">
-          <div className="p-6 space-y-6">
+        <div className="overflow-hidden rounded-lg border bg-gradient-to-br from-muted/30 to-muted/10">
+          <div className="space-y-6 p-6">
             {sections.map((section, index) => (
               <div key={index} className="space-y-2">
-                <div className="flex items-start justify-between group">
-                  <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary"></span>
+                <div className="group flex items-start justify-between">
+                  <h3 className="flex items-center gap-2 font-semibold text-primary text-sm">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
                     {section.title}
                   </h3>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      const copyText = section.tags 
-                        ? section.tags.join(', ')
-                        : section.content;
+                      const copyText = section.tags ? section.tags.join(', ') : section.content;
                       copyToClipboard(copyText);
                     }}
-                    className="h-6 px-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="h-6 px-2 text-xs opacity-0 transition-opacity group-hover:opacity-100"
                   >
-                    <Check className="h-3 w-3 mr-1" />
+                    <Check className="mr-1 h-3 w-3" />
                     Copy
                   </Button>
                 </div>
-                <div className="pl-4 border-l-2 border-primary/20">
+                <div className="border-primary/20 border-l-2 pl-4">
                   {section.tags && section.tags.length > 0 ? (
                     <div className="flex flex-wrap gap-1.5">
                       {section.tags.map((tag, i) => (
                         <span
                           key={i}
-                          className="inline-block px-2.5 py-1 text-xs rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
+                          className="inline-block rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-primary text-xs transition-colors hover:bg-primary/20"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-line">
+                    <p className="whitespace-pre-line text-foreground/90 text-sm leading-relaxed">
                       {section.content}
                     </p>
                   )}
                 </div>
               </div>
             ))}
-            
+
             {negativePrompt && (
-              <div className="pt-4 border-t space-y-2">
-                <div className="flex items-start justify-between group">
-                  <h3 className="text-sm font-semibold text-destructive flex items-center gap-2">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-destructive"></span>
+              <div className="space-y-2 border-t pt-4">
+                <div className="group flex items-start justify-between">
+                  <h3 className="flex items-center gap-2 font-semibold text-destructive text-sm">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-destructive" />
                     Negative Prompt
                   </h3>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(negativePrompt)}
-                    className="h-6 px-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="h-6 px-2 text-xs opacity-0 transition-opacity group-hover:opacity-100"
                   >
-                    <Check className="h-3 w-3 mr-1" />
+                    <Check className="mr-1 h-3 w-3" />
                     Copy
                   </Button>
                 </div>
-                <div className="pl-4 border-l-2 border-destructive/20">
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    {negativePrompt}
-                  </p>
+                <div className="border-destructive/20 border-l-2 pl-4">
+                  <p className="text-muted-foreground text-sm leading-relaxed">{negativePrompt}</p>
                 </div>
               </div>
             )}

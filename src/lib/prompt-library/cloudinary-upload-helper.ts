@@ -20,17 +20,14 @@ export async function uploadPromptImage(
   fileName: string
 ): Promise<UploadResult> {
   const folderPath = `prompt-library/${category}`;
-  
+
   try {
     const result = await cloudinary.uploader.upload(imagePath, {
       folder: folderPath,
       public_id: fileName.replace(/\.[^/.]+$/, ''),
       resource_type: 'image',
       overwrite: false,
-      transformation: [
-        { quality: 'auto:best' },
-        { fetch_format: 'auto' }
-      ],
+      transformation: [{ quality: 'auto:best' }, { fetch_format: 'auto' }],
     });
 
     return {
@@ -50,21 +47,17 @@ export async function uploadBulkImages(
   images: Array<{ path: string; category: string; fileName: string }>
 ): Promise<UploadResult[]> {
   const results: UploadResult[] = [];
-  
+
   for (const image of images) {
     try {
-      const result = await uploadPromptImage(
-        image.path,
-        image.category,
-        image.fileName
-      );
+      const result = await uploadPromptImage(image.path, image.category, image.fileName);
       results.push(result);
       console.log(`✓ Uploaded: ${result.publicId}`);
     } catch (error) {
       console.error(`✗ Failed to upload ${image.fileName}:`, error);
     }
   }
-  
+
   return results;
 }
 
@@ -79,7 +72,7 @@ export async function createPromptLibraryFolders(): Promise<void> {
   ];
 
   console.log('Cloudinary folders will be created automatically on first upload:');
-  folders.forEach(folder => console.log(`  - ${folder}`));
+  folders.forEach((folder) => console.log(`  - ${folder}`));
 }
 
 export function getExpectedPublicId(category: string, fileName: string): string {

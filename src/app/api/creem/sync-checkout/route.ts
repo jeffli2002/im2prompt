@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/auth-utils';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
+import { formatPlanName, getCreditsForPlan } from '@/lib/creem/plan-utils';
 import db from '@/server/db';
-import { userCredits, creditTransactions } from '@/server/db/schema';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
+import { creditTransactions, userCredits } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
-import { getCreditsForPlan, formatPlanName } from '@/lib/creem/plan-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,7 +92,7 @@ async function grantSubscriptionCredits(
 export async function POST(request: NextRequest) {
   try {
     console.log('[Creem Sync] Received sync request');
-    
+
     const session = await getSessionFromRequest(request.headers);
 
     if (!session?.user) {
@@ -102,7 +102,10 @@ export async function POST(request: NextRequest) {
 
     if (session.user.id === 'dev-user') {
       console.warn('[Creem Sync] Refusing to sync checkout for mock dev user');
-      return NextResponse.json({ error: 'Test user not allowed to sync subscriptions' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Test user not allowed to sync subscriptions' },
+        { status: 403 }
+      );
     }
 
     console.log(`[Creem Sync] User authenticated: ${session.user.id}`);
@@ -112,10 +115,7 @@ export async function POST(request: NextRequest) {
 
     if (!checkoutId) {
       console.error('[Creem Sync] Missing checkoutId');
-      return NextResponse.json(
-        { error: 'Missing checkoutId' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing checkoutId' }, { status: 400 });
     }
 
     console.log(`[Creem Sync] Syncing checkout ${checkoutId} for user ${session.user.id}`);
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     const planId = body.planId || 'pro'; // Default to pro if not specified
     const isYearly = body.isYearly || false;
     const newInterval = isYearly ? 'year' : 'month';
-    
+
     console.log(`[Creem Sync] Requested plan: ${planId} ${newInterval}`);
 
     // Check if subscription already exists
@@ -136,20 +136,22 @@ export async function POST(request: NextRequest) {
     if (existingSubscription) {
       const currentPlan = existingSubscription.priceId;
       const currentInterval = existingSubscription.interval;
-      
-      console.log(`[Creem Sync] User already has active subscription: ${currentPlan} ${currentInterval}`);
+
+      console.log(
+        `[Creem Sync] User already has active subscription: ${currentPlan} ${currentInterval}`
+      );
       console.log(`[Creem Sync] Attempting to create: ${planId} ${newInterval}`);
-      
+
       // Check if this is the exact same subscription (idempotency check)
       // If subscription was created within the last 30 seconds with same plan/interval, it's likely a duplicate request
       const subscriptionAge = Date.now() - new Date(existingSubscription.createdAt).getTime();
-      const isRecentDuplicate = 
-        currentPlan === planId && 
-        currentInterval === newInterval && 
-        subscriptionAge < 30000; // 30 seconds
-      
+      const isRecentDuplicate =
+        currentPlan === planId && currentInterval === newInterval && subscriptionAge < 30000; // 30 seconds
+
       if (isRecentDuplicate) {
-        console.log(`[Creem Sync] Duplicate request detected - subscription created ${subscriptionAge}ms ago`);
+        console.log(
+          `[Creem Sync] Duplicate request detected - subscription created ${subscriptionAge}ms ago`
+        );
         return NextResponse.json({
           success: true,
           message: 'Subscription already exists (duplicate request ignored)',
@@ -160,17 +162,19 @@ export async function POST(request: NextRequest) {
           },
         });
       }
-      
+
       // If subscription is set to cancel at period end, immediately cancel it and create new one
       if (existingSubscription.cancelAtPeriodEnd) {
-        console.log(`[Creem Sync] Existing subscription is set to cancel, immediately canceling it`);
-        
+        console.log(
+          '[Creem Sync] Existing subscription is set to cancel, immediately canceling it'
+        );
+
         // Immediately cancel the old subscription
         await paymentRepository.update(existingSubscription.id, {
           status: 'canceled',
           cancelAtPeriodEnd: false,
         });
-        
+
         await paymentRepository.createEvent({
           paymentId: existingSubscription.id,
           eventType: 'canceled',
@@ -182,29 +186,34 @@ export async function POST(request: NextRequest) {
             newInterval: newInterval,
           }),
         });
-        
-        console.log(`[Creem Sync] Old subscription canceled, proceeding with new subscription`);
+
+        console.log('[Creem Sync] Old subscription canceled, proceeding with new subscription');
       } else if (currentPlan === planId && currentInterval === newInterval) {
         // If trying to subscribe to the exact same plan AND interval without cancellation, reject
-        return NextResponse.json({
-          success: false,
-          error: `You already have an active ${planId.toUpperCase()} ${newInterval === 'year' ? 'yearly' : 'monthly'} subscription`,
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            success: false,
+            error: `You already have an active ${planId.toUpperCase()} ${newInterval === 'year' ? 'yearly' : 'monthly'} subscription`,
+          },
+          { status: 400 }
+        );
       } else {
-        console.log(`[Creem Sync] Plan/interval change detected: ${currentPlan} ${currentInterval} → ${planId} ${newInterval}`);
-        
-        const isUpgrade = 
+        console.log(
+          `[Creem Sync] Plan/interval change detected: ${currentPlan} ${currentInterval} → ${planId} ${newInterval}`
+        );
+
+        const isUpgrade =
           (currentPlan === 'pro' && planId === 'proplus') ||
           (currentInterval === 'month' && newInterval === 'year');
-        
+
         if (isUpgrade) {
-          console.log(`[Creem Sync] This is an upgrade - scheduling for period end`);
-          
+          console.log('[Creem Sync] This is an upgrade - scheduling for period end');
+
           await paymentRepository.update(existingSubscription.id, {
             priceId: planId,
             interval: newInterval,
           });
-          
+
           await paymentRepository.createEvent({
             paymentId: existingSubscription.id,
             eventType: 'upgraded',
@@ -218,9 +227,11 @@ export async function POST(request: NextRequest) {
               effectiveAt: existingSubscription.periodEnd?.toISOString(),
             }),
           });
-          
-          console.log(`[Creem Sync] Upgrade scheduled for period end: ${existingSubscription.periodEnd?.toISOString()}`);
-          
+
+          console.log(
+            `[Creem Sync] Upgrade scheduled for period end: ${existingSubscription.periodEnd?.toISOString()}`
+          );
+
           return NextResponse.json({
             success: true,
             message: `Subscription will be upgraded to ${planId.toUpperCase()} ${newInterval === 'year' ? 'yearly' : 'monthly'} at the end of current period`,
@@ -231,37 +242,36 @@ export async function POST(request: NextRequest) {
               currentPeriodEnd: existingSubscription.periodEnd?.toISOString(),
             },
           });
-        } else {
-          console.log(`[Creem Sync] This is a downgrade - canceling old and creating new`);
-          
-          await paymentRepository.update(existingSubscription.id, {
-            status: 'canceled',
-            cancelAtPeriodEnd: false,
-          });
-          
-          await paymentRepository.createEvent({
-            paymentId: existingSubscription.id,
-            eventType: 'canceled',
-            eventData: JSON.stringify({
-              subscriptionId: existingSubscription.subscriptionId,
-              canceledAt: new Date().toISOString(),
-              reason: 'plan_changed',
-              oldPlan: currentPlan,
-              oldInterval: currentInterval,
-              newPlan: planId,
-              newInterval: newInterval,
-            }),
-          });
-          
-          console.log(`[Creem Sync] Old subscription canceled, proceeding with new subscription`);
         }
+        console.log('[Creem Sync] This is a downgrade - canceling old and creating new');
+
+        await paymentRepository.update(existingSubscription.id, {
+          status: 'canceled',
+          cancelAtPeriodEnd: false,
+        });
+
+        await paymentRepository.createEvent({
+          paymentId: existingSubscription.id,
+          eventType: 'canceled',
+          eventData: JSON.stringify({
+            subscriptionId: existingSubscription.subscriptionId,
+            canceledAt: new Date().toISOString(),
+            reason: 'plan_changed',
+            oldPlan: currentPlan,
+            oldInterval: currentInterval,
+            newPlan: planId,
+            newInterval: newInterval,
+          }),
+        });
+
+        console.log('[Creem Sync] Old subscription canceled, proceeding with new subscription');
       }
     }
 
     // Create subscription record
     const subscriptionId = `sub_${checkoutId}`;
     const customerId = `cus_${session.user.id}`;
-    
+
     const now = new Date();
     const periodEnd = new Date();
     periodEnd.setMonth(periodEnd.getMonth() + (isYearly ? 12 : 1));
@@ -271,7 +281,7 @@ export async function POST(request: NextRequest) {
       provider: 'creem' as const,
       priceId: planId,
       type: 'subscription' as const,
-      interval: isYearly ? 'year' as const : 'month' as const,
+      interval: isYearly ? ('year' as const) : ('month' as const),
       userId: session.user.id,
       customerId,
       subscriptionId,
@@ -280,19 +290,14 @@ export async function POST(request: NextRequest) {
       periodEnd,
     };
 
-    console.log(`[Creem Sync] Creating new subscription:`, newSubscriptionData);
+    console.log('[Creem Sync] Creating new subscription:', newSubscriptionData);
 
     await paymentRepository.create(newSubscriptionData);
 
-    console.log(`[Creem Sync] Subscription created successfully in database`);
+    console.log('[Creem Sync] Subscription created successfully in database');
 
     // Grant subscription credits
-    await grantSubscriptionCredits(
-      session.user.id,
-      planId,
-      subscriptionId,
-      newInterval
-    );
+    await grantSubscriptionCredits(session.user.id, planId, subscriptionId, newInterval);
 
     console.log(`[Creem Sync] Successfully synced subscription for user ${session.user.id}`);
 
@@ -309,9 +314,6 @@ export async function POST(request: NextRequest) {
     console.error('[Creem Sync] Error syncing checkout:', error);
     const errorMessage = error instanceof Error ? error.message : 'Failed to sync checkout';
     console.error('[Creem Sync] Error details:', errorMessage);
-    return NextResponse.json(
-      { error: errorMessage, details: String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: errorMessage, details: String(error) }, { status: 500 });
   }
 }

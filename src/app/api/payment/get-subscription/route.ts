@@ -1,10 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/auth-utils';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
+    console.log('[get-subscription] Headers:', Object.fromEntries(request.headers.entries()));
     const session = await getSessionFromRequest(request.headers);
+    console.log('[get-subscription] Session:', session?.user?.email || 'no session');
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

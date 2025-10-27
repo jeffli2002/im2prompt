@@ -1,6 +1,6 @@
+import { desc, eq } from 'drizzle-orm';
 import db from './src/server/db/index.js';
 import { payment } from './src/server/db/schema.js';
-import { eq, desc } from 'drizzle-orm';
 
 const userId = 'dev-user';
 

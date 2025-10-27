@@ -1,9 +1,20 @@
 'use client';
 
-import ProtectedContainer from '@/components/dashboard/protected-container';
 import { useIsAdmin } from '@/components/auth/permission-provider';
+import ProtectedContainer from '@/components/dashboard/protected-container';
 import type { SidebarGroup } from '@/types';
-import { Coins, History, CreditCard, Files, Shield, Users, Key, Image, Sparkles, BarChart3 } from 'lucide-react';
+import {
+  BarChart3,
+  Coins,
+  CreditCard,
+  Files,
+  History,
+  Image,
+  Key,
+  Shield,
+  Sparkles,
+  Users,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';

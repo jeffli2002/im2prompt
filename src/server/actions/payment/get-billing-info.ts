@@ -1,9 +1,9 @@
 'use server';
 
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import type { ActionResult, PaymentRecord } from '@/payment/types';
-import { ErrorLogger } from '@/lib/logger/logger-utils';
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
+import { ErrorLogger } from '@/lib/logger/logger-utils';
+import type { ActionResult, PaymentRecord } from '@/payment/types';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
 
 const billingErrorLogger = new ErrorLogger('billing-info');
 
@@ -31,12 +31,17 @@ export async function getBillingInfo(): Promise<ActionResult<BillingInfo>> {
       session.user.id
     );
 
-    console.log(`[getBillingInfo] Active subscription:`, activeSubscription ? {
-      priceId: activeSubscription.priceId,
-      interval: activeSubscription.interval,
-      status: activeSubscription.status,
-      cancelAtPeriodEnd: activeSubscription.cancelAtPeriodEnd,
-    } : null);
+    console.log(
+      '[getBillingInfo] Active subscription:',
+      activeSubscription
+        ? {
+            priceId: activeSubscription.priceId,
+            interval: activeSubscription.interval,
+            status: activeSubscription.status,
+            cancelAtPeriodEnd: activeSubscription.cancelAtPeriodEnd,
+          }
+        : null
+    );
 
     // 获取用户的支付历史
     const paymentHistory = await paymentRepository.findByUserId(session.user.id);

@@ -1,7 +1,7 @@
-import db from '@/server/db';
-import { usageTracking, monthlyUsageTracking } from '@/server/db/schema';
-import { eq, and } from 'drizzle-orm';
 import { creditsConfig } from '@/config/credits.config';
+import db from '@/server/db';
+import { monthlyUsageTracking, usageTracking } from '@/server/db/schema';
+import { and, eq } from 'drizzle-orm';
 
 export interface QuotaCheckResult {
   canProceed: boolean;
@@ -23,18 +23,12 @@ export const quotaService = {
 
     // Check daily usage
     const dailyUsage = await db.query.usageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.date, today)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.date, today)),
     });
 
     // Check monthly usage
     const monthlyUsage = await db.query.monthlyUsageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.month, currentMonth)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.month, currentMonth)),
     });
 
     const dailyUsed = dailyUsage?.imageToTextCount || 0;
@@ -65,18 +59,12 @@ export const quotaService = {
 
     // Check daily usage
     const dailyUsage = await db.query.usageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.date, today)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.date, today)),
     });
 
     // Check monthly usage
     const monthlyUsage = await db.query.monthlyUsageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.month, currentMonth)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.month, currentMonth)),
     });
 
     const dailyUsed = dailyUsage?.imageGenerationCount || 0;
@@ -107,18 +95,12 @@ export const quotaService = {
 
     // Check daily usage
     const dailyUsage = await db.query.usageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.date, today)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.date, today)),
     });
 
     // Check monthly usage
     const monthlyUsage = await db.query.monthlyUsageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.month, currentMonth)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.month, currentMonth)),
     });
 
     const dailyUsed = dailyUsage?.videoGenerationCount || 0;
@@ -147,10 +129,7 @@ export const quotaService = {
 
     // Update daily tracking
     const existingDaily = await db.query.usageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.date, today)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.date, today)),
     });
 
     if (existingDaily) {
@@ -160,10 +139,7 @@ export const quotaService = {
           imageToTextCount: existingDaily.imageToTextCount + 1,
           updatedAt: new Date(),
         })
-        .where(and(
-          eq(usageTracking.userId, userId),
-          eq(usageTracking.date, today)
-        ));
+        .where(and(eq(usageTracking.userId, userId), eq(usageTracking.date, today)));
     } else {
       await db.insert(usageTracking).values({
         id: `usage_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
@@ -179,10 +155,7 @@ export const quotaService = {
 
     // Update monthly tracking
     const existingMonthly = await db.query.monthlyUsageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.month, currentMonth)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.month, currentMonth)),
     });
 
     if (existingMonthly) {
@@ -192,10 +165,9 @@ export const quotaService = {
           imageToTextCount: existingMonthly.imageToTextCount + 1,
           updatedAt: new Date(),
         })
-        .where(and(
-          eq(monthlyUsageTracking.userId, userId),
-          eq(monthlyUsageTracking.month, currentMonth)
-        ));
+        .where(
+          and(eq(monthlyUsageTracking.userId, userId), eq(monthlyUsageTracking.month, currentMonth))
+        );
     } else {
       await db.insert(monthlyUsageTracking).values({
         id: `monthly_usage_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
@@ -214,10 +186,7 @@ export const quotaService = {
 
     // Update daily tracking
     const existingDaily = await db.query.usageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.date, today)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.date, today)),
     });
 
     if (existingDaily) {
@@ -227,10 +196,7 @@ export const quotaService = {
           imageGenerationCount: existingDaily.imageGenerationCount + 1,
           updatedAt: new Date(),
         })
-        .where(and(
-          eq(usageTracking.userId, userId),
-          eq(usageTracking.date, today)
-        ));
+        .where(and(eq(usageTracking.userId, userId), eq(usageTracking.date, today)));
     } else {
       await db.insert(usageTracking).values({
         id: `usage_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
@@ -246,10 +212,7 @@ export const quotaService = {
 
     // Update monthly tracking
     const existingMonthly = await db.query.monthlyUsageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.month, currentMonth)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.month, currentMonth)),
     });
 
     if (existingMonthly) {
@@ -259,10 +222,9 @@ export const quotaService = {
           imageGenerationCount: existingMonthly.imageGenerationCount + 1,
           updatedAt: new Date(),
         })
-        .where(and(
-          eq(monthlyUsageTracking.userId, userId),
-          eq(monthlyUsageTracking.month, currentMonth)
-        ));
+        .where(
+          and(eq(monthlyUsageTracking.userId, userId), eq(monthlyUsageTracking.month, currentMonth))
+        );
     } else {
       await db.insert(monthlyUsageTracking).values({
         id: `monthly_usage_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
@@ -281,10 +243,7 @@ export const quotaService = {
 
     // Update daily tracking
     const existingDaily = await db.query.usageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.date, today)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.date, today)),
     });
 
     if (existingDaily) {
@@ -294,10 +253,7 @@ export const quotaService = {
           videoGenerationCount: existingDaily.videoGenerationCount + 1,
           updatedAt: new Date(),
         })
-        .where(and(
-          eq(usageTracking.userId, userId),
-          eq(usageTracking.date, today)
-        ));
+        .where(and(eq(usageTracking.userId, userId), eq(usageTracking.date, today)));
     } else {
       await db.insert(usageTracking).values({
         id: `usage_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
@@ -313,10 +269,7 @@ export const quotaService = {
 
     // Update monthly tracking
     const existingMonthly = await db.query.monthlyUsageTracking.findFirst({
-      where: (table, { eq, and }) => and(
-        eq(table.userId, userId),
-        eq(table.month, currentMonth)
-      ),
+      where: (table, { eq, and }) => and(eq(table.userId, userId), eq(table.month, currentMonth)),
     });
 
     if (existingMonthly) {
@@ -326,10 +279,9 @@ export const quotaService = {
           videoGenerationCount: existingMonthly.videoGenerationCount + 1,
           updatedAt: new Date(),
         })
-        .where(and(
-          eq(monthlyUsageTracking.userId, userId),
-          eq(monthlyUsageTracking.month, currentMonth)
-        ));
+        .where(
+          and(eq(monthlyUsageTracking.userId, userId), eq(monthlyUsageTracking.month, currentMonth))
+        );
     } else {
       await db.insert(monthlyUsageTracking).values({
         id: `monthly_usage_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,

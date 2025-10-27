@@ -81,10 +81,7 @@ export interface PlanCreditInfo {
 /**
  * Calculate the credit allocation for a plan/price identifier.
  */
-export function getCreditsForPlan(
-  identifier: string,
-  interval?: BillingInterval
-): PlanCreditInfo {
+export function getCreditsForPlan(identifier: string, interval?: BillingInterval): PlanCreditInfo {
   const resolved = resolvePlanByIdentifier(identifier, interval);
 
   if (!resolved) {
@@ -101,8 +98,7 @@ export function getCreditsForPlan(
   const effectiveInterval: BillingInterval = interval || resolved.interval;
 
   const monthlyCredits =
-    plan.credits?.monthly ??
-    (plan.credits?.yearly ? Math.round(plan.credits.yearly / 12) : 0);
+    plan.credits?.monthly ?? (plan.credits?.yearly ? Math.round(plan.credits.yearly / 12) : 0);
   const yearlyCredits = plan.credits?.yearly ?? monthlyCredits * 12;
 
   const amount = effectiveInterval === 'year' ? yearlyCredits : monthlyCredits;

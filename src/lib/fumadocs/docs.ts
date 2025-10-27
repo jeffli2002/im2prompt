@@ -37,29 +37,32 @@ export interface DocsTreeItem {
 function getMetaConfigFromSource(locale: string, folderPath = ''): MetaConfig | null {
   try {
     // Access the compiled meta data from .source/index.ts
-    const sourceData = docs.toFumadocsSource() as {
-      files?: Array<{ path: string; type: string; data?: unknown }>;
-    } | {
-      files: () => Array<{ path: string; type: string; data?: unknown }>;
-    };
-    
+    const sourceData = docs.toFumadocsSource() as
+      | {
+          files?: Array<{ path: string; type: string; data?: unknown }>;
+        }
+      | {
+          files: () => Array<{ path: string; type: string; data?: unknown }>;
+        };
+
     // Build the expected meta path
     const metaPath = folderPath ? `${locale}/${folderPath}/meta.json` : `${locale}/meta.json`;
-    
+
     // Find the meta file in the source data
     const rawFiles = Array.isArray((sourceData as any).files)
       ? (sourceData as any).files
       : typeof (sourceData as any).files === 'function'
         ? (sourceData as any).files()
         : [];
-    const metaFile = rawFiles.find((file: { path: string; type: string; data?: unknown }) => 
-      file.path === metaPath && file.type === 'meta'
+    const metaFile = rawFiles.find(
+      (file: { path: string; type: string; data?: unknown }) =>
+        file.path === metaPath && file.type === 'meta'
     );
-    
+
     if (metaFile?.data) {
       return metaFile.data as MetaConfig;
     }
-    
+
     return null;
   } catch (error) {
     console.warn(`Failed to get meta config for ${locale}/${folderPath}:`, error);
@@ -69,7 +72,7 @@ function getMetaConfigFromSource(locale: string, folderPath = ''): MetaConfig | 
 
 export function getDocsPages(locale = 'en'): DocsPage[] {
   const allPages = docsSource.getPages();
-  
+
   const filteredPages = allPages.filter((page) => {
     const urlParts = page.url.split('/');
     const pageLocale = urlParts[2];
@@ -78,7 +81,7 @@ export function getDocsPages(locale = 'en'): DocsPage[] {
 
   // Get meta configuration for ordering
   const metaConfig = getMetaConfigFromSource(locale);
-  
+
   if (metaConfig?.pages) {
     // Create a map for quick lookup
     const pageMap = new Map<string, DocsPage>();
@@ -93,7 +96,7 @@ export function getDocsPages(locale = 'en'): DocsPage[] {
         }
       }
     }
-    
+
     // Order pages according to meta.json
     const orderedPages: DocsPage[] = [];
     for (const pageSlug of metaConfig.pages) {
@@ -103,12 +106,12 @@ export function getDocsPages(locale = 'en'): DocsPage[] {
         pageMap.delete(pageSlug);
       }
     }
-    
+
     // Add any remaining pages that weren't in meta.json
     for (const remainingPage of pageMap.values()) {
       orderedPages.push(remainingPage);
     }
-    
+
     return orderedPages;
   }
 
@@ -117,7 +120,7 @@ export function getDocsPages(locale = 'en'): DocsPage[] {
     // Put index page first
     if (a.slugs.includes('index')) return -1;
     if (b.slugs.includes('index')) return 1;
-    
+
     // Then sort by title
     const titleA = a.data.title || '';
     const titleB = b.data.title || '';
@@ -138,7 +141,7 @@ export function getDocsPageTree(locale = 'en') {
 // Cloudflare Workers compatible docs tree builder
 export function buildDocsTree(locale = 'en'): DocsTreeItem[] {
   const allPages = docsSource.getPages();
-  
+
   const filteredPages = allPages.filter((page) => {
     const urlParts = page.url.split('/');
     const pageLocale = urlParts[2];
@@ -154,10 +157,10 @@ export function buildDocsTree(locale = 'en'): DocsTreeItem[] {
     for (const pageSlug of rootMetaConfig.pages) {
       // Check if this is a folder by looking for pages with more than 2 slugs
       // and where the second slug matches pageSlug
-      const folderPages = filteredPages.filter(page => 
-        page.slugs.length > 2 && page.slugs[1] === pageSlug
+      const folderPages = filteredPages.filter(
+        (page) => page.slugs.length > 2 && page.slugs[1] === pageSlug
       );
-      
+
       if (folderPages.length > 0) {
         // This is a folder
         const folderMetaConfig = getMetaConfigFromSource(locale, pageSlug);
@@ -165,20 +168,20 @@ export function buildDocsTree(locale = 'en'): DocsTreeItem[] {
           type: 'folder',
           name: folderMetaConfig?.title || pageSlug,
           defaultOpen: folderMetaConfig?.defaultOpen || false,
-          children: []
+          children: [],
         };
 
         // Process folder contents
         if (folderMetaConfig?.pages) {
           for (const subPageSlug of folderMetaConfig.pages) {
-            const subPage = folderPages.find(page => 
-              page.slugs[page.slugs.length - 1] === subPageSlug
+            const subPage = folderPages.find(
+              (page) => page.slugs[page.slugs.length - 1] === subPageSlug
             );
             if (subPage) {
               folderItem.children?.push({
                 type: 'page',
                 name: subPage.data.title || subPageSlug,
-                url: `/docs/${pageSlug}/${subPageSlug}`
+                url: `/docs/${pageSlug}/${subPageSlug}`,
               });
             }
           }
@@ -187,7 +190,7 @@ export function buildDocsTree(locale = 'en'): DocsTreeItem[] {
         tree.push(folderItem);
       } else {
         // This is a regular page
-        const page = filteredPages.find(p => {
+        const page = filteredPages.find((p) => {
           if (pageSlug === 'index') {
             return p.slugs.length === 1 && p.file.name === 'index';
           }
@@ -199,7 +202,7 @@ export function buildDocsTree(locale = 'en'): DocsTreeItem[] {
           tree.push({
             type: 'page',
             name: page.data.title || pageSlug,
-            url
+            url,
           });
         }
       }

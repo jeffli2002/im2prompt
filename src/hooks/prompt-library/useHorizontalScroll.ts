@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useHorizontalScroll<T extends HTMLElement>() {
   const scrollRef = useRef<T>(null);
@@ -12,9 +12,7 @@ export function useHorizontalScroll<T extends HTMLElement>() {
     if (!element) return;
 
     setCanScrollLeft(element.scrollLeft > 0);
-    setCanScrollRight(
-      element.scrollLeft < element.scrollWidth - element.clientWidth - 1
-    );
+    setCanScrollRight(element.scrollLeft < element.scrollWidth - element.clientWidth - 1);
   }, []);
 
   useEffect(() => {
@@ -23,7 +21,7 @@ export function useHorizontalScroll<T extends HTMLElement>() {
     if (element) {
       element.addEventListener('scroll', checkScroll);
       window.addEventListener('resize', checkScroll);
-      
+
       return () => {
         element.removeEventListener('scroll', checkScroll);
         window.removeEventListener('resize', checkScroll);

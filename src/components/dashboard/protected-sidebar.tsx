@@ -1,34 +1,34 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { LogoImage } from '@/components/ui/logo-image';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { LogoImage } from '@/components/ui/logo-image';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
+import { navbarConfig } from '@/config/navbar.config';
 import { cn } from '@/lib/utils';
 import type { ProtectedSidebarProps } from '@/types';
-import { 
-  ChevronDown, 
-  ChevronLeft, 
-  ChevronRight, 
-  Menu,
-  Users,
+import {
   Bell,
-  Files,
-  PenTool,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   CreditCard,
-  Shield,
+  Files,
   Home,
-  Settings,
-  LayoutDashboard,
   Image as ImageIcon,
-  Sparkles
+  LayoutDashboard,
+  Menu,
+  PenTool,
+  Settings,
+  Shield,
+  Sparkles,
+  Users,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { navbarConfig } from '@/config/navbar.config';
+import { useState } from 'react';
 
 // Icon mapping
 const iconMap = {
@@ -83,9 +83,9 @@ export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: Protect
       {/* Header */}
       <div className="flex h-16 items-center justify-between border-b px-4">
         {collapsed ? (
-          <div className="relative w-8 h-8">
-            <LogoImage 
-              src={navbarConfig.logo.src} 
+          <div className="relative h-8 w-8">
+            <LogoImage
+              src={navbarConfig.logo.src}
               alt={navbarConfig.logo.alt}
               width={32}
               height={32}
@@ -96,17 +96,17 @@ export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: Protect
           </div>
         ) : (
           <div className="flex items-center space-x-2">
-            <div className="relative w-8 h-8">
-            <LogoImage 
-              src={navbarConfig.logo.src} 
-              alt={navbarConfig.logo.alt}
-              width={32}
-              height={32}
-              className="rounded-lg object-contain"
-              priority
-              unoptimized
-            />
-          </div>
+            <div className="relative h-8 w-8">
+              <LogoImage
+                src={navbarConfig.logo.src}
+                alt={navbarConfig.logo.alt}
+                width={32}
+                height={32}
+                className="rounded-lg object-contain"
+                priority
+                unoptimized
+              />
+            </div>
             <Link href="/">
               <span className="font-semibold text-lg">im2Prompt</span>
             </Link>
@@ -164,9 +164,12 @@ export function ProtectedSidebar({ collapsed, onToggle, sidebarGroups }: Protect
                               <Icon className={cn('h-4 w-4', !collapsed && 'mr-3')} />
                               {!collapsed && (
                                 <>
-                                  <span className="text-sm flex-1">{item.title}</span>
+                                  <span className="flex-1 text-sm">{item.title}</span>
                                   {item.badge && (
-                                    <Badge variant="secondary" className="ml-auto text-xs px-1.5 py-0">
+                                    <Badge
+                                      variant="secondary"
+                                      className="ml-auto px-1.5 py-0 text-xs"
+                                    >
                                       {item.badge}
                                     </Badge>
                                   )}

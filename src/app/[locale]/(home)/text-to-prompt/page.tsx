@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -11,11 +12,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { creditsConfig } from '@/config/credits.config';
 import { Camera, Copy, Download, Image as ImageIcon, Loader2, Sparkles, Wand2 } from 'lucide-react';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { creditsConfig } from '@/config/credits.config';
 
 export default function TextToPromptPage() {
   const [inputText, setInputText] = useState<string>('');
@@ -232,10 +232,22 @@ export default function TextToPromptPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="flux-1.1-pro">Flux 1.1 Pro - {creditsConfig.consumption.imageGeneration['flux-1.1-pro']} credits</SelectItem>
-                      <SelectItem value="flux-1.1-ultra">Flux 1.1 Ultra - {creditsConfig.consumption.imageGeneration['flux-1.1-ultra']} credits</SelectItem>
-                      <SelectItem value="stable-diffusion">Stable Diffusion - {creditsConfig.consumption.imageGeneration['stable-diffusion']} credits</SelectItem>
-                      <SelectItem value="nano-banana">Nano Banana - {creditsConfig.consumption.imageGeneration['nano-banana']} credits</SelectItem>
+                      <SelectItem value="flux-1.1-pro">
+                        Flux 1.1 Pro - {creditsConfig.consumption.imageGeneration['flux-1.1-pro']}{' '}
+                        credits
+                      </SelectItem>
+                      <SelectItem value="flux-1.1-ultra">
+                        Flux 1.1 Ultra -{' '}
+                        {creditsConfig.consumption.imageGeneration['flux-1.1-ultra']} credits
+                      </SelectItem>
+                      <SelectItem value="stable-diffusion">
+                        Stable Diffusion -{' '}
+                        {creditsConfig.consumption.imageGeneration['stable-diffusion']} credits
+                      </SelectItem>
+                      <SelectItem value="nano-banana">
+                        Nano Banana - {creditsConfig.consumption.imageGeneration['nano-banana']}{' '}
+                        credits
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

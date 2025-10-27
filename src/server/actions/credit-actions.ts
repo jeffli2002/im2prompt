@@ -1,18 +1,19 @@
 'use server';
 
-import { auth } from '@/lib/auth/auth';
-import { headers } from 'next/headers';
-import { creditService } from '@/lib/credits';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import type { ActionResult } from '@/payment/types';
-import type { UserCreditAccount, CreditTransaction } from '@/lib/credits';
+import { paymentConfig } from '@/config';
 import { creditsConfig } from '@/config/credits.config';
-import db from '@/server/db';
-import { creditTransactions, userQuotaUsage } from '@/server/db/schema';
-import { eq, and } from 'drizzle-orm';
-import { quotaService, updateQuotaUsage, type QuotaService } from '@/lib/quota/quota-service';
-import { getCreditsForPlan, resolvePlanByIdentifier } from '@/lib/creem/plan-utils';
+import { auth } from '@/lib/auth/auth';
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
+import { creditService } from '@/lib/credits';
+import type { CreditTransaction, UserCreditAccount } from '@/lib/credits';
+import { getCreditsForPlan, resolvePlanByIdentifier } from '@/lib/creem/plan-utils';
+import { type QuotaService, quotaService, updateQuotaUsage } from '@/lib/quota/quota-service';
+import type { ActionResult } from '@/payment/types';
+import db from '@/server/db';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
+import { creditTransactions, userQuotaUsage } from '@/server/db/schema';
+import { and, eq } from 'drizzle-orm';
+import { headers } from 'next/headers';
 
 export interface GetCreditBalanceResponse extends UserCreditAccount {
   availableBalance: number;
@@ -92,7 +93,7 @@ export async function getCreditBalance(): Promise<ActionResult<GetCreditBalanceR
     if (granted) {
       account = await creditService.getOrCreateCreditAccount(session.user.id);
     }
-    
+
     return {
       success: true,
       data: {
@@ -115,10 +116,9 @@ async function ensureSubscriptionCredits(userId: string): Promise<boolean> {
     const existingSubscriptionCredit = await db
       .select({ id: creditTransactions.id })
       .from(creditTransactions)
-      .where(and(
-        eq(creditTransactions.userId, userId),
-        eq(creditTransactions.source, 'subscription')
-      ))
+      .where(
+        and(eq(creditTransactions.userId, userId), eq(creditTransactions.source, 'subscription'))
+      )
       .limit(1);
 
     if (existingSubscriptionCredit.length > 0) {
@@ -175,12 +175,8 @@ export async function getCreditHistory(
     }
 
     const { limit = 50, offset = 0 } = params;
-    const transactions = await creditService.getTransactionHistory(
-      session.user.id,
-      limit,
-      offset
-    );
-    
+    const transactions = await creditService.getTransactionHistory(session.user.id, limit, offset);
+
     return {
       success: true,
       data: transactions,
@@ -215,45 +211,56 @@ export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageRespons
 
     // Get user's current subscription to determine limits
     const subscription = await paymentRepository.findActiveSubscriptionByUserId(session.user.id);
-    
+
     // Get monthly usage records
-    const monthlyUsageRecords = await db.select({
-      service: userQuotaUsage.service,
-      usedAmount: userQuotaUsage.usedAmount,
-    }).from(userQuotaUsage)
-    .where(and(
-      eq(userQuotaUsage.userId, session.user.id),
-      eq(userQuotaUsage.period, currentPeriod)
-    ));
+    const monthlyUsageRecords = await db
+      .select({
+        service: userQuotaUsage.service,
+        usedAmount: userQuotaUsage.usedAmount,
+      })
+      .from(userQuotaUsage)
+      .where(
+        and(eq(userQuotaUsage.userId, session.user.id), eq(userQuotaUsage.period, currentPeriod))
+      );
 
     // Get daily usage records
-    const dailyUsageRecords = await db.select({
-      service: userQuotaUsage.service,
-      usedAmount: userQuotaUsage.usedAmount,
-    }).from(userQuotaUsage)
-    .where(and(
-      eq(userQuotaUsage.userId, session.user.id),
-      eq(userQuotaUsage.period, currentDailyPeriod)
-    ));
+    const dailyUsageRecords = await db
+      .select({
+        service: userQuotaUsage.service,
+        usedAmount: userQuotaUsage.usedAmount,
+      })
+      .from(userQuotaUsage)
+      .where(
+        and(
+          eq(userQuotaUsage.userId, session.user.id),
+          eq(userQuotaUsage.period, currentDailyPeriod)
+        )
+      );
 
     // Extract usage data
-    const storageUsage = monthlyUsageRecords.find(record => record.service === 'storage')?.usedAmount || 0;
-    const monthlyImageGenUsage = monthlyUsageRecords.find(record => record.service === 'image_generation')?.usedAmount || 0;
-    const monthlyVideoGenUsage = monthlyUsageRecords.find(record => record.service === 'video_generation')?.usedAmount || 0;
-    const monthlyImageExtUsage = monthlyUsageRecords.find(record => record.service === 'image_extraction')?.usedAmount || 0;
-    const dailyImageGenUsage = dailyUsageRecords.find(record => record.service === 'image_generation')?.usedAmount || 0;
-    const dailyVideoGenUsage = dailyUsageRecords.find(record => record.service === 'video_generation')?.usedAmount || 0;
-    const dailyImageExtUsage = dailyUsageRecords.find(record => record.service === 'image_extraction')?.usedAmount || 0;
-    
+    const storageUsage =
+      monthlyUsageRecords.find((record) => record.service === 'storage')?.usedAmount || 0;
+    const monthlyImageGenUsage =
+      monthlyUsageRecords.find((record) => record.service === 'image_generation')?.usedAmount || 0;
+    const monthlyVideoGenUsage =
+      monthlyUsageRecords.find((record) => record.service === 'video_generation')?.usedAmount || 0;
+    const monthlyImageExtUsage =
+      monthlyUsageRecords.find((record) => record.service === 'image_extraction')?.usedAmount || 0;
+    const dailyImageGenUsage =
+      dailyUsageRecords.find((record) => record.service === 'image_generation')?.usedAmount || 0;
+    const dailyVideoGenUsage =
+      dailyUsageRecords.find((record) => record.service === 'video_generation')?.usedAmount || 0;
+    const dailyImageExtUsage =
+      dailyUsageRecords.find((record) => record.service === 'image_extraction')?.usedAmount || 0;
+
     // Get limits from payment config
-    const { paymentConfig } = await import('@/config');
     const resolvedPlan = subscription
       ? resolvePlanByIdentifier(subscription.priceId, subscription.interval || undefined)
       : resolvePlanByIdentifier('free');
 
-    const userPlan = resolvedPlan?.plan || paymentConfig.plans.find(p => p.id === 'free');
+    const userPlan = resolvedPlan?.plan || paymentConfig.plans.find((p) => p.id === 'free');
     const planLimits = userPlan?.limits || paymentConfig.plans[0]?.limits || {}; // Default to free plan
-    
+
     // Determine limits
     const baseStorageLimit = creditsConfig.freeUser.storage.freeQuotaGB * 1024 * 1024 * 1024;
     let storageLimit = baseStorageLimit;
@@ -271,7 +278,7 @@ export async function getQuotaUsage(): Promise<ActionResult<GetQuotaUsageRespons
           break;
       }
     }
-    
+
     return {
       success: true,
       data: {
@@ -336,8 +343,9 @@ export async function grantCreditsToUser(
   description?: string
 ): Promise<ActionResult<CreditTransaction>> {
   try {
+    const headersList = await headers();
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {
@@ -352,7 +360,7 @@ export async function grantCreditsToUser(
     // Note: The user type from better-auth might not have role by default
     const userWithRole = session.user as typeof session.user & { role?: string };
     const isAdmin = userWithRole.role === 'admin';
-    
+
     if (!isAdmin) {
       return {
         success: false,
@@ -378,7 +386,7 @@ export async function grantCreditsToUser(
         grantedAt: new Date().toISOString(),
       },
     });
-    
+
     return {
       success: true,
       data: transaction,
@@ -403,8 +411,9 @@ export async function spendCredits(
   referenceId?: string
 ): Promise<ActionResult<CreditTransaction>> {
   try {
+    const headersList = await headers();
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {
@@ -441,7 +450,7 @@ export async function spendCredits(
         timestamp: new Date().toISOString(),
       },
     });
-    
+
     return {
       success: true,
       data: transaction,
@@ -463,8 +472,9 @@ export async function updateUserQuotaUsage(
   amount: number
 ): Promise<ActionResult<{ used: number; service: QuotaService }>> {
   try {
+    const headersList = await headers();
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {
@@ -501,8 +511,9 @@ export async function updateUserQuotaUsage(
  */
 export async function initializeUserQuotaUsage(): Promise<ActionResult<{ message: string }>> {
   try {
+    const headersList = await headers();
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {

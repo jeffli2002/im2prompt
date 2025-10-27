@@ -1,9 +1,9 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -119,7 +119,7 @@ export function ResetPasswordContent() {
       <div className="flex w-full max-w-sm flex-col gap-6">
         <Card className="border border-border/80 shadow-lg">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-semibold">
+            <CardTitle className="font-semibold text-2xl">
               {showResetForm ? t('tokenTitle') : t('title')}
             </CardTitle>
             <CardDescription>
@@ -128,7 +128,7 @@ export function ResetPasswordContent() {
           </CardHeader>
           <CardContent>
             {showInvalidTokenNotice && (
-              <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive text-sm">
                 {t('tokenError')}
               </div>
             )}
@@ -162,20 +162,14 @@ export function ResetPasswordContent() {
                   />
                 </div>
 
-                {resetError && (
-                  <p className="text-sm text-destructive">{resetError}</p>
-                )}
+                {resetError && <p className="text-destructive text-sm">{resetError}</p>}
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={resetState === 'submitting'}
-                >
+                <Button type="submit" className="w-full" disabled={resetState === 'submitting'}>
                   {resetState === 'submitting' ? t('updating') : t('updateButton')}
                 </Button>
 
                 {resetState === 'success' && (
-                  <div className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-600">
+                  <div className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-green-600 text-sm">
                     {t('tokenSuccess')}
                   </div>
                 )}
@@ -195,9 +189,7 @@ export function ResetPasswordContent() {
                   />
                 </div>
 
-                {requestError && (
-                  <p className="text-sm text-destructive">{requestError}</p>
-                )}
+                {requestError && <p className="text-destructive text-sm">{requestError}</p>}
 
                 <Button
                   type="submit"
@@ -208,7 +200,7 @@ export function ResetPasswordContent() {
                 </Button>
 
                 {requestState === 'success' && (
-                  <div className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-600">
+                  <div className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-green-600 text-sm">
                     {t('success')}
                   </div>
                 )}
@@ -219,11 +211,14 @@ export function ResetPasswordContent() {
 
         <div
           className={cn(
-            'text-center text-sm text-muted-foreground',
+            'text-center text-muted-foreground text-sm',
             'flex flex-col items-center gap-2'
           )}
         >
-          <Link href={`/${locale}/login`} className="underline underline-offset-4 hover:text-primary">
+          <Link
+            href={`/${locale}/login`}
+            className="underline underline-offset-4 hover:text-primary"
+          >
             {t('backToLogin')}
           </Link>
           {showInvalidTokenNotice && (

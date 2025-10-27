@@ -1,17 +1,17 @@
-import { creemConfig } from './client';
+import { createHmac } from 'node:crypto';
+import { ErrorLogger } from '@/lib/logger/logger-utils';
 import type {
-  PaymentProvider,
   CreatePaymentParams,
   CreateSubscriptionParams,
-  UpdateSubscriptionParams,
-  PaymentResult,
-  SubscriptionResult,
-  PaymentStatus,
   CreemCheckoutParams,
   CreemSubscriptionParams,
+  PaymentProvider,
+  PaymentResult,
+  PaymentStatus,
+  SubscriptionResult,
+  UpdateSubscriptionParams,
 } from '@/payment/types';
-import { ErrorLogger } from '@/lib/logger/logger-utils';
-import { createHmac } from 'crypto';
+import { creemConfig } from './client';
 
 const creemErrorLogger = new ErrorLogger('creem-provider');
 
@@ -23,15 +23,12 @@ export class CreemProvider implements PaymentProvider {
     this.apiKey = creemConfig.apiKey;
   }
 
-  private async makeRequest<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
           ...options.headers,
         },
@@ -53,14 +50,14 @@ export class CreemProvider implements PaymentProvider {
     }
   }
 
-
   async createPayment(params: CreatePaymentParams): Promise<PaymentResult> {
     try {
       const { userId, priceId, successUrl, cancelUrl, metadata } = params;
 
       const requestBody: any = {
         product_id: priceId,
-        success_url: successUrl || `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing?success=true`,
+        success_url:
+          successUrl || `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing?success=true`,
         metadata: {
           userId,
           ...metadata,
@@ -216,11 +213,11 @@ export class CreemProvider implements PaymentProvider {
   async upgradeSubscription(
     subscriptionId: string,
     newProductId: string,
-    useProration: boolean = false
+    useProration = false
   ): Promise<SubscriptionResult> {
     try {
       const updateBehavior = useProration ? 'proration-charge' : 'proration-none';
-      
+
       const response = await this.makeRequest<{
         id: string;
         customerId: string;
@@ -267,11 +264,11 @@ export class CreemProvider implements PaymentProvider {
   async downgradeSubscription(
     subscriptionId: string,
     newProductId: string,
-    scheduleAtPeriodEnd: boolean = true
+    scheduleAtPeriodEnd = true
   ): Promise<SubscriptionResult> {
     try {
       const updateBehavior = scheduleAtPeriodEnd ? 'proration-none' : 'proration-charge';
-      
+
       const response = await this.makeRequest<{
         id: string;
         customerId: string;
@@ -358,7 +355,10 @@ export class CreemProvider implements PaymentProvider {
     }
   }
 
-  async generateCustomerPortalLink(customerId: string, returnUrl: string): Promise<{ url: string }> {
+  async generateCustomerPortalLink(
+    customerId: string,
+    returnUrl: string
+  ): Promise<{ url: string }> {
     try {
       const response = await this.makeRequest<{
         url: string;
@@ -423,9 +423,7 @@ export class CreemProvider implements PaymentProvider {
 
   async getPaymentStatus(paymentId: string): Promise<PaymentStatus> {
     try {
-      const response = await this.makeRequest<{ status: string }>(
-        `/payments/${paymentId}`
-      );
+      const response = await this.makeRequest<{ status: string }>(`/payments/${paymentId}`);
       return response.status as PaymentStatus;
     } catch (error) {
       creemErrorLogger.logError(error as Error, {
@@ -441,7 +439,7 @@ export class CreemProvider implements PaymentProvider {
       const expectedSignature = createHmac('sha256', creemConfig.webhookSecret)
         .update(payload)
         .digest('hex');
-      
+
       return signature === expectedSignature;
     } catch (error) {
       creemErrorLogger.logError(error as Error, {

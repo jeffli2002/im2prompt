@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { reactivateSubscription } from '@/server/actions/payment/reactivate-subscription';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +20,7 @@ export async function POST(
   } catch (error) {
     console.error('[API] Reactivate subscription error:', error);
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to reactivate subscription',
       },

@@ -1,14 +1,15 @@
-import React from 'react';
-import { Palette, Megaphone, Video, Code, ArrowRight } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ArrowRight, Code, Megaphone, Palette, Video } from 'lucide-react';
+import React from 'react';
 
 export function UseCases() {
   const cases = [
     {
       icon: Palette,
       title: 'AI Artists & Designers',
-      description: 'Reverse-engineer stunning artwork to understand prompt techniques and create variations.',
+      description:
+        'Reverse-engineer stunning artwork to understand prompt techniques and create variations.',
       features: [
         'Analyze successful prompts',
         'Learn prompt engineering',
@@ -32,13 +33,9 @@ export function UseCases() {
     {
       icon: Video,
       title: 'Content Creators',
-      description: 'Generate eye-catching thumbnails and social media visuals that drive engagement.',
-      features: [
-        'YouTube thumbnails',
-        'Instagram posts',
-        'TikTok covers',
-        'Story templates',
-      ],
+      description:
+        'Generate eye-catching thumbnails and social media visuals that drive engagement.',
+      features: ['YouTube thumbnails', 'Instagram posts', 'TikTok covers', 'Story templates'],
       gradient: 'from-orange-500 to-red-500',
     },
     {
@@ -56,78 +53,85 @@ export function UseCases() {
   ];
 
   return (
-    <section className="py-32 relative">
+    <section className="relative py-32">
       {/* Subtle background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background/98 to-muted/20" />
-      
+
       <div className="container relative">
         {/* Enhanced section header */}
-        <div className="text-center max-w-4xl mx-auto mb-20">
-          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="mx-auto mb-20 max-w-4xl text-center">
+          <h2 className="fade-in slide-in-from-bottom-4 mb-6 animate-in font-bold text-5xl duration-700 sm:text-6xl lg:text-7xl">
             <span className="bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
               Built for Every Creator
             </span>
           </h2>
-          <p className="text-xl sm:text-2xl text-muted-foreground/80 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 max-w-3xl mx-auto leading-relaxed">
+          <p className="fade-in slide-in-from-bottom-4 mx-auto max-w-3xl animate-in text-muted-foreground/80 text-xl leading-relaxed delay-100 duration-700 sm:text-2xl">
             Whether you're an artist, marketer, or developer, im2Prompt adapts to your workflow.
             <br className="hidden sm:block" />
-            <span className="text-muted-foreground/70">Discover how different creators use our platform.</span>
+            <span className="text-muted-foreground/70">
+              Discover how different creators use our platform.
+            </span>
           </p>
         </div>
 
         {/* Enhanced use cases grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
           {cases.map((useCase, index) => (
             <Card
               key={useCase.title}
-              className="relative overflow-hidden p-10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4 group border-border/50 hover:border-primary/50"
+              className="hover:-translate-y-2 fade-in slide-in-from-bottom-4 group relative animate-in overflow-hidden border-border/50 p-10 transition-all duration-500 hover:border-primary/50 hover:shadow-2xl"
               style={{
                 animationDelay: `${index * 100 + 200}ms`,
                 animationDuration: '700ms',
               }}
             >
               {/* Enhanced gradient background */}
-              <div className={`absolute top-0 right-0 w-80 h-80 bg-gradient-to-br ${useCase.gradient} opacity-10 blur-3xl group-hover:opacity-20 transition-opacity duration-500`} />
+              <div
+                className={`absolute top-0 right-0 h-80 w-80 bg-gradient-to-br ${useCase.gradient} opacity-10 blur-3xl transition-opacity duration-500 group-hover:opacity-20`}
+              />
 
               {/* Enhanced icon */}
-              <div className={`w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-br ${useCase.gradient} mb-8 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+              <div
+                className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${useCase.gradient} mb-8 shadow-lg transition-transform duration-300 group-hover:scale-110`}
+              >
                 <useCase.icon className="h-6 w-6 text-white" />
               </div>
 
               {/* Enhanced content */}
-              <h3 className="text-3xl font-bold mb-4 group-hover:text-primary transition-colors duration-300">
+              <h3 className="mb-4 font-bold text-3xl transition-colors duration-300 group-hover:text-primary">
                 {useCase.title}
               </h3>
-              <p className="text-muted-foreground/80 mb-8 text-lg leading-relaxed group-hover:text-muted-foreground transition-colors duration-300">
+              <p className="mb-8 text-lg text-muted-foreground/80 leading-relaxed transition-colors duration-300 group-hover:text-muted-foreground">
                 {useCase.description}
               </p>
 
               {/* Enhanced feature list */}
               <ul className="space-y-3">
                 {useCase.features.map((feature, featureIndex) => (
-                  <li key={feature} className="flex items-center text-base group-hover:text-foreground transition-colors duration-300">
-                    <div className="w-2 h-2 rounded-full bg-primary mr-4 group-hover:bg-primary/80 transition-colors duration-300" />
+                  <li
+                    key={feature}
+                    className="flex items-center text-base transition-colors duration-300 group-hover:text-foreground"
+                  >
+                    <div className="mr-4 h-2 w-2 rounded-full bg-primary transition-colors duration-300 group-hover:bg-primary/80" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
 
               {/* Subtle hover effect overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-lg" />
+              <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             </Card>
           ))}
         </div>
 
         {/* Try it free button */}
-        <div className="text-center mt-16">
-          <Button 
-            asChild 
-            size="lg" 
-            className="px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+        <div className="mt-16 text-center">
+          <Button
+            asChild
+            size="lg"
+            className="px-8 py-6 font-semibold text-lg shadow-lg transition-all duration-300 hover:shadow-xl"
           >
-            <a href="/image-to-prompt">
-              Try Image to Prompt
-            </a>
+            <a href="/image-to-prompt">Try Image to Prompt</a>
           </Button>
         </div>
       </div>

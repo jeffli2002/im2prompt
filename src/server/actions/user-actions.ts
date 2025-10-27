@@ -1,10 +1,10 @@
 'use server';
 
 import { auth } from '@/lib/auth/auth';
-import { headers } from 'next/headers';
 import db from '@/server/db';
 import { user } from '@/server/db/schema';
-import { count, desc, asc, ilike, and, gte, or, eq, isNotNull } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, ilike, isNotNull, or } from 'drizzle-orm';
+import { headers } from 'next/headers';
 import { getUserAdminStatus } from './auth-actions';
 
 export interface UserStats {
@@ -44,8 +44,9 @@ export interface GetUsersOptions {
  * Get user statistics
  */
 export async function getUserStats(): Promise<UserStats> {
+  const headersList = await headers();
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: Object.fromEntries(headersList.entries()),
   });
 
   if (!session?.user) {
@@ -59,9 +60,7 @@ export async function getUserStats(): Promise<UserStats> {
 
   try {
     // Get total users
-    const totalUsersResult = await db
-      .select({ count: count() })
-      .from(user);
+    const totalUsersResult = await db.select({ count: count() }).from(user);
 
     // Get active users (users who have verified their email)
     const activeUsersResult = await db
@@ -72,7 +71,7 @@ export async function getUserStats(): Promise<UserStats> {
     // Get new users (registered in the last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
+
     const newUsersResult = await db
       .select({ count: count() })
       .from(user)
@@ -98,8 +97,9 @@ export async function getUserStats(): Promise<UserStats> {
  * Get paginated user list
  */
 export async function getUsers(options: GetUsersOptions = {}): Promise<UserListResponse> {
+  const headersList = await headers();
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: Object.fromEntries(headersList.entries()),
   });
 
   if (!session?.user) {
@@ -125,12 +125,7 @@ export async function getUsers(options: GetUsersOptions = {}): Promise<UserListR
     // Build where conditions
     const conditions = [];
     if (search) {
-      conditions.push(
-        or(
-          ilike(user.name, `%${search}%`),
-          ilike(user.email, `%${search}%`)
-        )
-      );
+      conditions.push(or(ilike(user.name, `%${search}%`), ilike(user.email, `%${search}%`)));
     }
 
     // Build sort condition
@@ -173,4 +168,4 @@ export async function getUsers(options: GetUsersOptions = {}): Promise<UserListR
     console.error('Error fetching users:', error);
     throw new Error('Failed to fetch users');
   }
-} 
+}

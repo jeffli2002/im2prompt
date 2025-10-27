@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
-import { headers } from 'next/headers';
-import { CreemProvider } from '@/payment/creem/provider';
-import { isCreemConfigured } from '@/payment/creem/client';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { isCreemConfigured } from '@/payment/creem/client';
+import { CreemProvider } from '@/payment/creem/provider';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
+import { headers } from 'next/headers';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const errorLogger = new ErrorLogger('creem-subscription-manage');
@@ -21,33 +21,23 @@ export async function GET(
 ) {
   try {
     if (!isCreemConfigured) {
-      return NextResponse.json(
-        { error: 'Creem is not configured' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Creem is not configured' }, { status: 503 });
     }
 
+    const headersList = await headers();
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { subscriptionId } = await params;
-    const paymentRecord = await paymentRepository.findBySubscriptionId(
-      subscriptionId
-    );
+    const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
 
     if (!paymentRecord || paymentRecord.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: 'Subscription not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Subscription not found' }, { status: 404 });
     }
 
     const creemProvider = new CreemProvider();
@@ -60,10 +50,7 @@ export async function GET(
       operation: 'get-subscription',
       subscriptionId: subscriptionId,
     });
-    return NextResponse.json(
-      { error: 'Failed to get subscription' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to get subscription' }, { status: 500 });
   }
 }
 
@@ -73,43 +60,30 @@ export async function PATCH(
 ) {
   try {
     if (!isCreemConfigured) {
-      return NextResponse.json(
-        { error: 'Creem is not configured' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Creem is not configured' }, { status: 503 });
     }
 
+    const headersList = await headers();
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { subscriptionId } = await params;
-    const paymentRecord = await paymentRepository.findBySubscriptionId(
-      subscriptionId
-    );
+    const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
 
     if (!paymentRecord || paymentRecord.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: 'Subscription not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Subscription not found' }, { status: 404 });
     }
 
     const body = await request.json();
     const validatedData = updateSchema.parse(body);
 
     const creemProvider = new CreemProvider();
-    const result = await creemProvider.updateSubscription(
-      subscriptionId,
-      validatedData
-    );
+    const result = await creemProvider.updateSubscription(subscriptionId, validatedData);
 
     return NextResponse.json(result);
   } catch (error) {
@@ -126,10 +100,7 @@ export async function PATCH(
       );
     }
 
-    return NextResponse.json(
-      { error: 'Failed to update subscription' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to update subscription' }, { status: 500 });
   }
 }
 
@@ -139,43 +110,30 @@ export async function DELETE(
 ) {
   try {
     if (!isCreemConfigured) {
-      return NextResponse.json(
-        { error: 'Creem is not configured' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Creem is not configured' }, { status: 503 });
     }
 
+    const headersList = await headers();
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { subscriptionId } = await params;
-    const paymentRecord = await paymentRepository.findBySubscriptionId(
-      subscriptionId
-    );
+    const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
 
     if (!paymentRecord || paymentRecord.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: 'Subscription not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Subscription not found' }, { status: 404 });
     }
 
     const creemProvider = new CreemProvider();
     const success = await creemProvider.cancelSubscription(subscriptionId);
 
     if (!success) {
-      return NextResponse.json(
-        { error: 'Failed to cancel subscription' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to cancel subscription' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
@@ -185,9 +143,6 @@ export async function DELETE(
       operation: 'cancel-subscription',
       subscriptionId: subscriptionId,
     });
-    return NextResponse.json(
-      { error: 'Failed to cancel subscription' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to cancel subscription' }, { status: 500 });
   }
 }

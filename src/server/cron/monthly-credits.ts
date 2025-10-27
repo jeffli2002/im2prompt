@@ -1,9 +1,9 @@
-import { and, eq, inArray, isNull, not, or } from 'drizzle-orm';
-import db from '@/server/db';
-import { user, payment } from '@/server/db/schema';
-import { creditService } from '@/lib/credits';
 import { paymentConfig } from '@/config/payment.config';
+import { creditService } from '@/lib/credits';
 import { quotaService } from '@/lib/quota/quota-service';
+import db from '@/server/db';
+import { payment, user } from '@/server/db/schema';
+import { and, eq, inArray, isNull, not, or } from 'drizzle-orm';
 
 /**
  * Grant monthly free credits to users without active subscriptions
@@ -12,34 +12,31 @@ import { quotaService } from '@/lib/quota/quota-service';
  */
 export async function grantMonthlyFreeCredits() {
   console.log('🎁 Starting monthly free credits distribution and quota update...');
-  
+
   try {
     // Get all users who don't have active subscriptions (free users)
     const freeUsers = await db
-      .select({ 
+      .select({
         userId: user.id,
         userName: user.name,
         userEmail: user.email,
       })
       .from(user)
       .leftJoin(payment, eq(payment.userId, user.id))
-      .where(
-        or(
-          isNull(payment.status),
-          not(inArray(payment.status, ['active', 'trialing']))
-        )
-      );
+      .where(or(isNull(payment.status), not(inArray(payment.status, ['active', 'trialing']))));
 
     console.log(`Found ${freeUsers.length} free users`);
 
-    const freePlan = paymentConfig.plans.find(p => p.id === 'free');
+    const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
     const freeCredits = freePlan?.credits?.monthly || 0;
-    
+
     if (!freeCredits || freeCredits <= 0) {
-      console.log('ℹ️ No monthly credits configured for free plan (free users get one-time signup bonus only)');
+      console.log(
+        'ℹ️ No monthly credits configured for free plan (free users get one-time signup bonus only)'
+      );
       console.log('✅ Monthly credits distribution completed (0 free users to process)');
-      return { 
-        success: true, 
+      return {
+        success: true,
         totalUsers: 0,
         successCount: 0,
         errorCount: 0,
@@ -47,7 +44,7 @@ export async function grantMonthlyFreeCredits() {
         totalCreditsDistributed: 0,
         quotaUpdateSuccessCount: 0,
         quotaUpdateErrorCount: 0,
-        message: 'Free users do not receive monthly credits'
+        message: 'Free users do not receive monthly credits',
       };
     }
 
@@ -60,7 +57,7 @@ export async function grantMonthlyFreeCredits() {
       try {
         // Check if user already has a credit account, create if not
         await creditService.getOrCreateCreditAccount(user.userId);
-        
+
         // Grant monthly credits
         await creditService.earnCredits({
           userId: user.userId,
@@ -81,7 +78,10 @@ export async function grantMonthlyFreeCredits() {
         errorCount++;
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         errors.push({ userId: user.userId, error: errorMessage });
-        console.error(`❌ Failed to grant credits to ${user.userEmail} (${user.userId}):`, errorMessage);
+        console.error(
+          `❌ Failed to grant credits to ${user.userEmail} (${user.userId}):`,
+          errorMessage
+        );
       }
     }
 
@@ -89,17 +89,17 @@ export async function grantMonthlyFreeCredits() {
     console.log(`   ✅ Success: ${successCount} users`);
     console.log(`   ❌ Errors: ${errorCount} users`);
     console.log(`   💰 Total credits distributed: ${successCount * freeCredits}`);
-    
+
     // Update quota usage records for all users (reset monthly usage)
     console.log('📊 Updating quota usage records for all users...');
     let quotaUpdateSuccessCount = 0;
     let quotaUpdateErrorCount = 0;
     const quotaErrors: Array<{ userId: string; error: string }> = [];
-    
+
     // Get all users for quota update
     const allUsers = await db.select({ id: user.id, email: user.email }).from(user);
     console.log(`Found ${allUsers.length} users for quota update`);
-    
+
     for (const userData of allUsers) {
       try {
         await quotaService.initializeForUser(userData.id);
@@ -109,10 +109,13 @@ export async function grantMonthlyFreeCredits() {
         quotaUpdateErrorCount++;
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         quotaErrors.push({ userId: userData.id, error: errorMessage });
-        console.error(`❌ Failed to update quota for ${userData.email} (${userData.id}):`, errorMessage);
+        console.error(
+          `❌ Failed to update quota for ${userData.email} (${userData.id}):`,
+          errorMessage
+        );
       }
     }
-    
+
     console.log('📊 Quota update completed:');
     console.log(`   ✅ Success: ${quotaUpdateSuccessCount} users`);
     console.log(`   ❌ Errors: ${quotaUpdateErrorCount} users`);

@@ -1,8 +1,8 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { getModelCost } from '@/config/credits.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits/credit-service';
-import { getModelCost } from '@/config/credits.config';
 import { quotaService } from '@/lib/usage/quota-service';
+import { type NextRequest, NextResponse } from 'next/server';
 
 const MODEL_ENDPOINTS: Record<string, string> = {
   'flux-1.1': 'https://api.bfl.ai/v1/flux-pro-1.1',
@@ -17,31 +17,31 @@ const MODEL_ENDPOINTS: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
   try {
-    const isTestMode = process.env.NODE_ENV === 'test' || process.env.DISABLE_AUTH === 'true' || request.headers.get('x-test-mode') === 'true';
-    
+    const isTestMode =
+      process.env.NODE_ENV === 'test' ||
+      process.env.DISABLE_AUTH === 'true' ||
+      request.headers.get('x-test-mode') === 'true';
+
     let userId: string;
-    
+
     if (isTestMode) {
       userId = 'test-user-id';
     } else {
       const session = await auth.api.getSession({
         headers: request.headers,
       });
-      
+
       if (!session?.user?.id) {
-        return NextResponse.json(
-          { error: 'Unauthorized' },
-          { status: 401 }
-        );
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
-      
+
       userId = session.user.id;
     }
-    
-    const { 
-      prompt, 
-      model = 'flux-1.1', 
-      width = 1024, 
+
+    const {
+      prompt,
+      model = 'flux-1.1',
+      width = 1024,
       height = 1024,
       raw = false,
       aspect_ratio,
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       seed,
       safety_tolerance = 2,
       output_format = 'jpeg',
-      image
+      image,
     } = await request.json();
 
     if (!prompt || typeof prompt !== 'string') {
@@ -58,25 +58,24 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     const creditCost = getModelCost('imageGeneration', model);
     if (creditCost === 0) {
-      return NextResponse.json(
-        { error: `Invalid model: ${model}` },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: `Invalid model: ${model}` }, { status: 400 });
     }
-    
+
     const quotaCheck = await quotaService.checkImageGenerationQuota(userId);
-    let shouldChargeCredits = quotaCheck.shouldChargeCredits;
-    
+    const shouldChargeCredits = quotaCheck.shouldChargeCredits;
+
     if (!isTestMode) {
       if (shouldChargeCredits) {
         const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
         if (!hasCredits) {
           const limitType = quotaCheck.quotaRemaining === 0 ? 'daily' : 'monthly';
           return NextResponse.json(
-            { error: `Insufficient credits. You have used your ${limitType} free quota (1/day, 3/month).` },
+            {
+              error: `Insufficient credits. You have used your ${limitType} free quota (1/day, 3/month).`,
+            },
             { status: 402 }
           );
         }
@@ -100,10 +99,7 @@ export async function POST(request: NextRequest) {
 
     const endpoint = MODEL_ENDPOINTS[model];
     if (!endpoint) {
-      return NextResponse.json(
-        { error: `Unsupported model: ${model}` },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: `Unsupported model: ${model}` }, { status: 400 });
     }
 
     const isStableDiffusion = model === 'stable-diffusion';
@@ -116,7 +112,7 @@ export async function POST(request: NextRequest) {
       }
 
       let messageContent: any;
-      
+
       if (image) {
         messageContent = [
           {
@@ -137,7 +133,7 @@ export async function POST(request: NextRequest) {
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${openRouterApiKey}`,
+          Authorization: `Bearer ${openRouterApiKey}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002',
         },
@@ -162,11 +158,11 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json();
-      
+
       // Gemini returns images in the message.images array
       const images = data.choices?.[0]?.message?.images;
       let imageUrl: string | undefined;
-      
+
       if (images && Array.isArray(images) && images.length > 0) {
         // Get the first image's data URL
         imageUrl = images[0]?.image_url?.url;
@@ -174,21 +170,23 @@ export async function POST(request: NextRequest) {
 
       if (!imageUrl) {
         console.error('No image found in response. Full response:', JSON.stringify(data, null, 2));
-        return NextResponse.json(
-          { error: 'No image URL in response' },
-          { status: 500 }
-        );
+        return NextResponse.json({ error: 'No image URL in response' }, { status: 500 });
       }
-      
+
       await quotaService.incrementImageGenerationUsage(userId);
-      
+
       if (!isTestMode && shouldChargeCredits) {
         await creditService.spendCredits({
           userId,
           amount: creditCost,
           source: 'api_call',
           description: `Image generation with ${model}`,
-          metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100), usedFreeQuota: !shouldChargeCredits },
+          metadata: {
+            feature: 'image-generation',
+            model,
+            prompt: prompt.substring(0, 100),
+            usedFreeQuota: !shouldChargeCredits,
+          },
         });
       }
 
@@ -207,7 +205,10 @@ export async function POST(request: NextRequest) {
     if (isStableDiffusion) {
       const stabilityApiKey = process.env.STABILITY_API_KEY;
       if (!stabilityApiKey) {
-        return NextResponse.json({ error: 'Stable Diffusion API key not configured' }, { status: 500 });
+        return NextResponse.json(
+          { error: 'Stable Diffusion API key not configured' },
+          { status: 500 }
+        );
       }
 
       const formData = new FormData();
@@ -224,8 +225,8 @@ export async function POST(request: NextRequest) {
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
-          'authorization': `Bearer ${stabilityApiKey}`,
-          'accept': 'image/*',
+          authorization: `Bearer ${stabilityApiKey}`,
+          accept: 'image/*',
         },
         body: formData,
       });
@@ -242,16 +243,21 @@ export async function POST(request: NextRequest) {
       const imageBuffer = await response.arrayBuffer();
       const base64Image = Buffer.from(imageBuffer).toString('base64');
       const imageUrl = `data:image/${output_format || 'jpeg'};base64,${base64Image}`;
-      
+
       await quotaService.incrementImageGenerationUsage(userId);
-      
+
       if (!isTestMode && shouldChargeCredits) {
         await creditService.spendCredits({
           userId,
           amount: creditCost,
           source: 'api_call',
           description: `Image generation with ${model}`,
-          metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100), usedFreeQuota: !shouldChargeCredits },
+          metadata: {
+            feature: 'image-generation',
+            model,
+            prompt: prompt.substring(0, 100),
+            usedFreeQuota: !shouldChargeCredits,
+          },
         });
       }
 
@@ -273,7 +279,7 @@ export async function POST(request: NextRequest) {
     }
 
     const isUltraModel = model === 'flux-1.1-ultra';
-    
+
     const requestBody: Record<string, unknown> = {
       prompt,
     };
@@ -308,7 +314,7 @@ export async function POST(request: NextRequest) {
     const submitResponse = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        'accept': 'application/json',
+        accept: 'application/json',
         'x-key': fluxApiKey,
         'Content-Type': 'application/json',
       },
@@ -329,10 +335,7 @@ export async function POST(request: NextRequest) {
     const pollingUrl = submitData.polling_url;
 
     if (!pollingUrl) {
-      return NextResponse.json(
-        { error: 'No polling URL returned from API' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'No polling URL returned from API' }, { status: 500 });
     }
 
     const maxPollingAttempts = 60;
@@ -340,11 +343,11 @@ export async function POST(request: NextRequest) {
     let attempts = 0;
 
     while (attempts < maxPollingAttempts) {
-      await new Promise(resolve => setTimeout(resolve, pollingInterval));
+      await new Promise((resolve) => setTimeout(resolve, pollingInterval));
 
       const pollResponse = await fetch(pollingUrl, {
         headers: {
-          'accept': 'application/json',
+          accept: 'application/json',
           'x-key': fluxApiKey,
         },
       });
@@ -363,21 +366,23 @@ export async function POST(request: NextRequest) {
       if (pollData.status === 'Ready') {
         const imageUrl = pollData.result?.sample;
         if (!imageUrl) {
-          return NextResponse.json(
-            { error: 'No image URL in ready response' },
-            { status: 500 }
-          );
+          return NextResponse.json({ error: 'No image URL in ready response' }, { status: 500 });
         }
-        
+
         await quotaService.incrementImageGenerationUsage(userId);
-        
+
         if (!isTestMode && shouldChargeCredits) {
           await creditService.spendCredits({
             userId,
             amount: creditCost,
             source: 'api_call',
             description: `Image generation with ${model}`,
-            metadata: { feature: 'image-generation', model, prompt: prompt.substring(0, 100), usedFreeQuota: !shouldChargeCredits },
+            metadata: {
+              feature: 'image-generation',
+              model,
+              prompt: prompt.substring(0, 100),
+              usedFreeQuota: !shouldChargeCredits,
+            },
           });
         }
 
@@ -392,21 +397,16 @@ export async function POST(request: NextRequest) {
           quotaRemaining: quotaCheck.quotaRemaining - 1,
           usedFreeQuota: !shouldChargeCredits,
         });
-      } else if (pollData.status === 'Error' || pollData.status === 'Failed') {
+      }
+      if (pollData.status === 'Error' || pollData.status === 'Failed') {
         console.error('Flux API generation failed:', pollData);
-        return NextResponse.json(
-          { error: 'Image generation failed' },
-          { status: 500 }
-        );
+        return NextResponse.json({ error: 'Image generation failed' }, { status: 500 });
       }
 
       attempts++;
     }
 
-    return NextResponse.json(
-      { error: 'Image generation timed out' },
-      { status: 408 }
-    );
+    return NextResponse.json({ error: 'Image generation timed out' }, { status: 408 });
   } catch (error) {
     console.error('Error generating image:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

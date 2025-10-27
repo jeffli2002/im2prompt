@@ -1,10 +1,10 @@
 'use server';
 
-import { creemService } from '@/lib/creem/creem-service';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import type { ActionResult } from '@/payment/types';
-import { ErrorLogger } from '@/lib/logger/logger-utils';
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
+import { creemService } from '@/lib/creem/creem-service';
+import { ErrorLogger } from '@/lib/logger/logger-utils';
+import type { ActionResult } from '@/payment/types';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
 
 const cancelErrorLogger = new ErrorLogger('cancel-subscription');
 
@@ -12,7 +12,7 @@ export async function cancelSubscription(
   subscriptionId: string
 ): Promise<ActionResult<{ canceled: boolean }>> {
   let session: { user?: { id: string } } | null = null;
-  
+
   try {
     session = await getSessionWithAuthBypass();
     if (!session?.user) {
@@ -71,7 +71,6 @@ export async function cancelSubscription(
       },
       message: 'Subscription will be canceled at the end of current period',
     };
-
   } catch (error) {
     cancelErrorLogger.logError(error as Error, {
       operation: 'cancelSubscription',
@@ -83,4 +82,4 @@ export async function cancelSubscription(
       error: error instanceof Error ? error.message : 'Failed to cancel subscription',
     };
   }
-} 
+}

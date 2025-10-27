@@ -1,7 +1,7 @@
+import { env } from '@/env';
 import { auth } from '@/lib/auth/auth';
 import { isAdmin } from '@/lib/auth/permissions';
 import { headers } from 'next/headers';
-import { env } from '@/env';
 
 /**
  * Check if authentication is disabled for development
@@ -17,7 +17,7 @@ export function isAuthDisabled(): boolean {
  */
 export async function getUserAdminStatus(): Promise<boolean> {
   'use server';
-  
+
   // If auth is disabled, return true (user is admin)
   if (isAuthDisabled()) {
     return true;
@@ -26,7 +26,7 @@ export async function getUserAdminStatus(): Promise<boolean> {
   try {
     const headersList = await headers();
     const session = await auth.api.getSession({
-      headers: headersList,
+      headers: Object.fromEntries(headersList.entries()),
     });
 
     if (!session?.user) {

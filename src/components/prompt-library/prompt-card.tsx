@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { useTranslations } from 'next-intl';
-import { Copy, Check } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import type { PromptExample } from '@/types/prompt-library';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { getPromptImageUrl } from '@/lib/prompt-library/image-utils';
+import type { PromptExample } from '@/types/prompt-library';
+import { Check, Copy } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface PromptCardProps {
   example: PromptExample;
@@ -27,11 +27,11 @@ export function PromptCard({ example, onClick }: PromptCardProps) {
   };
 
   return (
-    <Card 
-      className="overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] dark:hover:shadow-purple-500/20"
+    <Card
+      className="cursor-pointer overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg dark:hover:shadow-purple-500/20"
       onClick={onClick}
     >
-      <div className="relative aspect-[16/9] overflow-hidden bg-gray-100 dark:bg-gray-800 rounded-t-lg">
+      <div className="relative aspect-[16/9] overflow-hidden rounded-t-lg bg-gray-100 dark:bg-gray-800">
         <Image
           src={getPromptImageUrl(example.cloudinaryPublicId, 'card')}
           alt={example.title}
@@ -42,33 +42,39 @@ export function PromptCard({ example, onClick }: PromptCardProps) {
         />
         {example.featured && (
           <div className="absolute top-3 right-3">
-            <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
+            <Badge className="border-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white">
               {t('prompts.featured')}
             </Badge>
           </div>
         )}
       </div>
-      
+
       <CardContent className="p-5">
-        <h3 className="font-semibold text-base mb-2 line-clamp-1 text-gray-900 dark:text-gray-100">
+        <h3 className="mb-2 line-clamp-1 font-semibold text-base text-gray-900 dark:text-gray-100">
           {example.title}
         </h3>
-        
-        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4 min-h-[2.5rem]">
+
+        <p className="mb-4 line-clamp-2 min-h-[2.5rem] text-gray-600 text-sm dark:text-gray-400">
           {example.prompt}
         </p>
-        
-        <div className="flex flex-wrap gap-1.5 mb-4 items-center">
-          {example.tags.slice(0, 2).map(tag => (
-            <Badge key={tag} variant="secondary" className="text-xs bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+
+        <div className="mb-4 flex flex-wrap items-center gap-1.5">
+          {example.tags.slice(0, 2).map((tag) => (
+            <Badge
+              key={tag}
+              variant="secondary"
+              className="bg-gray-100 text-xs transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+            >
               {tag}
             </Badge>
           ))}
           {example.tags.length > 2 && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">+{example.tags.length - 2}</span>
+            <span className="text-gray-500 text-xs dark:text-gray-400">
+              +{example.tags.length - 2}
+            </span>
           )}
           {example.model && (
-            <Badge variant="outline" className="text-xs ml-auto">
+            <Badge variant="outline" className="ml-auto text-xs">
               {example.model}
             </Badge>
           )}
@@ -78,16 +84,16 @@ export function PromptCard({ example, onClick }: PromptCardProps) {
           onClick={handleCopy}
           variant="outline"
           size="sm"
-          className="w-full hover:bg-purple-50 hover:border-purple-300 dark:hover:bg-purple-950/30 dark:hover:border-purple-700 transition-all"
+          className="w-full transition-all hover:border-purple-300 hover:bg-purple-50 dark:hover:border-purple-700 dark:hover:bg-purple-950/30"
         >
           {copied ? (
             <>
-              <Check className="w-4 h-4 mr-2" />
+              <Check className="mr-2 h-4 w-4" />
               {t('actions.copied')}
             </>
           ) : (
             <>
-              <Copy className="w-4 h-4 mr-2" />
+              <Copy className="mr-2 h-4 w-4" />
               {t('actions.copyPrompt')}
             </>
           )}

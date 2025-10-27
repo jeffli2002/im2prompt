@@ -1,6 +1,6 @@
-import { eq, and } from 'drizzle-orm';
 import db from '@/server/db';
 import { systemConfig } from '@/server/db/schema';
+import { and, eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
 export type ConfigCategory = 'credits' | 'storage' | 'moderation' | 'features';
@@ -39,7 +39,6 @@ class ConfigRepository {
         return value === 'true';
       case 'json':
         return JSON.parse(value);
-      case 'string':
       default:
         return value;
     }
@@ -82,12 +81,7 @@ class ConfigRepository {
     const result = await db
       .select()
       .from(systemConfig)
-      .where(
-        and(
-          eq(systemConfig.category, category),
-          eq(systemConfig.key, key)
-        )
-      )
+      .where(and(eq(systemConfig.category, category), eq(systemConfig.key, key)))
       .limit(1);
 
     if (!result[0]) {
@@ -121,9 +115,13 @@ class ConfigRepository {
     return value !== null ? Boolean(value) : defaultValue;
   }
 
-  async getJson<T = any>(category: ConfigCategory, key: string, defaultValue: T | null = null): Promise<T | null> {
+  async getJson<T = any>(
+    category: ConfigCategory,
+    key: string,
+    defaultValue: T | null = null
+  ): Promise<T | null> {
     const value = await this.get(category, key);
-    return value !== null ? value as T : defaultValue;
+    return value !== null ? (value as T) : defaultValue;
   }
 
   async update(category: ConfigCategory, key: string, data: UpdateConfigData) {
@@ -133,12 +131,7 @@ class ConfigRepository {
         ...data,
         updatedAt: new Date(),
       })
-      .where(
-        and(
-          eq(systemConfig.category, category),
-          eq(systemConfig.key, key)
-        )
-      )
+      .where(and(eq(systemConfig.category, category), eq(systemConfig.key, key)))
       .returning();
 
     this.cache.delete(this.getCacheKey(category, key));
@@ -153,12 +146,7 @@ class ConfigRepository {
   async delete(category: ConfigCategory, key: string): Promise<boolean> {
     const result = await db
       .delete(systemConfig)
-      .where(
-        and(
-          eq(systemConfig.category, category),
-          eq(systemConfig.key, key)
-        )
-      )
+      .where(and(eq(systemConfig.category, category), eq(systemConfig.key, key)))
       .returning();
 
     this.cache.delete(this.getCacheKey(category, key));
@@ -175,10 +163,7 @@ class ConfigRepository {
   }
 
   async findAll() {
-    return await db
-      .select()
-      .from(systemConfig)
-      .orderBy(systemConfig.category, systemConfig.key);
+    return await db.select().from(systemConfig).orderBy(systemConfig.category, systemConfig.key);
   }
 
   clearCache(): void {
@@ -199,7 +184,9 @@ class ConfigRepository {
     return this.getNumber('storage', key, defaults[tier]);
   }
 
-  async isFeatureEnabled(feature: 'public_gallery' | 'content_sharing' | 'user_history'): Promise<boolean> {
+  async isFeatureEnabled(
+    feature: 'public_gallery' | 'content_sharing' | 'user_history'
+  ): Promise<boolean> {
     const key = `${feature}_enabled`;
     return this.getBoolean('features', key, true);
   }

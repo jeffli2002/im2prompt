@@ -1,9 +1,15 @@
-import { and, eq, sql } from 'drizzle-orm';
 import db from '@/server/db';
 import { userQuotaUsage } from '@/server/db/schema';
+import { and, eq, sql } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
-export type QuotaService = 'api_call' | 'storage' | 'custom' | 'image_generation' | 'video_generation' | 'image_extraction';
+export type QuotaService =
+  | 'api_call'
+  | 'storage'
+  | 'custom'
+  | 'image_generation'
+  | 'video_generation'
+  | 'image_extraction';
 
 export interface UpdateQuotaUsageParams {
   userId: string;
@@ -47,16 +53,19 @@ export async function updateQuotaUsage(params: UpdateQuotaUsageParams): Promise<
 
   try {
     // Try to update existing record first
-    const updated = await db.update(userQuotaUsage)
+    const updated = await db
+      .update(userQuotaUsage)
       .set({
         usedAmount: sql`${userQuotaUsage.usedAmount} + ${amount}`,
         updatedAt: new Date(),
       })
-      .where(and(
-        eq(userQuotaUsage.userId, userId),
-        eq(userQuotaUsage.service, service),
-        eq(userQuotaUsage.period, period)
-      ))
+      .where(
+        and(
+          eq(userQuotaUsage.userId, userId),
+          eq(userQuotaUsage.service, service),
+          eq(userQuotaUsage.period, period)
+        )
+      )
       .returning();
 
     if (updated.length > 0) {
@@ -74,9 +83,7 @@ export async function updateQuotaUsage(params: UpdateQuotaUsageParams): Promise<
       updatedAt: new Date(),
     };
 
-    const inserted = await db.insert(userQuotaUsage)
-      .values(newRecord)
-      .returning();
+    const inserted = await db.insert(userQuotaUsage).values(newRecord).returning();
 
     return inserted[0] as QuotaUsageRecord;
   } catch (error) {
@@ -93,12 +100,10 @@ export async function getQuotaUsageByPeriod(
   period: string = getCurrentPeriod()
 ): Promise<QuotaUsageRecord[]> {
   try {
-    const records = await db.select()
+    const records = await db
+      .select()
       .from(userQuotaUsage)
-      .where(and(
-        eq(userQuotaUsage.userId, userId),
-        eq(userQuotaUsage.period, period)
-      ));
+      .where(and(eq(userQuotaUsage.userId, userId), eq(userQuotaUsage.period, period)));
 
     return records;
   } catch (error) {
@@ -116,13 +121,16 @@ export async function getQuotaUsageByService(
   period: string = getCurrentPeriod()
 ): Promise<QuotaUsageRecord | null> {
   try {
-    const records = await db.select()
+    const records = await db
+      .select()
       .from(userQuotaUsage)
-      .where(and(
-        eq(userQuotaUsage.userId, userId),
-        eq(userQuotaUsage.service, service),
-        eq(userQuotaUsage.period, period)
-      ))
+      .where(
+        and(
+          eq(userQuotaUsage.userId, userId),
+          eq(userQuotaUsage.service, service),
+          eq(userQuotaUsage.period, period)
+        )
+      )
       .limit(1);
 
     return records.length > 0 ? (records[0] as QuotaUsageRecord) : null;
@@ -140,15 +148,13 @@ export async function resetQuotaUsage(
   period: string = getCurrentPeriod()
 ): Promise<void> {
   try {
-    await db.update(userQuotaUsage)
+    await db
+      .update(userQuotaUsage)
       .set({
         usedAmount: 0,
         updatedAt: new Date(),
       })
-      .where(and(
-        eq(userQuotaUsage.userId, userId),
-        eq(userQuotaUsage.period, period)
-      ));
+      .where(and(eq(userQuotaUsage.userId, userId), eq(userQuotaUsage.period, period)));
   } catch (error) {
     console.error('Error resetting quota usage:', error);
     throw new Error(`Failed to reset quota usage for user ${userId}`);
@@ -162,14 +168,20 @@ export async function initializeQuotaUsage(
   userId: string,
   period: string = getCurrentPeriod()
 ): Promise<QuotaUsageRecord[]> {
-  const services = ['api_call', 'storage', 'image_generation', 'video_generation', 'image_extraction'] as const;
+  const services = [
+    'api_call',
+    'storage',
+    'image_generation',
+    'video_generation',
+    'image_extraction',
+  ] as const;
   const records = [];
 
   try {
     for (const service of services) {
       // Check if record already exists
       const existing = await getQuotaUsageByService(userId, service, period);
-      
+
       if (!existing) {
         const newRecord = {
           id: uuidv4(),
@@ -181,9 +193,7 @@ export async function initializeQuotaUsage(
           updatedAt: new Date(),
         };
 
-        const inserted = await db.insert(userQuotaUsage)
-          .values(newRecord)
-          .returning();
+        const inserted = await db.insert(userQuotaUsage).values(newRecord).returning();
 
         records.push(inserted[0] as QuotaUsageRecord);
       } else {
@@ -203,61 +213,76 @@ export async function initializeQuotaUsage(
  */
 export const quotaService = {
   // API Call tracking
-  trackApiCall: (userId: string, calls = 1) => 
+  trackApiCall: (userId: string, calls = 1) =>
     updateQuotaUsage({ userId, service: 'api_call', amount: calls }),
 
   // Storage tracking (in bytes)
-  trackStorageUsage: (userId: string, bytes: number) => 
+  trackStorageUsage: (userId: string, bytes: number) =>
     updateQuotaUsage({ userId, service: 'storage', amount: bytes }),
 
   // Image generation tracking
-  trackImageGeneration: (userId: string, count = 1) => 
+  trackImageGeneration: (userId: string, count = 1) =>
     updateQuotaUsage({ userId, service: 'image_generation', amount: count }),
-  
-  trackImageGenerationDaily: (userId: string, count = 1) => 
-    updateQuotaUsage({ userId, service: 'image_generation', amount: count, period: getCurrentDailyPeriod() }),
+
+  trackImageGenerationDaily: (userId: string, count = 1) =>
+    updateQuotaUsage({
+      userId,
+      service: 'image_generation',
+      amount: count,
+      period: getCurrentDailyPeriod(),
+    }),
 
   // Video generation tracking
-  trackVideoGeneration: (userId: string, count = 1) => 
+  trackVideoGeneration: (userId: string, count = 1) =>
     updateQuotaUsage({ userId, service: 'video_generation', amount: count }),
-  
-  trackVideoGenerationDaily: (userId: string, count = 1) => 
-    updateQuotaUsage({ userId, service: 'video_generation', amount: count, period: getCurrentDailyPeriod() }),
+
+  trackVideoGenerationDaily: (userId: string, count = 1) =>
+    updateQuotaUsage({
+      userId,
+      service: 'video_generation',
+      amount: count,
+      period: getCurrentDailyPeriod(),
+    }),
 
   // Image extraction tracking
-  trackImageExtraction: (userId: string, count = 1) => 
+  trackImageExtraction: (userId: string, count = 1) =>
     updateQuotaUsage({ userId, service: 'image_extraction', amount: count }),
-  
-  trackImageExtractionDaily: (userId: string, count = 1) => 
-    updateQuotaUsage({ userId, service: 'image_extraction', amount: count, period: getCurrentDailyPeriod() }),
+
+  trackImageExtractionDaily: (userId: string, count = 1) =>
+    updateQuotaUsage({
+      userId,
+      service: 'image_extraction',
+      amount: count,
+      period: getCurrentDailyPeriod(),
+    }),
 
   // Get current usage
   getCurrentUsage: (userId: string) => getQuotaUsageByPeriod(userId),
-  
+
   // Get specific service usage
-  getApiCallUsage: (userId: string, period?: string) => 
+  getApiCallUsage: (userId: string, period?: string) =>
     getQuotaUsageByService(userId, 'api_call', period),
-    
-  getStorageUsage: (userId: string, period?: string) => 
+
+  getStorageUsage: (userId: string, period?: string) =>
     getQuotaUsageByService(userId, 'storage', period),
 
-  getImageGenerationUsage: (userId: string, period?: string) => 
+  getImageGenerationUsage: (userId: string, period?: string) =>
     getQuotaUsageByService(userId, 'image_generation', period),
-  
-  getVideoGenerationUsage: (userId: string, period?: string) => 
+
+  getVideoGenerationUsage: (userId: string, period?: string) =>
     getQuotaUsageByService(userId, 'video_generation', period),
-  
-  getImageExtractionUsage: (userId: string, period?: string) => 
+
+  getImageExtractionUsage: (userId: string, period?: string) =>
     getQuotaUsageByService(userId, 'image_extraction', period),
 
   // Get daily usage
-  getDailyImageGeneration: (userId: string) => 
+  getDailyImageGeneration: (userId: string) =>
     getQuotaUsageByService(userId, 'image_generation', getCurrentDailyPeriod()),
-  
-  getDailyVideoGeneration: (userId: string) => 
+
+  getDailyVideoGeneration: (userId: string) =>
     getQuotaUsageByService(userId, 'video_generation', getCurrentDailyPeriod()),
-  
-  getDailyImageExtraction: (userId: string) => 
+
+  getDailyImageExtraction: (userId: string) =>
     getQuotaUsageByService(userId, 'image_extraction', getCurrentDailyPeriod()),
 
   // Initialize for new users

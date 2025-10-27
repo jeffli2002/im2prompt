@@ -1,20 +1,20 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
-import { useAuthInitialized, useAuthLoading, useIsAuthenticated } from '@/store/auth-store';
 import { useNavbarConfig } from '@/hooks/use-config';
-import { Book, Sunset, Trees, Zap } from 'lucide-react';
-import { createElement } from 'react';
-import { useTranslations } from 'next-intl';
-import type { UseNavbarReturn, LogoConfig, AuthConfig, MenuItem } from '@/types/navbar';
+import { useAuthInitialized, useAuthLoading, useIsAuthenticated } from '@/store/auth-store';
 import type { NavbarMenuItem } from '@/types';
+import type { AuthConfig, LogoConfig, MenuItem, UseNavbarReturn } from '@/types/navbar';
+import { Book, Sunset, Trees, Zap } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useParams, useRouter } from 'next/navigation';
+import { createElement } from 'react';
 import type { JSX } from 'react';
 
 // Icon mapping function
 const getIconComponent = (iconName?: string): JSX.Element | undefined => {
   if (!iconName) return undefined;
 
-  const iconProps = { className: "size-5 shrink-0" };
+  const iconProps = { className: 'size-5 shrink-0' };
 
   switch (iconName) {
     case 'Book':
@@ -31,22 +31,28 @@ const getIconComponent = (iconName?: string): JSX.Element | undefined => {
 };
 
 // Translation helper function
-const translateMenuItem = (item: NavbarMenuItem, t: (key: string) => string, locale: string): MenuItem => {
-  const url = item.url ? (item.url.startsWith('#') ? item.url : `/${locale}${item.url}`) : undefined;
-  
+const translateMenuItem = (
+  item: NavbarMenuItem,
+  t: (key: string) => string,
+  locale: string
+): MenuItem => {
+  const url = item.url
+    ? item.url.startsWith('#')
+      ? item.url
+      : `/${locale}${item.url}`
+    : undefined;
+
   return {
     title: t(item.title),
     url,
     description: item.description ? t(item.description) : undefined,
     icon: getIconComponent(item.icon),
-    items: item.items?.map(subItem => translateMenuItem(subItem, t, locale)),
+    items: item.items?.map((subItem) => translateMenuItem(subItem, t, locale)),
     onClick: item.onClick ? () => {} : undefined,
     badge: item.badge,
     highlight: item.highlight,
   };
 };
-
-
 
 export function useNavbar(): UseNavbarReturn {
   const params = useParams();
@@ -73,11 +79,11 @@ export function useNavbar(): UseNavbarReturn {
   const auth: AuthConfig = {
     login: {
       text: t(config.auth.login.text),
-      url: `/${locale}${config.auth.login.url}`
+      url: `/${locale}${config.auth.login.url}`,
     },
     signup: {
       text: t(config.auth.signup.text),
-      url: `/${locale}${config.auth.signup.url}`
+      url: `/${locale}${config.auth.signup.url}`,
     },
   };
 
@@ -108,7 +114,7 @@ export function useNavbar(): UseNavbarReturn {
   };
 
   // Menu configuration with i18n
-  const menu: MenuItem[] = config.menu.items.map(item => {
+  const menu: MenuItem[] = config.menu.items.map((item) => {
     const translatedItem = translateMenuItem(item, t, locale);
 
     // Handle special onClick handlers
@@ -129,5 +135,4 @@ export function useNavbar(): UseNavbarReturn {
     isInitialized,
     handlePricingClick,
   };
-} 
- 
+}

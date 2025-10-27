@@ -1,6 +1,6 @@
-import { eq, desc, and, or, inArray, sql, lte, gte } from 'drizzle-orm';
 import db from '@/server/db';
-import { userContentHistory, publicContent } from '@/server/db/schema';
+import { publicContent, userContentHistory } from '@/server/db/schema';
+import { and, desc, eq, gte, inArray, lte, or, sql } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface CreateHistoryData {
@@ -177,9 +177,9 @@ export class ContentRepository {
 
     return await db
       .update(userContentHistory)
-      .set({ 
+      .set({
         status: 'expired',
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .where(inArray(userContentHistory.id, ids))
       .returning();

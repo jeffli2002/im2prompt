@@ -2,15 +2,15 @@
 
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 import { creemService } from '@/lib/creem/creem-service';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import type { ActionResult } from '@/payment/types';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
+import type { ActionResult } from '@/payment/types';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
 
 const syncErrorLogger = new ErrorLogger('sync-subscription-periods');
 
 export async function syncSubscriptionPeriods(): Promise<ActionResult<{ updated: number }>> {
   let session: { user?: { id: string } } | null = null;
-  
+
   try {
     session = await getSessionWithAuthBypass();
     if (!session?.user) {
@@ -21,11 +21,12 @@ export async function syncSubscriptionPeriods(): Promise<ActionResult<{ updated:
     }
 
     const subscriptions = await paymentRepository.findByUserId(session.user.id);
-    const activeSubscriptions = subscriptions.filter(sub => 
-      sub.type === 'subscription' && 
-      sub.subscriptionId && 
-      ['active', 'trialing', 'past_due'].includes(sub.status) &&
-      (!sub.periodStart || !sub.periodEnd)
+    const activeSubscriptions = subscriptions.filter(
+      (sub) =>
+        sub.type === 'subscription' &&
+        sub.subscriptionId &&
+        ['active', 'trialing', 'past_due'].includes(sub.status) &&
+        (!sub.periodStart || !sub.periodEnd)
     );
 
     let updatedCount = 0;
@@ -33,19 +34,23 @@ export async function syncSubscriptionPeriods(): Promise<ActionResult<{ updated:
     for (const subscription of activeSubscriptions) {
       try {
         if (!subscription.subscriptionId) continue;
-        
+
         const result = await creemService.getSubscription(subscription.subscriptionId);
-        
+
         if (result.success && result.subscription) {
           const creemSub = result.subscription;
-          
+
           await paymentRepository.update(subscription.id, {
-            periodStart: creemSub.current_period_start_date ? new Date(creemSub.current_period_start_date) : undefined,
-            periodEnd: creemSub.current_period_end_date ? new Date(creemSub.current_period_end_date) : undefined,
+            periodStart: creemSub.current_period_start_date
+              ? new Date(creemSub.current_period_start_date)
+              : undefined,
+            periodEnd: creemSub.current_period_end_date
+              ? new Date(creemSub.current_period_end_date)
+              : undefined,
             status: creemSub.status as any,
             cancelAtPeriodEnd: creemSub.cancel_at_period_end || false,
           });
-          
+
           updatedCount++;
         }
       } catch (error) {
@@ -62,7 +67,6 @@ export async function syncSubscriptionPeriods(): Promise<ActionResult<{ updated:
       data: { updated: updatedCount },
       message: `Successfully updated ${updatedCount} subscription(s)`,
     };
-
   } catch (error) {
     syncErrorLogger.logError(error as Error, {
       operation: 'syncSubscriptionPeriods',
@@ -75,9 +79,11 @@ export async function syncSubscriptionPeriods(): Promise<ActionResult<{ updated:
   }
 }
 
-export async function syncSingleSubscription(subscriptionId: string): Promise<ActionResult<{ updated: boolean }>> {
+export async function syncSingleSubscription(
+  subscriptionId: string
+): Promise<ActionResult<{ updated: boolean }>> {
   let session: { user?: { id: string } } | null = null;
-  
+
   try {
     session = await getSessionWithAuthBypass();
     if (!session?.user) {
@@ -107,7 +113,7 @@ export async function syncSingleSubscription(subscriptionId: string): Promise<Ac
     }
 
     const result = await creemService.getSubscription(subscriptionId);
-    
+
     if (!result.success || !result.subscription) {
       // If subscription doesn't exist in Creem, might be a dev subscription
       if (result.error?.includes('404') || result.error?.includes('does not exist')) {
@@ -151,7 +157,6 @@ export async function syncSingleSubscription(subscriptionId: string): Promise<Ac
       data: { updated: true },
       message: `订阅信息同步成功 - 期间: ${periodStart?.toLocaleDateString()} 到 ${periodEnd?.toLocaleDateString()}`,
     };
-
   } catch (error) {
     syncErrorLogger.logError(error as Error, {
       operation: 'syncSingleSubscription',
@@ -163,4 +168,4 @@ export async function syncSingleSubscription(subscriptionId: string): Promise<Ac
       error: error instanceof Error ? error.message : '同步订阅信息失败',
     };
   }
-} 
+}

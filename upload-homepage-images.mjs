@@ -1,5 +1,5 @@
+import { readFileSync } from 'node:fs';
 import { v2 as cloudinary } from 'cloudinary';
-import { readFileSync } from 'fs';
 
 cloudinary.config({
   cloud_name: 'dvskpqqvv',

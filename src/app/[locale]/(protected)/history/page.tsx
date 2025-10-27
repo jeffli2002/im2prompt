@@ -1,21 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Image as ImageIcon, 
-  Video, 
-  FileText, 
-  RefreshCw, 
-  Trash2,
+import {
   Calendar,
-  Layers
+  FileText,
+  Image as ImageIcon,
+  Layers,
+  RefreshCw,
+  Trash2,
+  Video,
 } from 'lucide-react';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 interface HistoryItem {
   id: string;
@@ -88,7 +88,7 @@ export default function HistoryPage() {
       }
 
       const response = await fetch(`/api/v1/history?${params.toString()}`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch history');
       }
@@ -104,7 +104,7 @@ export default function HistoryPage() {
 
   useEffect(() => {
     fetchHistory(activeTab);
-  }, [activeTab, page]);
+  }, [activeTab, fetchHistory]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this item?')) {
@@ -140,7 +140,7 @@ export default function HistoryPage() {
       }
 
       const data = await response.json();
-      
+
       switch (item.contentType) {
         case 'image_to_prompt':
           window.location.href = '/image-to-prompt';
@@ -176,7 +176,7 @@ export default function HistoryPage() {
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           <div className="flex flex-col md:flex-row">
-            <div className="relative w-full md:w-48 h-48 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <div className="relative flex h-48 w-full items-center justify-center bg-gray-100 md:w-48 dark:bg-gray-800">
               {item.thumbnailUrl || item.cloudinaryUrl ? (
                 <Image
                   src={item.thumbnailUrl || item.cloudinaryUrl || ''}
@@ -186,12 +186,10 @@ export default function HistoryPage() {
                   unoptimized
                 />
               ) : (
-                <TypeIcon className="w-16 h-16 text-gray-400" />
+                <TypeIcon className="h-16 w-16 text-gray-400" />
               )}
               <div className="absolute top-2 left-2">
-                <Badge className={typeConfig.color}>
-                  {typeConfig.label}
-                </Badge>
+                <Badge className={typeConfig.color}>{typeConfig.label}</Badge>
               </div>
               <div className="absolute top-2 right-2">
                 <Badge variant="secondary" className={statusInfo.color}>
@@ -200,40 +198,34 @@ export default function HistoryPage() {
               </div>
             </div>
 
-            <div className="flex-1 p-4 space-y-3">
+            <div className="flex-1 space-y-3 p-4">
               <div>
-                <p className="text-sm font-medium line-clamp-2">
-                  {item.promptText}
-                </p>
+                <p className="line-clamp-2 font-medium text-sm">{item.promptText}</p>
                 {item.negativePrompt && (
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-1">
+                  <p className="mt-1 line-clamp-1 text-gray-500 text-xs">
                     Negative: {item.negativePrompt}
                   </p>
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-2 text-xs text-gray-600">
+              <div className="flex flex-wrap gap-2 text-gray-600 text-xs">
                 {item.modelStyle && (
                   <div className="flex items-center gap-1">
-                    <Layers className="w-3 h-3" />
+                    <Layers className="h-3 w-3" />
                     <span>{item.modelStyle}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
+                  <Calendar className="h-3 w-3" />
                   <span>{formatDate(item.createdAt)}</span>
                 </div>
                 <span className="font-medium">{item.creditsSpent} credits</span>
               </div>
 
-              {item.errorMessage && (
-                <p className="text-xs text-red-500">{item.errorMessage}</p>
-              )}
+              {item.errorMessage && <p className="text-red-500 text-xs">{item.errorMessage}</p>}
 
               {item.expiresAt && item.status !== 'expired' && (
-                <p className="text-xs text-gray-500">
-                  Expires: {formatDate(item.expiresAt)}
-                </p>
+                <p className="text-gray-500 text-xs">Expires: {formatDate(item.expiresAt)}</p>
               )}
 
               <div className="flex gap-2 pt-2">
@@ -243,15 +235,11 @@ export default function HistoryPage() {
                   onClick={() => handleRecreate(item)}
                   disabled={item.status === 'expired' || item.status === 'failed'}
                 >
-                  <RefreshCw className="w-4 h-4 mr-1" />
+                  <RefreshCw className="mr-1 h-4 w-4" />
                   Recreate
                 </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handleDelete(item.id)}
-                >
-                  <Trash2 className="w-4 h-4 mr-1" />
+                <Button size="sm" variant="ghost" onClick={() => handleDelete(item.id)}>
+                  <Trash2 className="mr-1 h-4 w-4" />
                   Delete
                 </Button>
               </div>
@@ -275,12 +263,10 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto space-y-6 p-6">
       <div>
-        <h1 className="text-3xl font-bold">Content History</h1>
-        <p className="text-gray-600 mt-2">
-          View and manage your generated content
-        </p>
+        <h1 className="font-bold text-3xl">Content History</h1>
+        <p className="mt-2 text-gray-600">View and manage your generated content</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -291,14 +277,14 @@ export default function HistoryPage() {
           <TabsTrigger value="video_generation">Video Generation</TabsTrigger>
         </TabsList>
 
-        <TabsContent value={activeTab} className="space-y-4 mt-6">
+        <TabsContent value={activeTab} className="mt-6 space-y-4">
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
                 <Card key={i}>
                   <CardContent className="p-6">
                     <div className="flex gap-4">
-                      <Skeleton className="w-48 h-48" />
+                      <Skeleton className="h-48 w-48" />
                       <div className="flex-1 space-y-3">
                         <Skeleton className="h-4 w-full" />
                         <Skeleton className="h-4 w-3/4" />
@@ -318,7 +304,7 @@ export default function HistoryPage() {
               </div>
 
               {history.totalPages > 1 && (
-                <div className="flex justify-center gap-2 mt-6">
+                <div className="mt-6 flex justify-center gap-2">
                   <Button
                     variant="outline"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}

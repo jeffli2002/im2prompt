@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { LogoImage } from '@/components/ui/logo-image';
 import {
   Github as IconBrandGithub,
@@ -7,6 +6,7 @@ import {
   Twitter as IconBrandTwitter,
   Mail as IconMail,
 } from '@/lib/icons';
+import Image from 'next/image';
 import type React from 'react';
 
 interface FooterProps {
@@ -60,10 +60,17 @@ const defaultSections = [
 ];
 
 const defaultSocialLinks = [
-  { icon: <IconBrandTwitter strokeWidth={1} className="size-5" />, href: 'https://x.com/jeffli2002', label: 'Twitter' },
-  { icon: <IconMail strokeWidth={1} className="size-5" />, href: 'mailto:jefflee2002@gmail.com', label: 'Email' },
+  {
+    icon: <IconBrandTwitter strokeWidth={1} className="size-5" />,
+    href: 'https://x.com/jeffli2002',
+    label: 'Twitter',
+  },
+  {
+    icon: <IconMail strokeWidth={1} className="size-5" />,
+    href: 'mailto:jefflee2002@gmail.com',
+    label: 'Email',
+  },
 ];
-
 
 export const Footer = ({
   logo = {
@@ -85,9 +92,9 @@ export const Footer = ({
             {/* Logo */}
             <div className="flex items-center gap-2 lg:justify-start">
               <a href={logo.url} className="flex items-center gap-2">
-                <div className="relative w-8 h-8">
-                  <LogoImage 
-                    src={logo.src} 
+                <div className="relative h-8 w-8">
+                  <LogoImage
+                    src={logo.src}
                     alt={logo.alt}
                     title={logo.title}
                     width={32}
@@ -117,17 +124,24 @@ export const Footer = ({
                 <h3 className="mb-4 font-bold">{section.title}</h3>
                 <ul className="space-y-3 text-muted-foreground text-sm">
                   {section.links.map((link, linkIdx) => (
-                    <li key={link.name} className={`font-medium hover:text-primary ${link.highlight ? 'relative' : ''}`}>
-                      <a 
+                    <li
+                      key={link.name}
+                      className={`font-medium hover:text-primary ${link.highlight ? 'relative' : ''}`}
+                    >
+                      <a
                         href={link.href}
-                        className={link.highlight ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent font-bold' : ''}
+                        className={
+                          link.highlight
+                            ? 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text font-bold text-transparent'
+                            : ''
+                        }
                       >
                         {link.name}
                       </a>
                       {link.highlight && (
-                        <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                          <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+                        <span className="-top-1 -right-1 absolute flex h-2 w-2">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                          <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
                         </span>
                       )}
                     </li>
@@ -138,12 +152,16 @@ export const Footer = ({
           </div>
         </div>
         <div className="mt-8 border-t py-8">
-          <p className="text-muted-foreground font-medium text-xs text-center md:text-left">{copyright}</p>
+          <p className="text-center font-medium text-muted-foreground text-xs md:text-left">
+            {copyright}
+          </p>
         </div>
         <div className="mt-4 pt-4">
-          <div className="border-t mb-4"></div>
-          <p className="text-muted-foreground text-xs text-center md:text-left leading-relaxed">
-            * This platform is an independent product and is not affiliated with, endorsed by, or sponsored by Google or OpenAI or other AI model companies. We provide access to the AI models through our custom interface.
+          <div className="mb-4 border-t" />
+          <p className="text-center text-muted-foreground text-xs leading-relaxed md:text-left">
+            * This platform is an independent product and is not affiliated with, endorsed by, or
+            sponsored by Google or OpenAI or other AI model companies. We provide access to the AI
+            models through our custom interface.
           </p>
         </div>
       </div>

@@ -1,6 +1,7 @@
-import { UsagePage } from '@/components/usage/usage-page';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { UsagePageClient } from '@/components/usage/usage-page-client';
+import { getCreditBalance, getCreditHistory, getQuotaUsage } from '@/server/actions/credit-actions';
 import { Suspense } from 'react';
 
 function UsagePageSkeleton() {
@@ -46,10 +47,33 @@ function UsagePageSkeleton() {
   );
 }
 
+async function UsagePageServer() {
+  // Fetch all data on the server
+  const [balanceResult, historyResult, quotaResult] = await Promise.all([
+    getCreditBalance(),
+    getCreditHistory({ limit: 20 }),
+    getQuotaUsage(),
+  ]);
+  const initialBalance = balanceResult.success ? balanceResult.data ?? null : null;
+  const initialHistory = historyResult.success ? historyResult.data ?? [] : [];
+  const initialQuota = quotaResult.success ? quotaResult.data ?? null : null;
+
+  return (
+    <UsagePageClient
+      initialBalance={initialBalance}
+      initialHistory={initialHistory}
+      initialQuota={initialQuota}
+      balanceError={balanceResult.success ? null : balanceResult.error}
+      historyError={historyResult.success ? null : historyResult.error}
+      quotaError={quotaResult.success ? null : quotaResult.error}
+    />
+  );
+}
+
 export default function UsagePageRoute() {
   return (
     <Suspense fallback={<UsagePageSkeleton />}>
-      <UsagePage />
+      <UsagePageServer />
     </Suspense>
   );
 }

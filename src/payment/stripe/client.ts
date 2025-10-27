@@ -1,5 +1,5 @@
-import { Stripe } from 'stripe';
 import { env } from '@/env';
+import { Stripe } from 'stripe';
 import { paymentConfig } from '../../config/payment.config';
 
 // Stripe configuration
@@ -10,9 +10,9 @@ export const stripeConfig = {
 };
 
 // Server-side Stripe instance - only create if secret key is provided
-export const stripe = stripeConfig.secretKey 
+export const stripe = stripeConfig.secretKey
   ? new Stripe(stripeConfig.secretKey, {
       apiVersion: stripeConfig.apiVersion,
       typescript: true,
     })
-  : null as any; 
+  : (null as any);

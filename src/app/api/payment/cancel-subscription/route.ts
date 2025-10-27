@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/auth/auth-utils';
 import { creemService } from '@/lib/creem/creem-service';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,10 +15,7 @@ export async function POST(request: NextRequest) {
     const { subscriptionId } = body;
 
     if (!subscriptionId) {
-      return NextResponse.json(
-        { error: 'Missing subscription ID' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing subscription ID' }, { status: 400 });
     }
 
     const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);

@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { generateCustomerPortalLink } from '@/server/actions/payment/generate-customer-portal';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -13,11 +13,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}));
 
     const validation = portalSchema.safeParse(body);
-    
+
     if (!validation.success) {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: 'Invalid request data',
           details: validation.error.flatten().fieldErrors,
         },
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[API] Generate customer portal error:', error);
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to generate customer portal link',
       },

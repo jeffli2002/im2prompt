@@ -12,8 +12,35 @@ export default function middleware(request: NextRequest) {
     url.host = `www.${hostname}`;
     return NextResponse.redirect(url, 301);
   }
+
+  const response = intlMiddleware(request);
+  const pathname = request.nextUrl.pathname;
+  const baseUrl = 'https://www.im2prompt.com';
   
-  return intlMiddleware(request);
+  const canonicalPaths: Record<string, string> = {
+    '/': '/',
+    '/image-to-prompt': '/image-to-prompt',
+    '/text-to-prompt': '/text-to-prompt',
+    '/text-to-image': '/text-to-image',
+    '/text-to-video': '/text-to-video',
+    '/image-to-video': '/image-to-video',
+    '/blog': '/blog',
+    '/prompt-library': '/prompt-library',
+    '/login': '/login',
+    '/signup': '/signup',
+    '/terms': '/terms',
+    '/privacy': '/privacy',
+    '/refund': '/refund',
+  };
+
+  for (const [path, canonical] of Object.entries(canonicalPaths)) {
+    if (pathname === path || pathname === `/${routing.defaultLocale}${path}`) {
+      response.headers.set('Link', `<${baseUrl}${canonical}>; rel="canonical"`);
+      break;
+    }
+  }
+  
+  return response;
 }
 
 export const config = {

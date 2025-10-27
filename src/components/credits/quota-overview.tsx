@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Activity, Database, Zap } from 'lucide-react';
 import { getQuotaUsage } from '@/server/actions/credit-actions';
+import { Activity, Database, Zap } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 interface QuotaUsageData {
@@ -138,7 +138,8 @@ export function QuotaOverview() {
                     {Math.round((quotaData.apiCalls.used / quotaData.apiCalls.limit) * 100)}% used
                   </span>
                   <span className="text-muted-foreground">
-                    {(quotaData.apiCalls.limit - quotaData.apiCalls.used).toLocaleString()} remaining
+                    {(quotaData.apiCalls.limit - quotaData.apiCalls.used).toLocaleString()}{' '}
+                    remaining
                   </span>
                 </div>
               </>

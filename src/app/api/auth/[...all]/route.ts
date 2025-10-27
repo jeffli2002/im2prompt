@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth/auth';
 import { toNextJsHandler } from 'better-auth/next-js';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 const handler = toNextJsHandler(auth);
 
@@ -10,10 +10,7 @@ export const GET = handler.GET;
 // Handle OPTIONS preflight requests for CORS
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get('origin');
-  const allowedOrigins = [
-    'https://im2prompt.com',
-    'https://www.im2prompt.com',
-  ];
+  const allowedOrigins = ['https://im2prompt.com', 'https://www.im2prompt.com'];
 
   // In development, allow localhost
   if (process.env.NODE_ENV === 'development') {
