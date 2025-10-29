@@ -1,13 +1,59 @@
 import type { Metadata } from 'next';
+import { seoPages } from '@/config/seo.config';
+import { generateStructuredData, getOrganizationSchema, getWebPageSchema, getSoftwareApplicationSchema } from '@/lib/seo/structured-data';
 
 export const metadata: Metadata = {
-  title: 'Free Image to Prompt Generator - im2Prompt',
-  description: 'Convert Image to Prompt to generate your own image with AI',
+  title: seoPages.imageToPrompt.title,
+  description: seoPages.imageToPrompt.description,
+  keywords: seoPages.imageToPrompt.keywords,
   alternates: {
     canonical: 'https://www.im2prompt.com/image-to-prompt',
+  },
+  openGraph: {
+    ...seoPages.imageToPrompt.openGraph,
+    url: 'https://www.im2prompt.com/image-to-prompt',
+    locale: 'en_US',
+    siteName: 'im2Prompt',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: seoPages.imageToPrompt.openGraph.title,
+    description: seoPages.imageToPrompt.openGraph.description,
+    images: seoPages.imageToPrompt.openGraph.images,
+    creator: '@im2prompt',
+    site: '@im2prompt',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
 export default function ImageToPromptLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  const structuredData = generateStructuredData([
+    getOrganizationSchema(),
+    getWebPageSchema({
+      url: 'https://www.im2prompt.com/image-to-prompt',
+      name: 'Image to Prompt Generator',
+      description: seoPages.imageToPrompt.description,
+    }),
+    getSoftwareApplicationSchema(),
+  ]);
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: structuredData }}
+      />
+      {children}
+    </>
+  );
 }

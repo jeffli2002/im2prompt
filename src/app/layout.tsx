@@ -6,6 +6,12 @@ import type React from 'react';
 
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { appConfig } from '../config/app.config';
+import { 
+  generateStructuredData, 
+  getOrganizationSchema, 
+  getWebsiteSchema, 
+  getSoftwareApplicationSchema 
+} from '@/lib/seo/structured-data';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.im2prompt.com'),
@@ -16,7 +22,7 @@ export const metadata: Metadata = {
   creator: appConfig.metadata.creator,
   robots: appConfig.metadata.robots,
   alternates: {
-    canonical: '/',
+    canonical: 'https://www.im2prompt.com',
   },
   openGraph: {
     type: appConfig.metadata.openGraph.type as 'website',
@@ -25,6 +31,14 @@ export const metadata: Metadata = {
     siteName: appConfig.metadata.openGraph.siteName,
     title: appConfig.metadata.title.default,
     description: appConfig.metadata.description,
+    images: [
+      {
+        url: 'https://www.im2prompt.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'im2Prompt - AI Image to Prompt Generator',
+      },
+    ],
   },
   twitter: {
     card: appConfig.metadata.twitter.card as 'summary_large_image',
@@ -70,6 +84,16 @@ export default async function RootLayout({
         <meta
           name="google-site-verification"
           content="n43QebBEBeyBsRUaZ4yd5VksyiYaeKzwOAinwhgVSeo"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: generateStructuredData([
+              getOrganizationSchema(),
+              getWebsiteSchema(),
+              getSoftwareApplicationSchema(),
+            ]),
+          }}
         />
         {gaId && <GoogleAnalytics gaId={gaId} />}
       </head>
