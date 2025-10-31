@@ -112,12 +112,25 @@ export async function POST(request: NextRequest) {
       }
 
       let messageContent: any;
+      let promptText = prompt;
+
+      if (aspect_ratio) {
+        const aspectRatioMap: Record<string, string> = {
+          '1:1': 'square (1:1)',
+          '16:9': 'landscape (16:9)',
+          '9:16': 'portrait (9:16)',
+          '4:3': 'standard (4:3)',
+          '3:2': 'photo (3:2)',
+        };
+        const ratioDescription = aspectRatioMap[aspect_ratio] || aspect_ratio;
+        promptText = `${prompt}\n\nGenerate this image in ${ratioDescription} aspect ratio.`;
+      }
 
       if (image) {
         messageContent = [
           {
             type: 'text',
-            text: prompt,
+            text: promptText,
           },
           {
             type: 'image_url',
@@ -127,7 +140,7 @@ export async function POST(request: NextRequest) {
           },
         ];
       } else {
-        messageContent = prompt;
+        messageContent = promptText;
       }
 
       const response = await fetch(endpoint, {
@@ -307,8 +320,26 @@ export async function POST(request: NextRequest) {
         requestBody.output_format = output_format;
       }
     } else {
-      requestBody.width = width;
-      requestBody.height = height;
+      if (aspect_ratio) {
+        const aspectRatioToDimensions: Record<string, { width: number; height: number }> = {
+          '1:1': { width: 1024, height: 1024 },
+          '16:9': { width: 1024, height: 576 },
+          '9:16': { width: 576, height: 1024 },
+          '4:3': { width: 1024, height: 768 },
+          '3:2': { width: 1024, height: 683 },
+        };
+        const dimensions = aspectRatioToDimensions[aspect_ratio];
+        if (dimensions) {
+          requestBody.width = dimensions.width;
+          requestBody.height = dimensions.height;
+        } else {
+          requestBody.width = width;
+          requestBody.height = height;
+        }
+      } else {
+        requestBody.width = width;
+        requestBody.height = height;
+      }
     }
 
     const submitResponse = await fetch(endpoint, {
