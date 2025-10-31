@@ -776,7 +776,7 @@ export default function SoraVideoGenerator({
           {/* Right Column - Video Preview */}
           <div className="lg:sticky lg:top-24 lg:h-fit">
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-              {!result && (
+              {!result && !isGenerating && (
                 <div className="flex aspect-video items-center justify-center rounded-xl bg-muted/20">
                   <div className="space-y-3 text-center">
                     <Video className="mx-auto h-16 w-16 text-purple-300 dark:text-purple-400" />
@@ -787,7 +787,7 @@ export default function SoraVideoGenerator({
                 </div>
               )}
 
-              {result?.status === 'generating' && (
+              {(isGenerating || result?.status === 'generating') && (
                 <div className="flex aspect-video items-center justify-center rounded-xl bg-muted/20">
                   <div className="space-y-4 text-center">
                     <Loader2 className="mx-auto h-12 w-12 animate-spin text-purple-600 dark:text-purple-400" />

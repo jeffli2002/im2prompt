@@ -532,7 +532,7 @@ export default function ImageGenerator() {
 
           <div className="lg:sticky lg:top-24 lg:h-fit">
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-              {!result && (
+              {!result && !isGenerating && (
                 <div className="flex aspect-square items-center justify-center rounded-xl bg-muted/30">
                   <div className="space-y-3 text-center">
                     <ImageIcon className="mx-auto h-16 w-16 text-muted-foreground/40" />
