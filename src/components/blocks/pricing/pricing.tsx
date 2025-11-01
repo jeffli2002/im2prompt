@@ -318,36 +318,64 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
 
                     {/* Enhanced Credits Badge */}
                     {plan.credits && (
-                      <div className="mb-6 flex flex-wrap gap-2">
-                        {typeof plan.credits.monthly === 'number' && plan.credits.monthly > 0 && (
-                          <Badge
-                            variant="secondary"
-                            className="rounded-xl bg-blue-100 px-3 py-2 font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                          >
-                            {isYearly
-                              ? plan.credits.yearly || plan.credits.monthly * 12
-                              : plan.credits.monthly}{' '}
-                            Credits{isYearly ? '/year' : '/mo'}
-                          </Badge>
-                        )}
-                        {typeof plan.credits.onSubscribe === 'number' &&
-                          plan.credits.onSubscribe > 0 && (
+                      <>
+                        <div className="mb-3 flex flex-wrap gap-2">
+                          {typeof plan.credits.monthly === 'number' && plan.credits.monthly > 0 && (
                             <Badge
-                              variant="outline"
-                              className="rounded-xl border-green-200 px-3 py-2 text-green-700 dark:border-green-800 dark:text-green-300"
+                              variant="secondary"
+                              className="rounded-xl bg-blue-100 px-3 py-2 font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-200"
                             >
-                              +{plan.credits.onSubscribe} Bonus
+                              {isYearly
+                                ? plan.credits.yearly || plan.credits.monthly * 12
+                                : plan.credits.monthly}{' '}
+                              Credits{isYearly ? '/year' : '/mo'}
                             </Badge>
                           )}
-                        {typeof plan.credits.onSignup === 'number' && plan.credits.onSignup > 0 && (
-                          <Badge
-                            variant="outline"
-                            className="rounded-xl border-purple-200 px-3 py-2 text-purple-700 dark:border-purple-800 dark:text-purple-300"
-                          >
-                            {plan.credits.onSignup} Free Credits
-                          </Badge>
+                          {typeof plan.credits.onSubscribe === 'number' &&
+                            plan.credits.onSubscribe > 0 && (
+                              <Badge
+                                variant="outline"
+                                className="rounded-xl border-green-200 px-3 py-2 text-green-700 dark:border-green-800 dark:text-green-300"
+                              >
+                                +{plan.credits.onSubscribe} Bonus
+                              </Badge>
+                            )}
+                          {typeof plan.credits.onSignup === 'number' && plan.credits.onSignup > 0 && (
+                            <Badge
+                              variant="outline"
+                              className="rounded-xl border-purple-200 px-3 py-2 text-purple-700 dark:border-purple-800 dark:text-purple-300"
+                            >
+                              {plan.credits.onSignup} Free Credits
+                            </Badge>
+                          )}
+                        </div>
+                        {(plan.id === 'pro' || plan.id === 'proplus') && (
+                          <div className="mb-6 space-y-1 rounded-lg border border-muted bg-muted/30 p-3">
+                            <p className="text-muted-foreground text-xs">
+                              → Up to{' '}
+                              {plan.id === 'pro'
+                                ? isYearly
+                                  ? '1200'
+                                  : '100'
+                                : isYearly
+                                  ? '2160'
+                                  : '180'}{' '}
+                              Nano Banana images{isYearly ? '/year' : '/month'}
+                            </p>
+                            <p className="text-muted-foreground text-xs">
+                              → Up to{' '}
+                              {plan.id === 'pro'
+                                ? isYearly
+                                  ? '300'
+                                  : '25'
+                                : isYearly
+                                  ? '540'
+                                  : '45'}{' '}
+                              Sora 2 videos{isYearly ? '/year' : '/month'}
+                            </p>
+                          </div>
                         )}
-                      </div>
+                      </>
                     )}
 
                     <div className="mb-4">
@@ -397,7 +425,7 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                     </ul>
 
                     {/* Generation Capabilities */}
-                    <ul className="mt-6 space-y-3">
+                    <ul className="mt-4 space-y-3">
                       {generationCapabilities.map((capability) => (
                         <li key={`${plan.id}-${capability}`} className="flex items-center gap-3">
                           <div className="shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900">
@@ -407,17 +435,6 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                         </li>
                       ))}
                     </ul>
-                    {(plan.id === 'pro' || plan.id === 'proplus') && (
-                      <div className="mt-4 space-y-1 rounded-lg border border-muted bg-muted/30 p-3">
-                        <p className="text-muted-foreground text-xs">
-                          → Up to {isYearly ? '1200' : '100'} Nano Banana images
-                          {isYearly ? '/year' : '/month'}
-                        </p>
-                        <p className="text-muted-foreground text-xs">
-                          → Up to {isYearly ? '400' : '33'} Sora 2 videos{isYearly ? '/year' : '/month'}
-                        </p>
-                      </div>
-                    )}
                   </CardContent>
                   <CardFooter className="mt-auto p-8 pt-0">
                     <Button
