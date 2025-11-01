@@ -32,6 +32,7 @@ const config: NextConfig = {
     serverActions: {
       bodySizeLimit: '10mb',
     },
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   serverExternalPackages: ['@aws-sdk/client-s3'],
   output: 'standalone',

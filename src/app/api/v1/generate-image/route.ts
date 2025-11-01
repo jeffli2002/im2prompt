@@ -4,6 +4,9 @@ import { creditService } from '@/lib/credits/credit-service';
 import { quotaService } from '@/lib/usage/quota-service';
 import { type NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 const MODEL_ENDPOINTS: Record<string, string> = {
   'flux-1.1': 'https://api.bfl.ai/v1/flux-pro-1.1',
   'flux-1.1-pro': 'https://api.bfl.ai/v1/flux-pro-1.1',

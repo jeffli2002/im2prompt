@@ -7,6 +7,9 @@ import { creditTransactions, prompts, userCredits } from '@/server/db/schema';
 import { and, count, desc, eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 const COZE_WORKFLOW_API_URL = 'https://api.coze.cn/v1/workflow/run';
 const COZE_FILE_UPLOAD_URL = 'https://api.coze.cn/v1/files/upload';
 const COZE_WORKFLOW_ID = process.env.COZE_WORKFLOW_ID || '7550263539588399142';
