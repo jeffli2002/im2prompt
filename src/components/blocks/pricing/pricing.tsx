@@ -384,9 +384,9 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                       {plan.features.map((feature: PricingFeature, featureIndex: number) => (
                         <li
                           key={`${plan.id}-feature-${featureIndex}`}
-                          className="flex items-start gap-3"
+                          className="flex items-center gap-3"
                         >
-                          <div className="mt-0.5 rounded-full bg-green-100 p-1 dark:bg-green-900">
+                          <div className="shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900">
                             <CircleCheck className="size-3 text-green-600 dark:text-green-400" />
                           </div>
                           <span className="text-sm leading-relaxed">
@@ -399,8 +399,8 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                     {/* Generation Capabilities */}
                     <ul className="mt-6 space-y-3">
                       {generationCapabilities.map((capability) => (
-                        <li key={`${plan.id}-${capability}`} className="flex items-start gap-3">
-                          <div className="mt-0.5 rounded-full bg-green-100 p-1 dark:bg-green-900">
+                        <li key={`${plan.id}-${capability}`} className="flex items-center gap-3">
+                          <div className="shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900">
                             <CircleCheck className="size-3 text-green-600 dark:text-green-400" />
                           </div>
                           <span className="text-sm leading-relaxed">{capability}</span>
@@ -408,15 +408,13 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                       ))}
                     </ul>
                     {(plan.id === 'pro' || plan.id === 'proplus') && (
-                      <div className="mt-4 rounded-md border border-green-300 bg-green-50 p-4 text-foreground shadow-sm dark:border-green-800 dark:bg-green-950/40">
-                        <p className="font-semibold text-green-700 dark:text-green-300">
-                          Maximum generation capacity:
+                      <div className="mt-4 space-y-1 rounded-lg border border-muted bg-muted/30 p-3">
+                        <p className="text-muted-foreground text-xs">
+                          → Up to {isYearly ? '1200' : '100'} Nano Banana images
+                          {isYearly ? '/year' : '/month'}
                         </p>
-                        <p className="mt-2 font-medium text-green-700 dark:text-green-300">
-                          → Up to 1200 Nano Banana images/year
-                        </p>
-                        <p className="font-medium text-green-700 dark:text-green-300">
-                          → Up to 400 Sora 2 videos/year
+                        <p className="text-muted-foreground text-xs">
+                          → Up to {isYearly ? '400' : '33'} Sora 2 videos{isYearly ? '/year' : '/month'}
                         </p>
                       </div>
                     )}
