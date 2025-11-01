@@ -349,32 +349,6 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                             </Badge>
                           )}
                         </div>
-                        {(plan.id === 'pro' || plan.id === 'proplus') && (
-                          <div className="mb-6 space-y-1 rounded-lg border border-muted bg-muted/30 p-3">
-                            <p className="text-muted-foreground text-xs">
-                              → Up to{' '}
-                              {plan.id === 'pro'
-                                ? isYearly
-                                  ? '1200'
-                                  : '100'
-                                : isYearly
-                                  ? '2160'
-                                  : '180'}{' '}
-                              Nano Banana images{isYearly ? '/year' : '/month'}
-                            </p>
-                            <p className="text-muted-foreground text-xs">
-                              → Up to{' '}
-                              {plan.id === 'pro'
-                                ? isYearly
-                                  ? '300'
-                                  : '25'
-                                : isYearly
-                                  ? '540'
-                                  : '45'}{' '}
-                              Sora 2 videos{isYearly ? '/year' : '/month'}
-                            </p>
-                          </div>
-                        )}
                       </>
                     )}
 
@@ -422,6 +396,42 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                           </span>
                         </li>
                       ))}
+                      {(plan.id === 'pro' || plan.id === 'proplus') && (
+                        <>
+                          <li className="flex items-center gap-3">
+                            <div className="shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900">
+                              <CircleCheck className="size-3 text-green-600 dark:text-green-400" />
+                            </div>
+                            <span className="text-sm leading-relaxed">
+                              → Up to{' '}
+                              {plan.id === 'pro'
+                                ? isYearly
+                                  ? '1200'
+                                  : '100'
+                                : isYearly
+                                  ? '2160'
+                                  : '180'}{' '}
+                              Nano Banana images{isYearly ? '/year' : '/month'}
+                            </span>
+                          </li>
+                          <li className="flex items-center gap-3">
+                            <div className="shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900">
+                              <CircleCheck className="size-3 text-green-600 dark:text-green-400" />
+                            </div>
+                            <span className="text-sm leading-relaxed">
+                              → Up to{' '}
+                              {plan.id === 'pro'
+                                ? isYearly
+                                  ? '300'
+                                  : '25'
+                                : isYearly
+                                  ? '540'
+                                  : '45'}{' '}
+                              Sora 2 videos{isYearly ? '/year' : '/month'}
+                            </span>
+                          </li>
+                        </>
+                      )}
                     </ul>
 
                     {/* Generation Capabilities */}
