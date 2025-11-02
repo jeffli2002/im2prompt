@@ -383,19 +383,26 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                       <p className="mb-4 font-semibold text-primary">Everything in Free, and:</p>
                     )}
                     <ul className="space-y-3">
-                      {plan.features.map((feature: PricingFeature, featureIndex: number) => (
-                        <li
-                          key={`${plan.id}-feature-${featureIndex}`}
-                          className="flex items-center gap-3"
-                        >
-                          <div className="shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900">
-                            <CircleCheck className="size-3 text-green-600 dark:text-green-400" />
-                          </div>
-                          <span className="text-sm leading-relaxed">
-                            {adjustFeatureText(feature.text, plan, isYearly)}
-                          </span>
-                        </li>
-                      ))}
+                      {plan.features
+                        .filter(
+                          (feature: PricingFeature) =>
+                            !feature.text.includes('Commercial') &&
+                            !feature.text.includes('No watermark') &&
+                            !feature.text.includes('No Ads')
+                        )
+                        .map((feature: PricingFeature, featureIndex: number) => (
+                          <li
+                            key={`${plan.id}-feature-${featureIndex}`}
+                            className="flex items-center gap-3"
+                          >
+                            <div className="shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900">
+                              <CircleCheck className="size-3 text-green-600 dark:text-green-400" />
+                            </div>
+                            <span className="text-sm leading-relaxed">
+                              {adjustFeatureText(feature.text, plan, isYearly)}
+                            </span>
+                          </li>
+                        ))}
                       {(plan.id === 'pro' || plan.id === 'proplus') && (
                         <>
                           <li className="flex items-start gap-3 pl-6">
@@ -434,6 +441,26 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                           <span className="text-sm leading-relaxed">{capability}</span>
                         </li>
                       ))}
+                      {plan.features
+                        .filter(
+                          (feature: PricingFeature) =>
+                            feature.text.includes('Commercial') ||
+                            feature.text.includes('No watermark') ||
+                            feature.text.includes('No Ads')
+                        )
+                        .map((feature: PricingFeature, featureIndex: number) => (
+                          <li
+                            key={`${plan.id}-bottom-feature-${featureIndex}`}
+                            className="flex items-center gap-3"
+                          >
+                            <div className="shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900">
+                              <CircleCheck className="size-3 text-green-600 dark:text-green-400" />
+                            </div>
+                            <span className="text-sm leading-relaxed">
+                              {adjustFeatureText(feature.text, plan, isYearly)}
+                            </span>
+                          </li>
+                        ))}
                     </ul>
                   </CardContent>
                   <CardFooter className="mt-auto p-8 pt-0">
