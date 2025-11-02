@@ -398,11 +398,8 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                       ))}
                       {(plan.id === 'pro' || plan.id === 'proplus') && (
                         <>
-                          <li className="flex items-center gap-3">
-                            <div className="shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900">
-                              <CircleCheck className="size-3 text-green-600 dark:text-green-400" />
-                            </div>
-                            <span className="text-sm leading-relaxed">
+                          <li className="flex items-start gap-3 pl-6">
+                            <span className="text-muted-foreground text-sm leading-relaxed">
                               → Up to{' '}
                               {plan.id === 'pro'
                                 ? isYearly
@@ -414,11 +411,8 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                               Nano Banana images{isYearly ? '/year' : '/month'}
                             </span>
                           </li>
-                          <li className="flex items-center gap-3">
-                            <div className="shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900">
-                              <CircleCheck className="size-3 text-green-600 dark:text-green-400" />
-                            </div>
-                            <span className="text-sm leading-relaxed">
+                          <li className="flex items-start gap-3 pl-6">
+                            <span className="text-muted-foreground text-sm leading-relaxed">
                               → Up to{' '}
                               {plan.id === 'pro'
                                 ? isYearly
@@ -432,10 +426,6 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                           </li>
                         </>
                       )}
-                    </ul>
-
-                    {/* Generation Capabilities */}
-                    <ul className="mt-4 space-y-3">
                       {generationCapabilities.map((capability) => (
                         <li key={`${plan.id}-${capability}`} className="flex items-center gap-3">
                           <div className="shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900">

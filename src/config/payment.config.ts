@@ -73,10 +73,10 @@ export const paymentConfig: PaymentConfig = {
       features: [
         '300 Image-to-Text per month',
         '500 credits/month for generation',
+        'Commercial license',
         'No watermark for images',
         'No watermark for Sora 2 video',
         'No Ads',
-        'Commercial license',
       ],
       popular: true,
       limits: {
@@ -109,10 +109,10 @@ export const paymentConfig: PaymentConfig = {
       features: [
         '600 Image-to-Text per month',
         '900 credits/month for generation',
+        'Commercial License',
         'No watermark for images',
         'No watermark for Sora 2 video',
         'No Ads',
-        'Commercial License',
       ],
       popular: false,
       limits: {
