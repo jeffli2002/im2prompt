@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { emailService } from '@/lib/email';
+import type { FeedbackEmailParams } from '@/lib/email/email-types';
 
 export async function POST(request: Request) {
   try {
@@ -13,20 +15,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
-    console.log('Support ticket received:', {
+    const emailParams: FeedbackEmailParams = {
       name,
       email,
       subject,
-      category,
-      priority,
+      category: category || 'general',
+      priority: priority || 'normal',
       message,
-      timestamp: new Date().toISOString(),
-    });
+      metadata: {
+        timestamp: new Date().toISOString(),
+        userAgent: request.headers.get('user-agent'),
+      },
+    };
+
+    const result = await emailService.sendFeedbackEmail(emailParams);
+
+    if (!result.success) {
+      console.error('Failed to send feedback email:', result.error);
+    }
 
     return NextResponse.json(
       {
         success: true,
         message: 'Support ticket submitted successfully',
+        messageId: result.messageId,
       },
       { status: 200 }
     );

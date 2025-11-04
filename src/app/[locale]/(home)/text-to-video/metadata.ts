@@ -1,0 +1,21 @@
+import type { Metadata } from 'next';
+import { seoPages } from '@/config/seo.config';
+
+export const metadata: Metadata = {
+  title: seoPages.textToVideo.title,
+  description: seoPages.textToVideo.description,
+  keywords: seoPages.textToVideo.keywords,
+  alternates: {
+    canonical: '/text-to-video',
+  },
+  openGraph: {
+    ...seoPages.textToVideo.openGraph,
+    url: 'https://www.im2prompt.com/text-to-video',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: seoPages.textToVideo.openGraph.title,
+    description: seoPages.textToVideo.openGraph.description,
+    images: seoPages.textToVideo.openGraph.images,
+  },
+};

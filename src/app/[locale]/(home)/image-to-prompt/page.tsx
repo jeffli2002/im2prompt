@@ -465,9 +465,10 @@ export default function ImageToPromptPage() {
       {/* Bottom Section */}
       <div className="text-center space-y-6 mt-12">
         <p className="text-sm text-muted-foreground">
-          Want to analyze specific aspects like art style or describe people in the image? Try our{' '}
-          <a href="#" className="text-primary hover:underline">AI Describe Image</a>{' '}
-          tool for detailed analysis.
+          Want to enhance your prompts further? Try our{' '}
+          <a href="/text-to-prompt" className="text-primary hover:underline">text to prompt enhancer</a>{' '}
+          or generate images directly with our{' '}
+          <a href="/text-to-image" className="text-primary hover:underline">AI image generator</a>.
         </p>
         
         <Card className="mx-auto max-w-3xl">

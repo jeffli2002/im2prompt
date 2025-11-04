@@ -387,6 +387,12 @@ export default function TextToPromptPage() {
       </div>
 
       <div className="mt-12 space-y-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          Need to extract prompts from existing images? Try our{' '}
+          <a href="/image-to-prompt" className="text-primary hover:underline">image to prompt converter</a>{' '}
+          or create videos with our{' '}
+          <a href="/text-to-video" className="text-primary hover:underline">text to video generator</a>.
+        </p>
         <Card className="mx-auto max-w-3xl">
           <CardContent className="p-8">
             <h2 className="mb-4 font-bold text-2xl">Powered by Advanced AI</h2>

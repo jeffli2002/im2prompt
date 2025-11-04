@@ -1,0 +1,141 @@
+warning: in the working copy of 'src/app/[locale]/(home)/image-to-prompt/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/[locale]/(home)/text-to-prompt/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/support/feedback/route.ts', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/VIDEO_GENERATION_RESTORATION_SUMMARY.md b/VIDEO_GENERATION_RESTORATION_SUMMARY.md[m
+[1mindex 396267119..d17be82d4 100644[m
+[1m--- a/VIDEO_GENERATION_RESTORATION_SUMMARY.md[m
+[1m+++ b/VIDEO_GENERATION_RESTORATION_SUMMARY.md[m
+[36m@@ -150,3 +150,9 @@[m [mVideo Generation 功能现在已完全恢复并可以正常使用！🎬✨[m
+ [m
+ [m
+ [m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[1mdiff --git a/src/app/[locale]/(home)/image-to-prompt/page.tsx b/src/app/[locale]/(home)/image-to-prompt/page.tsx[m
+[1mindex ec73d0727..29fd646b5 100644[m
+[1m--- a/src/app/[locale]/(home)/image-to-prompt/page.tsx[m
+[1m+++ b/src/app/[locale]/(home)/image-to-prompt/page.tsx[m
+[36m@@ -465,9 +465,10 @@[m [mexport default function ImageToPromptPage() {[m
+       {/* Bottom Section */}[m
+       <div className="text-center space-y-6 mt-12">[m
+         <p className="text-sm text-muted-foreground">[m
+[31m-          Want to analyze specific aspects like art style or describe people in the image? Try our{' '}[m
+[31m-          <a href="#" className="text-primary hover:underline">AI Describe Image</a>{' '}[m
+[31m-          tool for detailed analysis.[m
+[32m+[m[32m          Want to enhance your prompts further? Try our{' '}[m
+[32m+[m[32m          <a href="/text-to-prompt" className="text-primary hover:underline">text to prompt enhancer</a>{' '}[m
+[32m+[m[32m          or generate images directly with our{' '}[m
+[32m+[m[32m          <a href="/text-to-image" className="text-primary hover:underline">AI image generator</a>.[m
+         </p>[m
+         [m
+         <Card className="mx-auto max-w-3xl">[m
+[1mdiff --git a/src/app/[locale]/(home)/text-to-prompt/page.tsx b/src/app/[locale]/(home)/text-to-prompt/page.tsx[m
+[1mindex 629e168b0..80e65f0d9 100644[m
+[1m--- a/src/app/[locale]/(home)/text-to-prompt/page.tsx[m
+[1m+++ b/src/app/[locale]/(home)/text-to-prompt/page.tsx[m
+[36m@@ -387,6 +387,12 @@[m [mexport default function TextToPromptPage() {[m
+       </div>[m
+ [m
+       <div className="mt-12 space-y-6 text-center">[m
+[32m+[m[32m        <p className="text-sm text-muted-foreground">[m
+[32m+[m[32m          Need to extract prompts from existing images? Try our{' '}[m
+[32m+[m[32m          <a href="/image-to-prompt" className="text-primary hover:underline">image to prompt converter</a>{' '}[m
+[32m+[m[32m          or create videos with our{' '}[m
+[32m+[m[32m          <a href="/text-to-video" className="text-primary hover:underline">text to video generator</a>.[m
+[32m+[m[32m        </p>[m
+         <Card className="mx-auto max-w-3xl">[m
+           <CardContent className="p-8">[m
+             <h2 className="mb-4 font-bold text-2xl">Powered by Advanced AI</h2>[m
+[1mdiff --git a/src/app/api/support/feedback/route.ts b/src/app/api/support/feedback/route.ts[m
+[1mindex b71f88a02..dfd39beb8 100644[m
+[1m--- a/src/app/api/support/feedback/route.ts[m
+[1m+++ b/src/app/api/support/feedback/route.ts[m
+[36m@@ -1,4 +1,6 @@[m
+ import { NextResponse } from 'next/server';[m
+[32m+[m[32mimport { emailService } from '@/lib/email';[m
+[32m+[m[32mimport type { FeedbackEmailParams } from '@/lib/email/email-types';[m
+ [m
+ export async function POST(request: Request) {[m
+   try {[m
+[36m@@ -13,20 +15,30 @@[m [mexport async function POST(request: Request) {[m
+       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });[m
+     }[m
+ [m
+[31m-    console.log('Support ticket received:', {[m
+[32m+[m[32m    const emailParams: FeedbackEmailParams = {[m
+       name,[m
+       email,[m
+       subject,[m
+[31m-      category,[m
+[31m-      priority,[m
+[32m+[m[32m      category: category || 'general',[m
+[32m+[m[32m      priority: priority || 'normal',[m
+       message,[m
+[31m-      timestamp: new Date().toISOString(),[m
+[31m-    });[m
+[32m+[m[32m      metadata: {[m
+[32m+[m[32m        timestamp: new Date().toISOString(),[m
+[32m+[m[32m        userAgent: request.headers.get('user-agent'),[m
+[32m+[m[32m      },[m
+[32m+[m[32m    };[m
+[32m+[m
+[32m+[m[32m    const result = await emailService.sendFeedbackEmail(emailParams);[m
+[32m+[m
+[32m+[m[32m    if (!result.success) {[m
+[32m+[m[32m      console.error('Failed to send feedback email:', result.error);[m
+[32m+[m[32m    }[m
+ [m
+     return NextResponse.json([m
+       {[m
+         success: true,[m
+         message: 'Support ticket submitted successfully',[m
+[32m+[m[32m        messageId: result.messageId,[m
+       },[m
+       { status: 200 }[m
+     );[m
+[1mdiff --git a/src/app/api/v1/sora/upload-image/route.ts b/src/app/api/v1/sora/upload-image/route.ts[m
+[1mindex 8004e528d..c54fc0b2c 100644[m
+[1m--- a/src/app/api/v1/sora/upload-image/route.ts[m
+[1m+++ b/src/app/api/v1/sora/upload-image/route.ts[m
+[36m@@ -160,3 +160,9 @@[m [mexport async function POST(request: NextRequest) {[m
+ [m
+ [m
+ [m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[1mdiff --git a/test-google-vision-face-detection.mjs b/test-google-vision-face-detection.mjs[m
+[1mindex 543f962bc..ecee90c31 100644[m
+[1m--- a/test-google-vision-face-detection.mjs[m
+[1m+++ b/test-google-vision-face-detection.mjs[m
+[36m@@ -168,3 +168,9 @@[m [mrunTests().catch(console.error);[m
+ [m
+ [m
+ [m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[1mdiff --git a/test-vision-api-logic.mjs b/test-vision-api-logic.mjs[m
+[1mindex 02105d08e..a83472c37 100644[m
+[1m--- a/test-vision-api-logic.mjs[m
+[1m+++ b/test-vision-api-logic.mjs[m
+[36m@@ -125,3 +125,9 @@[m [mconsole.log('\n💡 The Vision API integration logic is working correctly!');[m
+ [m
+ [m
+ [m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
