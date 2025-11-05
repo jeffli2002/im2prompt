@@ -86,6 +86,11 @@ export default async function RootLayout({
           content="n43QebBEBeyBsRUaZ4yd5VksyiYaeKzwOAinwhgVSeo"
         />
         <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9378191378774896"
+          crossOrigin="anonymous"
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: generateStructuredData([
