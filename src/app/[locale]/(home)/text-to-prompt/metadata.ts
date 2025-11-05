@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: seoPages.textToPrompt.description,
   keywords: seoPages.textToPrompt.keywords,
   alternates: {
-    canonical: '/text-to-prompt',
+    canonical: 'https://www.im2prompt.com/text-to-prompt',
   },
   openGraph: {
     ...seoPages.textToPrompt.openGraph,

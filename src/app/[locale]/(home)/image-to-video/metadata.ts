@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: seoPages.imageToVideo.description,
   keywords: seoPages.imageToVideo.keywords,
   alternates: {
-    canonical: '/image-to-video',
+    canonical: 'https://www.im2prompt.com/image-to-video',
   },
   openGraph: {
     ...seoPages.imageToVideo.openGraph,
