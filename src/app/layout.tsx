@@ -8,9 +8,7 @@ import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { appConfig } from '../config/app.config';
 import { 
   generateStructuredData, 
-  getOrganizationSchema, 
-  getWebsiteSchema, 
-  getSoftwareApplicationSchema 
+  getHomePageStructuredData
 } from '@/lib/seo/structured-data';
 
 export const metadata: Metadata = {
@@ -93,11 +91,7 @@ export default async function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: generateStructuredData([
-              getOrganizationSchema(),
-              getWebsiteSchema(),
-              getSoftwareApplicationSchema(),
-            ]),
+            __html: generateStructuredData(getHomePageStructuredData()),
           }}
         />
         {gaId && <GoogleAnalytics gaId={gaId} />}

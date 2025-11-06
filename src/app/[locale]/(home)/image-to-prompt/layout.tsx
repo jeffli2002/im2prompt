@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { seoPages } from '@/config/seo.config';
-import { generateStructuredData, getOrganizationSchema, getWebPageSchema, getSoftwareApplicationSchema } from '@/lib/seo/structured-data';
+import { generateStructuredData, getOrganizationSchema, getWebPageSchema, getSoftwareApplicationSchema, getImageToPromptHowToSchema, getDefaultFAQSchema } from '@/lib/seo/structured-data';
 
 export const metadata: Metadata = {
   title: seoPages.imageToPrompt.title,
   description: seoPages.imageToPrompt.description,
-  keywords: seoPages.imageToPrompt.keywords,
+  keywords: seoPages.imageToPrompt.keywords.join(', '),
   alternates: {
     canonical: 'https://www.im2prompt.com/image-to-prompt',
   },
@@ -41,10 +41,12 @@ export default function ImageToPromptLayout({ children }: { children: React.Reac
     getOrganizationSchema(),
     getWebPageSchema({
       url: 'https://www.im2prompt.com/image-to-prompt',
-      name: 'Image to Prompt Generator',
+      name: seoPages.imageToPrompt.title,
       description: seoPages.imageToPrompt.description,
     }),
     getSoftwareApplicationSchema(),
+    getImageToPromptHowToSchema(),
+    getDefaultFAQSchema(),
   ]);
 
   return (

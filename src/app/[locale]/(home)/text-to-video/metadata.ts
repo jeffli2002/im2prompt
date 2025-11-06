@@ -4,7 +4,7 @@ import { seoPages } from '@/config/seo.config';
 export const metadata: Metadata = {
   title: seoPages.textToVideo.title,
   description: seoPages.textToVideo.description,
-  keywords: seoPages.textToVideo.keywords,
+  keywords: seoPages.textToVideo.keywords.join(', '),
   alternates: {
     canonical: 'https://www.im2prompt.com/text-to-video',
   },

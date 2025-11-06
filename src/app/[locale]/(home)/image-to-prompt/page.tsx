@@ -205,9 +205,9 @@ export default function ImageToPromptPage() {
 
       {/* Header */}
       <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold mb-4">Free Image to Prompt Generator</h1>
+        <h1 className="text-4xl font-bold mb-4">Image to Prompt Tool — Extract Sora 2, Nano Banana & Midjourney Prompts</h1>
         <p className="text-xl text-muted-foreground">
-          Convert Image to Prompt to generate your own image
+          Upload any image and extract perfect AI prompts for Sora 2 video, Nano Banana YouTube thumbnails, Midjourney, Flux, Stable Diffusion. Free online tool with downloadable prompt templates.
         </p>
       </div>
 
@@ -473,9 +473,17 @@ export default function ImageToPromptPage() {
         
         <Card className="mx-auto max-w-3xl">
           <CardContent className="p-8">
-            <h2 className="text-2xl font-bold mb-4">Highly Accurate Image to Prompt Generation</h2>
+            <h2 className="text-2xl font-bold mb-4">Sora 2 Prompt Examples & Nano Banana YouTube Thumbnail Prompts</h2>
+            <p className="text-muted-foreground mb-4">
+              Convert original images to prompts optimized for Sora 2 video generation, Nano Banana YouTube thumbnails, and Midjourney portraits. Our AI extracts highly accurate prompts that work perfectly with each model's specific requirements.
+            </p>
+            <h3 className="text-xl font-semibold mb-2">How to Generate YouTube Thumbnail with AI</h3>
+            <p className="text-muted-foreground mb-4">
+              Upload your image, select Nano Banana format, and generate prompts optimized for YouTube thumbnails. Download the prompt template and use it with AI image generators to create eye-catching thumbnails that increase click-through rates.
+            </p>
+            <h3 className="text-xl font-semibold mb-2">How to Prompt Sora 2</h3>
             <p className="text-muted-foreground">
-              Convert original images to prompts and regenerated with AI to see our prompt accuracy
+              Use our image-to-prompt tool to convert images into Sora 2 video prompts. Select Sora 2 format to get cinematic video prompts with proper structure and keywords that Sora 2 understands best.
             </p>
           </CardContent>
         </Card>

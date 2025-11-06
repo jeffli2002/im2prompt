@@ -4,7 +4,7 @@ import { seoPages } from '@/config/seo.config';
 export const metadata: Metadata = {
   title: seoPages.textToImage.title,
   description: seoPages.textToImage.description,
-  keywords: seoPages.textToImage.keywords,
+  keywords: seoPages.textToImage.keywords.join(', '),
   alternates: {
     canonical: 'https://www.im2prompt.com/text-to-image',
   },

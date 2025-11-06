@@ -4,7 +4,7 @@ import { seoPages } from '@/config/seo.config';
 export const metadata: Metadata = {
   title: seoPages.textToPrompt.title,
   description: seoPages.textToPrompt.description,
-  keywords: seoPages.textToPrompt.keywords,
+  keywords: seoPages.textToPrompt.keywords.join(', '),
   alternates: {
     canonical: 'https://www.im2prompt.com/text-to-prompt',
   },
