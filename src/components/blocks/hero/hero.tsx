@@ -81,12 +81,23 @@ const Hero = ({ heading, description, button, reviews }: HeroProps) => {
         <div className="mx-auto max-w-6xl text-center">
           <h1 className="fade-in slide-in-from-bottom-4 animate-in delay-100 duration-700">
             <span className="font-bold text-3xl leading-[1.1] tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
-              Sora 2 Prompts for Short Video — Image→Video Templates
+              All-in-One AI Creation Flow — From{' '}
+              <span className="animate-gradient bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+                Text to Prompt, Image, and Video
+              </span>
             </span>
           </h1>
 
           <p className="fade-in slide-in-from-bottom-4 mx-auto mt-8 max-w-3xl animate-in text-lg text-muted-foreground delay-200 duration-700 md:text-xl">
-            Convert images to Sora 2 prompts, Nano Banana YouTube thumbnails, and Midjourney templates. Free image to prompt tool with downloadable templates. Extract prompts for Flux, Stable Diffusion, and create stunning AI visuals instantly.
+            Seamlessly powered by{' '}
+            <span className="bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-500 bg-clip-text font-extrabold text-transparent">
+              Nano Banana
+            </span>{' '}
+            for images and{' '}
+            <span className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 bg-clip-text font-extrabold text-transparent">
+              Sora 2
+            </span>{' '}
+            for videos.
           </p>
 
           {/* Key Highlights - Light Cards */}
