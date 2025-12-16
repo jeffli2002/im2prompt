@@ -1,5 +1,5 @@
 import type { GenerationCompleteParams } from '../email-types';
-import { renderBaseTemplate, escapeHtml } from './base-template';
+import { escapeHtml, renderBaseTemplate } from './base-template';
 
 export function renderGenerationCompleteTemplate(params: GenerationCompleteParams): string {
   const isImage = params.generationType === 'image';

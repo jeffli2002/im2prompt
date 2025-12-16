@@ -5,7 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { creditsConfig } from '@/config/credits.config';
 import type { CreditTransaction } from '@/lib/credits';
-import type { GetCreditBalanceResponse, GetQuotaUsageResponse } from '@/server/actions/credit-actions';
+import type {
+  GetCreditBalanceResponse,
+  GetQuotaUsageResponse,
+} from '@/server/actions/credit-actions';
 import { formatDistance } from 'date-fns';
 import {
   ArrowDownRight,

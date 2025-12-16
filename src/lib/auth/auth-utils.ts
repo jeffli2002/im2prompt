@@ -1,5 +1,5 @@
-import { auth } from '@/lib/auth/auth';
 import { env } from '@/env';
+import { auth } from '@/lib/auth/auth';
 import { cookies, headers } from 'next/headers';
 
 export interface SessionUser {
@@ -73,7 +73,10 @@ export async function getSessionFromRequest(requestHeaders: Headers): Promise<Se
   }
 
   // Otherwise get real session from better-auth
-  console.log('[getSessionFromRequest] Cookie header:', requestHeaders.get('cookie') ? 'present' : 'missing');
+  console.log(
+    '[getSessionFromRequest] Cookie header:',
+    requestHeaders.get('cookie') ? 'present' : 'missing'
+  );
   const session = await auth.api.getSession({
     headers: requestHeaders,
   });

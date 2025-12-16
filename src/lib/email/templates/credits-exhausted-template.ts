@@ -1,5 +1,5 @@
 import type { CreditsExhaustedParams } from '../email-types';
-import { renderBaseTemplate, escapeHtml } from './base-template';
+import { escapeHtml, renderBaseTemplate } from './base-template';
 
 export function renderCreditsExhaustedTemplate(params: CreditsExhaustedParams): string {
   const isFree = params.planName.toLowerCase() === 'free';
@@ -27,7 +27,9 @@ export function renderCreditsExhaustedTemplate(params: CreditsExhaustedParams): 
       <p style="margin: 8px 0;">✓ Unlimited text-to-prompt generation</p>
     </div>
 
-    ${isFree ? `
+    ${
+      isFree
+        ? `
       <div style="background-color: #dbeafe; padding: 24px; border-radius: 8px; margin: 24px 0; text-align: center;">
         <h3 style="margin: 0 0 16px 0;">Get More Credits!</h3>
         <div style="display: inline-block; text-align: left; margin: 16px 0;">
@@ -51,7 +53,9 @@ export function renderCreditsExhaustedTemplate(params: CreditsExhaustedParams): 
           Upgrade Now
         </a>
       </p>
-    ` : params.nextRefillDate && params.nextRefillAmount ? `
+    `
+        : params.nextRefillDate && params.nextRefillAmount
+          ? `
       <div style="background-color: #d1fae5; padding: 16px; border-left: 4px solid #10b981; border-radius: 4px; margin: 24px 0;">
         <p style="margin: 0; font-weight: 600; color: #065f46;">✓ Good News!</p>
         <p style="margin: 8px 0 0 0; color: #064e3b;">
@@ -65,7 +69,9 @@ export function renderCreditsExhaustedTemplate(params: CreditsExhaustedParams): 
           Upgrade to Pro+ (900 credits/month)
         </a>
       </div>
-    ` : ''}
+    `
+          : ''
+    }
 
     <p style="margin-top: 32px; font-size: 14px; color: #71717a;">
       In the meantime, you can still use your free daily features and explore text-to-prompt generation!

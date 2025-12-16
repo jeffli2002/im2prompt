@@ -62,11 +62,16 @@ test('All expected template files exist', () => {
 test('Templates have proper structure', () => {
   for (const template of expectedTemplates) {
     if (template === 'index.ts') continue;
-    
+
     const content = readFileSync(join(templateDir, template), 'utf-8');
-    assert(content.includes('export function render'), `${template} should export a render function`);
-    assert(content.includes('renderBaseTemplate') || template === 'base-template.ts', 
-      `${template} should use renderBaseTemplate`);
+    assert(
+      content.includes('export function render'),
+      `${template} should export a render function`
+    );
+    assert(
+      content.includes('renderBaseTemplate') || template === 'base-template.ts',
+      `${template} should use renderBaseTemplate`
+    );
   }
   console.log(`   Validated ${expectedTemplates.length - 1} template structures`);
 });
@@ -81,11 +86,8 @@ test('Base template has XSS protection', () => {
 });
 
 test('Templates use escapeHtml for user inputs', () => {
-  const templates = expectedTemplates.filter(t => 
-    t !== 'base-template.ts' && 
-    t !== 'index.ts'
-  );
-  
+  const templates = expectedTemplates.filter((t) => t !== 'base-template.ts' && t !== 'index.ts');
+
   let templatesWithEscape = 0;
   for (const template of templates) {
     const content = readFileSync(join(templateDir, template), 'utf-8');
@@ -93,25 +95,22 @@ test('Templates use escapeHtml for user inputs', () => {
       templatesWithEscape++;
     }
   }
-  
+
   assert(templatesWithEscape > 0, 'At least some templates should use escapeHtml');
   console.log(`   ${templatesWithEscape}/${templates.length} templates use escapeHtml`);
 });
 
 test('Templates have proper HTML structure', () => {
-  const templates = expectedTemplates.filter(t => 
-    t !== 'base-template.ts' && 
-    t !== 'index.ts'
-  );
-  
+  const templates = expectedTemplates.filter((t) => t !== 'base-template.ts' && t !== 'index.ts');
+
   for (const template of templates) {
     const content = readFileSync(join(templateDir, template), 'utf-8');
-    
+
     // Check they return HTML via renderBaseTemplate
     if (!content.includes('renderBaseTemplate')) {
       throw new Error(`${template} doesn't use renderBaseTemplate`);
     }
-    
+
     // Check they have title and content
     if (!content.includes('title:') || !content.includes('content')) {
       throw new Error(`${template} missing title or content`);
@@ -126,7 +125,10 @@ test('Welcome template has correct fields', () => {
   assert(content.includes('userName'), 'Should reference userName');
   assert(content.includes('signupCredits'), 'Should reference signupCredits');
   assert(content.includes('dashboardUrl'), 'Should reference dashboardUrl');
-  assert(content.includes('30 Credits') || content.includes('signupCredits'), 'Should show credits');
+  assert(
+    content.includes('30 Credits') || content.includes('signupCredits'),
+    'Should show credits'
+  );
 });
 
 test('Email verification template has code display', () => {
@@ -146,7 +148,10 @@ test('Payment failed template has urgency levels', () => {
 test('Credits templates have threshold logic', () => {
   const lowWarning = readFileSync(join(templateDir, 'credits-low-warning-template.ts'), 'utf-8');
   assert(lowWarning.includes('warningThreshold'), 'Should check threshold');
-  assert(lowWarning.includes('getAlertColor') || lowWarning.includes('#ef4444'), 'Should have color logic');
+  assert(
+    lowWarning.includes('getAlertColor') || lowWarning.includes('#ef4444'),
+    'Should have color logic'
+  );
   assert(lowWarning.includes('currentBalance'), 'Should show balance');
 });
 
@@ -176,7 +181,7 @@ test('email-types.ts exists and has all interfaces', () => {
     'NotificationEmailParams',
     'AlertEmailParams',
   ];
-  
+
   for (const type of requiredTypes) {
     assert(content.includes(type), `Missing type: ${type}`);
   }
@@ -216,7 +221,10 @@ test('Implementation summary exists', () => {
   const content = readFileSync('./EMAIL_SERVICE_IMPLEMENTATION.md', 'utf-8');
   assert(content.includes('Email Service Implementation'), 'Should have title');
   assert(content.includes('14'), 'Should mention 14 templates');
-  assert(content.includes('Production Ready') || content.includes('READY'), 'Should confirm ready status');
+  assert(
+    content.includes('Production Ready') || content.includes('READY'),
+    'Should confirm ready status'
+  );
   console.log(`   Documentation size: ${(content.length / 1024).toFixed(1)}KB`);
 });
 

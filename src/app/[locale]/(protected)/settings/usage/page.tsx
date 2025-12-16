@@ -54,9 +54,9 @@ async function UsagePageServer() {
     getCreditHistory({ limit: 20 }),
     getQuotaUsage(),
   ]);
-  const initialBalance = balanceResult.success ? balanceResult.data ?? null : null;
-  const initialHistory = historyResult.success ? historyResult.data ?? [] : [];
-  const initialQuota = quotaResult.success ? quotaResult.data ?? null : null;
+  const initialBalance = balanceResult.success ? (balanceResult.data ?? null) : null;
+  const initialHistory = historyResult.success ? (historyResult.data ?? []) : [];
+  const initialQuota = quotaResult.success ? (quotaResult.data ?? null) : null;
 
   return (
     <UsagePageClient

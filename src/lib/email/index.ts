@@ -4,7 +4,7 @@ export * from './email-config';
 export * from './email-errors';
 export { emailService } from './email-service';
 
-export { 
+export {
   renderFeedbackTemplate,
   renderNotificationTemplate,
   renderAlertTemplate,

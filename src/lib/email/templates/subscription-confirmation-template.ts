@@ -1,10 +1,12 @@
 import type { SubscriptionConfirmationParams } from '../email-types';
-import { renderBaseTemplate, escapeHtml } from './base-template';
+import { escapeHtml, renderBaseTemplate } from './base-template';
 
-export function renderSubscriptionConfirmationTemplate(params: SubscriptionConfirmationParams): string {
+export function renderSubscriptionConfirmationTemplate(
+  params: SubscriptionConfirmationParams
+): string {
   const isYearly = params.billingInterval === 'yearly';
   const savingsText = isYearly ? ' (You saved 20%!)' : '';
-  
+
   const content = `
     <div style="text-align: center; padding: 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; margin-bottom: 24px;">
       <h2 style="margin: 0; color: white;">Welcome to ${escapeHtml(params.planName)}!${savingsText}</h2>
@@ -40,7 +42,7 @@ export function renderSubscriptionConfirmationTemplate(params: SubscriptionConfi
     <div style="margin: 16px 0;">
       <p style="margin: 8px 0;">✓ <strong>${params.monthlyCredits} credits per month</strong></p>
       <p style="margin: 8px 0;">✓ <strong>${params.extractions} image-to-prompt extractions/month</strong></p>
-      ${params.features.map(feature => `<p style="margin: 8px 0;">✓ ${escapeHtml(feature)}</p>`).join('')}
+      ${params.features.map((feature) => `<p style="margin: 8px 0;">✓ ${escapeHtml(feature)}</p>`).join('')}
     </div>
 
     <div style="background-color: #dbeafe; padding: 16px; border-radius: 6px; margin: 24px 0;">

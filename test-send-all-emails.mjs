@@ -1,5 +1,5 @@
-import { Resend } from 'resend';
 import { config } from 'dotenv';
+import { Resend } from 'resend';
 
 config({ path: '.env.production' });
 
@@ -25,7 +25,7 @@ let failed = 0;
 async function sendTestEmail(name, html, subject) {
   try {
     console.log(`📤 Sending: ${name}...`);
-    
+
     const response = await resend.emails.send({
       from: FROM_EMAIL,
       to: TEST_EMAIL,
@@ -66,9 +66,11 @@ await sendTestEmail(
   'Welcome to im2prompt!'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
-const { renderEmailVerificationTemplate } = await import('./src/lib/email/templates/email-verification-template.ts');
+const { renderEmailVerificationTemplate } = await import(
+  './src/lib/email/templates/email-verification-template.ts'
+);
 await sendTestEmail(
   'Email Verification',
   renderEmailVerificationTemplate({
@@ -81,9 +83,11 @@ await sendTestEmail(
   'Verify Your Email Address'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
-const { renderPasswordResetTemplate } = await import('./src/lib/email/templates/password-reset-template.ts');
+const { renderPasswordResetTemplate } = await import(
+  './src/lib/email/templates/password-reset-template.ts'
+);
 await sendTestEmail(
   'Password Reset',
   renderPasswordResetTemplate({
@@ -98,9 +102,11 @@ await sendTestEmail(
   'Reset Your Password'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
-const { renderSubscriptionConfirmationTemplate } = await import('./src/lib/email/templates/subscription-confirmation-template.ts');
+const { renderSubscriptionConfirmationTemplate } = await import(
+  './src/lib/email/templates/subscription-confirmation-template.ts'
+);
 await sendTestEmail(
   'Subscription Confirmation',
   renderSubscriptionConfirmationTemplate({
@@ -121,9 +127,11 @@ await sendTestEmail(
   'Pro Subscription Activated'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
-const { renderPaymentFailedTemplate } = await import('./src/lib/email/templates/payment-failed-template.ts');
+const { renderPaymentFailedTemplate } = await import(
+  './src/lib/email/templates/payment-failed-template.ts'
+);
 await sendTestEmail(
   'Payment Failed',
   renderPaymentFailedTemplate({
@@ -142,9 +150,11 @@ await sendTestEmail(
   'Payment Failed - Action Required'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
-const { renderCreditsLowWarningTemplate } = await import('./src/lib/email/templates/credits-low-warning-template.ts');
+const { renderCreditsLowWarningTemplate } = await import(
+  './src/lib/email/templates/credits-low-warning-template.ts'
+);
 await sendTestEmail(
   'Credits Low Warning',
   renderCreditsLowWarningTemplate({
@@ -164,9 +174,11 @@ await sendTestEmail(
   'Credits Running Low'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
-const { renderCreditsExhaustedTemplate } = await import('./src/lib/email/templates/credits-exhausted-template.ts');
+const { renderCreditsExhaustedTemplate } = await import(
+  './src/lib/email/templates/credits-exhausted-template.ts'
+);
 await sendTestEmail(
   'Credits Exhausted',
   renderCreditsExhaustedTemplate({
@@ -182,9 +194,11 @@ await sendTestEmail(
   'Credits Exhausted'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
-const { renderCreditsRefilledTemplate } = await import('./src/lib/email/templates/credits-refilled-template.ts');
+const { renderCreditsRefilledTemplate } = await import(
+  './src/lib/email/templates/credits-refilled-template.ts'
+);
 await sendTestEmail(
   'Credits Refilled',
   renderCreditsRefilledTemplate({
@@ -201,9 +215,11 @@ await sendTestEmail(
   'Credits Refilled Successfully'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
-const { renderGenerationCompleteTemplate } = await import('./src/lib/email/templates/generation-complete-template.ts');
+const { renderGenerationCompleteTemplate } = await import(
+  './src/lib/email/templates/generation-complete-template.ts'
+);
 await sendTestEmail(
   'Generation Complete (Image)',
   renderGenerationCompleteTemplate({
@@ -223,7 +239,7 @@ await sendTestEmail(
   'Your Image is Ready'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
 await sendTestEmail(
   'Generation Complete (Video)',
@@ -244,9 +260,11 @@ await sendTestEmail(
   'Your Video is Ready'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
-const { renderGenerationFailedTemplate } = await import('./src/lib/email/templates/generation-failed-template.ts');
+const { renderGenerationFailedTemplate } = await import(
+  './src/lib/email/templates/generation-failed-template.ts'
+);
 await sendTestEmail(
   'Generation Failed',
   renderGenerationFailedTemplate({
@@ -266,7 +284,7 @@ await sendTestEmail(
   'Generation Failed - Credits Refunded'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
 const { renderFeedbackTemplate } = await import('./src/lib/email/templates/feedback-template.ts');
 await sendTestEmail(
@@ -288,9 +306,11 @@ await sendTestEmail(
   '[FEATURE] Request for new feature'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
-const { renderNotificationTemplate } = await import('./src/lib/email/templates/notification-template.ts');
+const { renderNotificationTemplate } = await import(
+  './src/lib/email/templates/notification-template.ts'
+);
 await sendTestEmail(
   'Notification Email',
   renderNotificationTemplate({
@@ -298,7 +318,8 @@ await sendTestEmail(
     userEmail: TEST_EMAIL,
     userId: 'test-user-123',
     title: 'New Feature Available',
-    message: 'We have just released a new feature: Batch Image Processing. You can now process multiple images at once!',
+    message:
+      'We have just released a new feature: Batch Image Processing. You can now process multiple images at once!',
     actionUrl: 'https://im2prompt.com/features/batch-processing',
     actionText: 'Try It Now',
     notificationType: 'announcement',
@@ -306,7 +327,7 @@ await sendTestEmail(
   'New Feature Available'
 );
 
-await new Promise(resolve => setTimeout(resolve, 1000));
+await new Promise((resolve) => setTimeout(resolve, 1000));
 
 const { renderAlertTemplate } = await import('./src/lib/email/templates/alert-template.ts');
 await sendTestEmail(

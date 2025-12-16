@@ -1,11 +1,12 @@
 import type { GenerationFailedParams } from '../email-types';
-import { renderBaseTemplate, escapeHtml } from './base-template';
+import { escapeHtml, renderBaseTemplate } from './base-template';
 
 export function renderGenerationFailedTemplate(params: GenerationFailedParams): string {
   const typeText = params.generationType === 'image' ? 'Image' : 'Video';
-  const isContentPolicy = params.failureReason.toLowerCase().includes('policy') || 
-                          params.failureReason.toLowerCase().includes('content') ||
-                          params.failureReason.toLowerCase().includes('inappropriate');
+  const isContentPolicy =
+    params.failureReason.toLowerCase().includes('policy') ||
+    params.failureReason.toLowerCase().includes('content') ||
+    params.failureReason.toLowerCase().includes('inappropriate');
 
   const content = `
     <div style="background-color: #f59e0b; color: white; padding: 16px; text-align: center; border-radius: 8px; margin-bottom: 24px;">
@@ -50,21 +51,25 @@ export function renderGenerationFailedTemplate(params: GenerationFailedParams): 
       <p style="margin: 0; font-style: italic; color: #71717a;">"${escapeHtml(params.prompt.substring(0, 200))}${params.prompt.length > 200 ? '...' : ''}"</p>
     </div>
 
-    ${isContentPolicy ? `
+    ${
+      isContentPolicy
+        ? `
       <div style="background-color: #fef3c7; padding: 16px; border-left: 4px solid #f59e0b; border-radius: 4px; margin: 24px 0;">
         <p style="margin: 0; font-weight: 600; color: #92400e;">Content Policy Notice</p>
         <p style="margin: 8px 0 0 0; color: #92400e;">
           Your prompt may have violated our content policy. Please review our guidelines and try again with appropriate content.
         </p>
       </div>
-    ` : `
+    `
+        : `
       <div style="background-color: #dbeafe; padding: 16px; border-left: 4px solid #3b82f6; border-radius: 4px; margin: 24px 0;">
         <p style="margin: 0; font-weight: 600; color: #1e40af;">Technical Issue</p>
         <p style="margin: 8px 0 0 0; color: #1e3a8a;">
           This was a technical issue on our end. Our team has been notified. Please try again - it should work now.
         </p>
       </div>
-    `}
+    `
+    }
 
     <div style="text-align: center; margin: 32px 0;">
       <a href="${escapeHtml(params.retryUrl)}" class="button" style="font-size: 18px; padding: 16px 48px;">

@@ -1,26 +1,26 @@
-import { Resend } from 'resend';
 import { env } from '@/env';
-import { ErrorLogger } from '@/lib/logger/logger-utils';
 import { createChildLogger } from '@/lib/logger/logger';
-import {
-  type EmailResult,
-  type SendEmailParams,
-  type FeedbackEmailParams,
-  type NotificationEmailParams,
-  type AlertEmailParams,
-  type EmailPriority,
-} from './email-types';
-import {
-  EmailServiceError,
-  EmailValidationError,
-  EmailDeliveryError,
-  EmailConfigurationError,
-} from './email-errors';
+import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { Resend } from 'resend';
 import { EMAIL_CONFIG, EMAIL_ROUTING, PRIORITY_CONFIG } from './email-config';
 import {
+  EmailConfigurationError,
+  EmailDeliveryError,
+  EmailServiceError,
+  EmailValidationError,
+} from './email-errors';
+import type {
+  AlertEmailParams,
+  EmailPriority,
+  EmailResult,
+  FeedbackEmailParams,
+  NotificationEmailParams,
+  SendEmailParams,
+} from './email-types';
+import {
+  renderAlertTemplate,
   renderFeedbackTemplate,
   renderNotificationTemplate,
-  renderAlertTemplate,
 } from './templates';
 
 const emailErrorLogger = new ErrorLogger('email-service');
@@ -33,14 +33,14 @@ export class EmailService {
   private getResendClient(): Resend {
     if (!this.resend) {
       const apiKey = env.RESEND_API_KEY;
-      
+
       if (!apiKey) {
         throw new EmailConfigurationError('RESEND_API_KEY is not configured');
       }
 
       this.resend = new Resend(apiKey);
       this.initialized = true;
-      
+
       emailLogger.info({ provider: 'resend' }, 'Resend client initialized');
     }
 
@@ -54,7 +54,7 @@ export class EmailService {
 
   private validateEmailParams(params: SendEmailParams): void {
     const recipients = Array.isArray(params.to) ? params.to : [params.to];
-    
+
     for (const email of recipients) {
       if (!this.validateEmail(email)) {
         throw new EmailValidationError(`Invalid email address: ${email}`);
@@ -86,10 +86,10 @@ export class EmailService {
       } catch (error) {
         lastError = error as Error;
         emailLogger.warn(
-          { 
-            attempt, 
+          {
+            attempt,
             maxAttempts: attempts,
-            error: lastError.message 
+            error: lastError.message,
           },
           'Email send attempt failed'
         );
@@ -99,7 +99,7 @@ export class EmailService {
             EMAIL_CONFIG.retry.initialDelay * Math.pow(2, attempt - 1),
             EMAIL_CONFIG.retry.maxDelay
           );
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
     }
@@ -117,7 +117,7 @@ export class EmailService {
 
       const sendFn = async () => {
         const bccList = [...(params.bcc || [])];
-        
+
         if (EMAIL_CONFIG.bccCategories.includes(params.category as any)) {
           if (!bccList.includes(EMAIL_CONFIG.monitoringBcc)) {
             bccList.push(EMAIL_CONFIG.monitoringBcc);
@@ -133,10 +133,12 @@ export class EmailService {
           cc: params.cc,
           bcc: bccList.length > 0 ? bccList : undefined,
           attachments: params.attachments,
-          tags: params.metadata ? [
-            { name: 'category', value: params.category },
-            { name: 'priority', value: params.priority || 'normal' },
-          ] : undefined,
+          tags: params.metadata
+            ? [
+                { name: 'category', value: params.category },
+                { name: 'priority', value: params.priority || 'normal' },
+              ]
+            : undefined,
         });
 
         if (response.error) {
@@ -144,10 +146,10 @@ export class EmailService {
         }
 
         emailLogger.info(
-          { 
+          {
             messageId: response.data?.id,
             category: params.category,
-            priority: params.priority 
+            priority: params.priority,
           },
           'Email sent successfully'
         );
@@ -175,10 +177,10 @@ export class EmailService {
   async sendFeedbackEmail(params: FeedbackEmailParams): Promise<EmailResult> {
     try {
       emailLogger.info(
-        { 
+        {
           category: params.category,
           priority: params.priority,
-          from: params.email 
+          from: params.email,
         },
         'Sending feedback email'
       );
@@ -253,10 +255,10 @@ export class EmailService {
   async sendAlertEmail(params: AlertEmailParams): Promise<EmailResult> {
     try {
       emailLogger.info(
-        { 
+        {
           alertType: params.alertType,
           severity: params.severity,
-          title: params.title 
+          title: params.title,
         },
         'Sending alert email'
       );
@@ -268,8 +270,8 @@ export class EmailService {
         throw new EmailConfigurationError('No admin emails configured for alerts');
       }
 
-      const priority = params.severity === 'critical' ? 'urgent' :
-                       params.severity === 'high' ? 'high' : 'normal';
+      const priority =
+        params.severity === 'critical' ? 'urgent' : params.severity === 'high' ? 'high' : 'normal';
 
       return await this.sendEmail(
         {

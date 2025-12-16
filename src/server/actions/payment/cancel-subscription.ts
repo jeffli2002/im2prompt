@@ -3,8 +3,12 @@
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 import { creemService } from '@/lib/creem/creem-service';
 import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { StripeProvider } from '@/payment/stripe/provider';
 import type { ActionResult } from '@/payment/types';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
+import {
+  type UpdatePaymentData,
+  paymentRepository,
+} from '@/server/db/repositories/payment-repository';
 
 const cancelErrorLogger = new ErrorLogger('cancel-subscription');
 
@@ -37,22 +41,44 @@ export async function cancelSubscription(
       };
     }
 
-    const result = await creemService.cancelSubscription(subscriptionId);
-    if (!result.success) {
-      if (result.error?.includes('does not exist') || result.error?.includes('not found')) {
-        await paymentRepository.update(paymentRecord.id, {
-          status: 'canceled',
-        });
+    const provider = paymentRecord.provider || 'stripe';
+    let alreadyCancelled = false;
+
+    if (provider === 'creem') {
+      const result = await creemService.cancelSubscription(subscriptionId);
+      if (!result.success) {
+        if (result.error?.includes('does not exist') || result.error?.includes('not found')) {
+          await paymentRepository.update(paymentRecord.id, {
+            status: 'canceled',
+            cancelAtPeriodEnd: false,
+          });
+        }
+        return {
+          success: false,
+          error: result.error || 'Failed to cancel subscription',
+        };
       }
-      return {
-        success: false,
-        error: result.error || 'Failed to cancel subscription',
-      };
+      alreadyCancelled = !!result.alreadyCancelled;
+    } else {
+      const stripeProvider = new StripeProvider();
+      const canceled = await stripeProvider.cancelSubscription(subscriptionId);
+      if (!canceled) {
+        return {
+          success: false,
+          error: 'Failed to cancel subscription with Stripe. Please try again or contact support.',
+        };
+      }
     }
 
-    await paymentRepository.update(paymentRecord.id, {
-      cancelAtPeriodEnd: true,
-    });
+    const updatePayload: UpdatePaymentData = {
+      cancelAtPeriodEnd: !alreadyCancelled,
+    };
+
+    if (alreadyCancelled) {
+      updatePayload.status = 'canceled';
+    }
+
+    await paymentRepository.update(paymentRecord.id, updatePayload);
 
     await paymentRepository.createEvent({
       paymentId: paymentRecord.id,
@@ -60,7 +86,9 @@ export async function cancelSubscription(
       eventData: JSON.stringify({
         subscriptionId,
         canceledAt: new Date().toISOString(),
-        cancelAtPeriodEnd: true,
+        cancelAtPeriodEnd: !alreadyCancelled,
+        alreadyCancelled,
+        provider,
       }),
     });
 
@@ -69,7 +97,9 @@ export async function cancelSubscription(
       data: {
         canceled: true,
       },
-      message: 'Subscription will be canceled at the end of current period',
+      message: alreadyCancelled
+        ? 'Subscription is already canceled'
+        : 'Subscription will be canceled at the end of current period',
     };
   } catch (error) {
     cancelErrorLogger.logError(error as Error, {

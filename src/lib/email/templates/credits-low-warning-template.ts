@@ -1,5 +1,5 @@
 import type { CreditsLowWarningParams } from '../email-types';
-import { renderBaseTemplate, escapeHtml } from './base-template';
+import { escapeHtml, renderBaseTemplate } from './base-template';
 
 export function renderCreditsLowWarningTemplate(params: CreditsLowWarningParams): string {
   const getAlertColor = () => {
@@ -43,7 +43,9 @@ export function renderCreditsLowWarningTemplate(params: CreditsLowWarningParams)
       <p style="margin: 8px 0;">🎨 You can still generate: <strong>~${estimatedGenerations} images</strong> or <strong>~${estimatedVideos} videos</strong></p>
     </div>
 
-    ${isFree ? `
+    ${
+      isFree
+        ? `
       <div style="background-color: #dbeafe; padding: 16px; border-left: 4px solid #3b82f6; border-radius: 4px; margin: 24px 0;">
         <p style="margin: 0; font-weight: 600; color: #1e40af;">💡 Upgrade to Never Run Out</p>
         <p style="margin: 8px 0 0 0; color: #1e3a8a;">
@@ -56,7 +58,9 @@ export function renderCreditsLowWarningTemplate(params: CreditsLowWarningParams)
           Upgrade to Pro
         </a>
       </p>
-    ` : params.nextRefillDate ? `
+    `
+        : params.nextRefillDate
+          ? `
       <div style="background-color: #d1fae5; padding: 16px; border-left: 4px solid #10b981; border-radius: 4px; margin: 24px 0;">
         <p style="margin: 0; font-weight: 600; color: #065f46;">✓ Good News!</p>
         <p style="margin: 8px 0 0 0; color: #064e3b;">
@@ -69,7 +73,9 @@ export function renderCreditsLowWarningTemplate(params: CreditsLowWarningParams)
           Need More? Upgrade to Pro+
         </a>
       </p>
-    ` : ''}
+    `
+          : ''
+    }
 
     <h3>Tips to Make Credits Last:</h3>
     <p style="margin: 8px 0;">💡 Use Image-to-Prompt (2 credits) before generating</p>

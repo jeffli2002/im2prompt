@@ -5,11 +5,8 @@ import type { Metadata } from 'next';
 import type React from 'react';
 
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
+import { generateStructuredData, getHomePageStructuredData } from '@/lib/seo/structured-data';
 import { appConfig } from '../config/app.config';
-import { 
-  generateStructuredData, 
-  getHomePageStructuredData
-} from '@/lib/seo/structured-data';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.im2prompt.com'),
@@ -87,17 +84,20 @@ export default async function RootLayout({
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9378191378774896"
           crossOrigin="anonymous"
+          suppressHydrationWarning
         />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: generateStructuredData(getHomePageStructuredData()),
           }}
+          suppressHydrationWarning
         />
         {gaId && <GoogleAnalytics gaId={gaId} />}
       </head>
       <body>
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               if (typeof globalThis !== 'undefined' && typeof globalThis.__name === 'undefined') {

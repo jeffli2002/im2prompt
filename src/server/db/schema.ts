@@ -1,4 +1,4 @@
-import { boolean, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, integer, jsonb, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -125,6 +125,31 @@ export const paymentEvent = pgTable('payment_event', {
 });
 
 // Credit system tables
+// Credit Pack Purchase
+export const creditPackPurchase = pgTable('credit_pack_purchase', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  creditPackId: text('credit_pack_id').notNull(),
+  credits: integer('credits').notNull(),
+  amountCents: integer('amount_cents').notNull(),
+  currency: text('currency').notNull().default('USD'),
+  provider: text('provider', { enum: ['stripe', 'creem'] })
+    .notNull()
+    .default('creem'),
+  orderId: text('order_id'),
+  checkoutId: text('checkout_id'),
+  creditTransactionId: text('credit_transaction_id').references(() => creditTransactions.id, {
+    onDelete: 'set null',
+  }),
+  metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
+  testMode: boolean('test_mode').default(false).notNull(),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
 export const userCredits = pgTable('user_credits', {
   id: text('id').primaryKey(),
   userId: text('user_id')
@@ -225,6 +250,61 @@ export const apiKey = pgTable('api_key', {
     .notNull(),
   updatedAt: timestamp('updated_at')
     .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+// Generated Assets (Images and Videos)
+export const generatedAsset = pgTable('generated_asset', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  batchJobId: text('batch_job_id'),
+  assetType: text('asset_type', {
+    enum: ['image', 'video'],
+  }).notNull(),
+  generationMode: text('generation_mode', {
+    enum: ['t2i', 'i2i', 't2v', 'i2v'],
+  }).notNull(),
+  // Product information
+  productName: text('product_name'),
+  productDescription: text('product_description'),
+  baseImageUrl: text('base_image_url'), // For I2I and I2V
+  // Generation parameters
+  prompt: text('prompt').notNull(),
+  enhancedPrompt: text('enhanced_prompt'), // After prompt enhancement
+  negativePrompt: text('negative_prompt'),
+  styleId: text('style_id'), // Reference to style configuration
+  styleCustomization: text('style_customization'), // Additional style text
+  // Video specific
+  videoStyle: text('video_style'), // For video generation styles
+  script: text('script'), // Generated script for video
+  scriptAudioUrl: text('script_audio_url'), // TTS audio URL
+  // Output
+  r2Key: text('r2_key').notNull(), // R2 storage key
+  publicUrl: text('public_url').notNull(), // Public accessible URL
+  thumbnailUrl: text('thumbnail_url'),
+  width: integer('width'),
+  height: integer('height'),
+  duration: integer('duration'), // For videos, in seconds
+  fileSize: integer('file_size'), // In bytes
+  // Status and metadata
+  status: text('status', {
+    enum: ['processing', 'completed', 'failed'],
+  })
+    .notNull()
+    .default('processing'),
+  errorMessage: text('error_message'),
+  creditsSpent: integer('credits_spent').notNull().default(0),
+  generationParams: jsonb('generation_params'), // Full generation parameters
+  metadata: jsonb('metadata'), // Additional metadata
+  // Retention policy
+  expiresAt: timestamp('expires_at'), // For auto-deletion based on subscription tier
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
     .notNull(),
 });
 
@@ -490,4 +570,48 @@ export const moderationLogs = pgTable(
     createdAtIdx: { name: 'moderation_created_at_idx', columns: [table.createdAt] },
   })
 );
-// Force rebuild
+
+// Subscription Plans
+export const subscription = pgTable('subscription', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  planType: text('plan_type', {
+    enum: ['free', 'pro', 'enterprise'],
+  })
+    .notNull()
+    .default('free'),
+  status: text('status', {
+    enum: ['active', 'cancelled', 'expired', 'trial'],
+  })
+    .notNull()
+    .default('active'),
+  periodStart: timestamp('period_start'),
+  periodEnd: timestamp('period_end'),
+  cancelAtPeriodEnd: boolean('cancel_at_period_end').default(false),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
+// Admin users table (separate from regular users for admin panel authentication)
+export const admins = pgTable('admins', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  email: text('email').notNull().unique(),
+  name: text('name'),
+  passwordHash: text('password_hash').notNull(),
+  role: text('role').notNull().default('admin'), // admin, super_admin
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  lastLoginAt: timestamp('last_login_at'),
+});

@@ -1,5 +1,5 @@
 import type { PasswordResetParams } from '../email-types';
-import { renderBaseTemplate, escapeHtml } from './base-template';
+import { escapeHtml, renderBaseTemplate } from './base-template';
 
 export function renderPasswordResetTemplate(params: PasswordResetParams): string {
   const content = `

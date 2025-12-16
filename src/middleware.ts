@@ -1,12 +1,19 @@
 import createMiddleware from 'next-intl/middleware';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { routing } from './i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
 export default function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Skip i18n middleware for admin routes and API routes
+  if (pathname.startsWith('/admin') || pathname.startsWith('/api')) {
+    return NextResponse.next();
+  }
+
   const hostname = request.headers.get('host');
-  
+
   if (hostname && !hostname.startsWith('www.') && !hostname.startsWith('localhost')) {
     const url = request.nextUrl.clone();
     url.host = `www.${hostname}`;
@@ -14,9 +21,8 @@ export default function middleware(request: NextRequest) {
   }
 
   const response = intlMiddleware(request);
-  const pathname = request.nextUrl.pathname;
   const baseUrl = 'https://www.im2prompt.com';
-  
+
   const canonicalPaths: Record<string, string> = {
     '/': '/',
     '/image-to-prompt': '/image-to-prompt',
@@ -39,7 +45,7 @@ export default function middleware(request: NextRequest) {
       break;
     }
   }
-  
+
   return response;
 }
 

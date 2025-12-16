@@ -1,20 +1,37 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { Upload, Image as ImageIcon, Sparkles, Loader2, Check, Video, Palette, Wand2, FileText, Plus } from 'lucide-react';
+import UpgradePrompt from '@/components/auth/UpgradePrompt';
+import { PromptPreview } from '@/components/prompt-preview';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
-import { PromptPreview } from '@/components/prompt-preview';
-import UpgradePrompt from '@/components/auth/UpgradePrompt';
-import { useQuota } from '@/hooks/useQuota';
-import { useAuth } from '@/contexts/AuthContext';
 import { creditsConfig } from '@/config/credits.config';
+import { useAuth } from '@/contexts/AuthContext';
+import { useQuota } from '@/hooks/useQuota';
+import {
+  Check,
+  FileText,
+  Image as ImageIcon,
+  Loader2,
+  Palette,
+  Plus,
+  Sparkles,
+  Upload,
+  Video,
+  Wand2,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
 
 interface AIModel {
   id: string;
@@ -31,28 +48,28 @@ const aiModels: AIModel[] = [
     name: 'General Image Prompt',
     description: 'Natural language description',
     icon: <FileText className="h-5 w-5" />,
-    gradient: 'from-blue-500/20 to-blue-600/20'
+    gradient: 'from-blue-500/20 to-blue-600/20',
   },
   {
     id: 'midjourney',
     name: 'Midjourney',
     description: 'Midjourney prompts with parameters',
     icon: <Palette className="h-5 w-5" />,
-    gradient: 'from-purple-500/20 to-purple-600/20'
+    gradient: 'from-purple-500/20 to-purple-600/20',
   },
   {
     id: 'nanoBanana',
     name: 'Nano Banana',
     description: 'Nano Banana format',
     icon: <Wand2 className="h-5 w-5" />,
-    gradient: 'from-pink-500/20 to-pink-600/20'
+    gradient: 'from-pink-500/20 to-pink-600/20',
   },
   {
     id: 'flux',
     name: 'Flux',
     description: 'Photorealistic prompts',
     icon: <Sparkles className="h-5 w-5" />,
-    gradient: 'from-cyan-500/20 to-blue-600/20'
+    gradient: 'from-cyan-500/20 to-blue-600/20',
   },
   {
     id: 'sora2',
@@ -60,8 +77,8 @@ const aiModels: AIModel[] = [
     description: 'Cinematic video prompts',
     icon: <Video className="h-5 w-5" />,
     badge: 'NEW',
-    gradient: 'from-red-500/20 to-orange-600/20'
-  }
+    gradient: 'from-red-500/20 to-orange-600/20',
+  },
 ];
 
 export default function ImageToPromptPage() {
@@ -77,15 +94,17 @@ export default function ImageToPromptPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [negativePrompt, setNegativePrompt] = useState<string>('');
-  const [promptHistory, setPromptHistory] = useState<Array<{prompt: string, model: string, timestamp: Date}>>([]);
+  const [promptHistory, setPromptHistory] = useState<
+    Array<{ prompt: string; model: string; timestamp: Date }>
+  >([]);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
   const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 4 * 1024 * 1024) {
-        toast.error("File too large", {
-          description: "Please upload an image less than 4MB",
+        toast.error('File too large', {
+          description: 'Please upload an image less than 4MB',
         });
         return;
       }
@@ -101,13 +120,16 @@ export default function ImageToPromptPage() {
     }
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      handleImageUpload({ target: { files: [file] } } as any);
-    }
-  }, [handleImageUpload]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const file = e.dataTransfer.files?.[0];
+      if (file?.type.startsWith('image/')) {
+        handleImageUpload({ target: { files: [file] } } as React.ChangeEvent<HTMLInputElement>);
+      }
+    },
+    [handleImageUpload]
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -115,8 +137,8 @@ export default function ImageToPromptPage() {
 
   const handleGeneratePrompt = async () => {
     if (!imageFile && !imageUrl) {
-      toast.error("No image provided", {
-        description: "Please upload an image or provide an image URL",
+      toast.error('No image provided', {
+        description: 'Please upload an image or provide an image URL',
       });
       return;
     }
@@ -156,27 +178,30 @@ export default function ImageToPromptPage() {
       }
 
       const data = await response.json();
-      
+
       if (data.success) {
         setGeneratedPrompt(data.data.prompt);
         setNegativePrompt(data.data.negativePrompt || '');
-        
-        await trackImageToText();
-        
-        setPromptHistory(prev => [{
-          prompt: data.data.prompt,
-          model: selectedModel,
-          timestamp: new Date()
-        }, ...prev.slice(0, 4)]);
 
-        toast.success("Prompt generated successfully!", {
+        await trackImageToText();
+
+        setPromptHistory((prev) => [
+          {
+            prompt: data.data.prompt,
+            model: selectedModel,
+            timestamp: new Date(),
+          },
+          ...prev.slice(0, 4),
+        ]);
+
+        toast.success('Prompt generated successfully!', {
           description: `Credits used: ${data.data.creditsUsed}. Remaining: ${data.data.remainingCredits}`,
         });
       }
     } catch (error) {
       console.error('Error generating prompt:', error);
-      toast.error("Generation failed", {
-        description: error instanceof Error ? error.message : "Failed to generate prompt",
+      toast.error('Generation failed', {
+        description: error instanceof Error ? error.message : 'Failed to generate prompt',
       });
     } finally {
       setIsLoading(false);
@@ -185,8 +210,8 @@ export default function ImageToPromptPage() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copied!", {
-      description: "Prompt copied to clipboard",
+    toast.success('Copied!', {
+      description: 'Prompt copied to clipboard',
     });
   };
 
@@ -204,23 +229,27 @@ export default function ImageToPromptPage() {
       )}
 
       {/* Header */}
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold mb-4">Image to Prompt Tool — Extract Sora 2, Nano Banana & Midjourney Prompts</h1>
-        <p className="text-xl text-muted-foreground">
-          Upload any image and extract perfect AI prompts for Sora 2 video, Nano Banana YouTube thumbnails, Midjourney, Flux, Stable Diffusion. Free online tool with downloadable prompt templates.
+      <div className="mb-10 text-center">
+        <h1 className="mb-4 font-bold text-4xl">
+          Image to Prompt Tool — Extract Sora 2, Nano Banana & Midjourney Prompts
+        </h1>
+        <p className="text-muted-foreground text-xl">
+          Upload any image and extract perfect AI prompts for Sora 2 video, Nano Banana YouTube
+          thumbnails, Midjourney, Flux, Stable Diffusion. Free online tool with downloadable prompt
+          templates.
         </p>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="mx-auto max-w-6xl space-y-6">
         {/* 1. Image Upload/Preview Card */}
         <Card className="overflow-hidden">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <h3 className="font-semibold">Step 1: Upload Image</h3>
               <div className="flex items-center gap-2">
-                <Button 
-                  variant={uploadMode === 'file' ? "default" : "outline"}
+                <Button
+                  variant={uploadMode === 'file' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => {
                     setUploadMode('file');
@@ -228,11 +257,11 @@ export default function ImageToPromptPage() {
                   }}
                   className="text-xs"
                 >
-                  <Upload className="h-3 w-3 mr-1" />
+                  <Upload className="mr-1 h-3 w-3" />
                   File
                 </Button>
-                <Button 
-                  variant={uploadMode === 'url' ? "default" : "outline"}
+                <Button
+                  variant={uploadMode === 'url' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => {
                     setUploadMode('url');
@@ -241,7 +270,7 @@ export default function ImageToPromptPage() {
                   }}
                   className="text-xs"
                 >
-                  <FileText className="h-3 w-3 mr-1" />
+                  <FileText className="mr-1 h-3 w-3" />
                   URL
                 </Button>
               </div>
@@ -251,20 +280,28 @@ export default function ImageToPromptPage() {
               <div
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
-                className={`relative border-2 border-dashed rounded-lg transition-all ${
-                  imagePreview 
-                    ? 'border-transparent bg-muted/10' 
-                    : 'border-muted-foreground/25 hover:border-muted-foreground/50 cursor-pointer'
+                className={`relative rounded-lg border-2 border-dashed transition-all ${
+                  imagePreview
+                    ? 'border-transparent bg-muted/10'
+                    : 'cursor-pointer border-muted-foreground/25 hover:border-muted-foreground/50'
                 }`}
                 style={{ minHeight: '400px' }}
                 onClick={() => !imagePreview && document.getElementById('image-upload')?.click()}
+                onKeyDown={(e) => {
+                  if ((e.key === 'Enter' || e.key === ' ') && !imagePreview) {
+                    e.preventDefault();
+                    document.getElementById('image-upload')?.click();
+                  }
+                }}
+                role="button"
+                tabIndex={0}
               >
                 {imagePreview ? (
                   <div className="relative h-full">
-                    <img 
-                      src={imagePreview} 
-                      alt="Preview" 
-                      className="w-full h-full object-contain rounded-lg"
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="h-full w-full rounded-lg object-contain"
                       style={{ maxHeight: '400px' }}
                     />
                     <div className="absolute top-2 right-2 flex gap-2">
@@ -277,7 +314,7 @@ export default function ImageToPromptPage() {
                         }}
                         className="shadow-sm"
                       >
-                        <Upload className="h-3 w-3 mr-1" />
+                        <Upload className="mr-1 h-3 w-3" />
                         Replace
                       </Button>
                       <Button
@@ -296,19 +333,19 @@ export default function ImageToPromptPage() {
                   </div>
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center space-y-4">
+                    <div className="space-y-4 text-center">
                       <div className="relative">
-                        <div className="mx-auto h-20 w-20 rounded-full border-2 border-dashed border-muted-foreground/25 flex items-center justify-center bg-muted/5">
+                        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-muted-foreground/25 border-dashed bg-muted/5">
                           <Plus className="h-8 w-8 text-muted-foreground/40" />
                         </div>
-                        <ImageIcon className="absolute bottom-0 right-0 h-6 w-6 text-muted-foreground/30" />
+                        <ImageIcon className="absolute right-0 bottom-0 h-6 w-6 text-muted-foreground/30" />
                       </div>
                       <div>
-                        <p className="text-base font-medium text-foreground mb-1">Drop your image here</p>
-                        <p className="text-sm text-muted-foreground">
-                          or click to browse
+                        <p className="mb-1 font-medium text-base text-foreground">
+                          Drop your image here
                         </p>
-                        <p className="text-xs text-muted-foreground mt-2">
+                        <p className="text-muted-foreground text-sm">or click to browse</p>
+                        <p className="mt-2 text-muted-foreground text-xs">
                           PNG, JPG, or WebP up to 4MB
                         </p>
                       </div>
@@ -330,14 +367,17 @@ export default function ImageToPromptPage() {
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://example.com/image.jpg"
-                  className="w-full px-3 py-2 border rounded-md text-sm"
+                  className="w-full rounded-md border px-3 py-2 text-sm"
                 />
                 {imageUrl && (
-                  <div className="relative border rounded-lg overflow-hidden bg-muted/10" style={{ minHeight: '350px' }}>
-                    <img 
-                      src={imageUrl} 
-                      alt="Preview" 
-                      className="w-full h-full object-contain"
+                  <div
+                    className="relative overflow-hidden rounded-lg border bg-muted/10"
+                    style={{ minHeight: '350px' }}
+                  >
+                    <img
+                      src={imageUrl}
+                      alt="Preview"
+                      className="h-full w-full object-contain"
                       style={{ maxHeight: '350px' }}
                     />
                   </div>
@@ -350,35 +390,42 @@ export default function ImageToPromptPage() {
         {/* 2. Model Selection */}
         <Card>
           <CardContent className="p-6">
-            <Label className="text-base font-semibold mb-4 block">Step 2: Select AI Model Style</Label>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <Label className="mb-4 block font-semibold text-base">
+              Step 2: Select AI Model Style
+            </Label>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
               {aiModels.map((model) => (
                 <button
                   key={model.id}
+                  type="button"
                   onClick={() => setSelectedModel(model.id)}
-                  className={`relative p-3 rounded-lg border-2 cursor-pointer transition-all group ${
-                    selectedModel === model.id 
-                      ? 'border-primary bg-primary/5 shadow-sm' 
+                  className={`group relative cursor-pointer rounded-lg border-2 p-3 transition-all ${
+                    selectedModel === model.id
+                      ? 'border-primary bg-primary/5 shadow-sm'
                       : 'border-border hover:border-muted-foreground/50 hover:bg-muted/5'
                   }`}
                 >
-                  <div className="flex flex-col items-center text-center gap-2">
-                    <div className={`p-2.5 rounded-lg bg-gradient-to-br ${model.gradient} group-hover:scale-110 transition-transform`}>
+                  <div className="flex flex-col items-center gap-2 text-center">
+                    <div
+                      className={`rounded-lg bg-gradient-to-br p-2.5 ${model.gradient} transition-transform group-hover:scale-110`}
+                    >
                       {model.icon}
                     </div>
                     <div className="w-full">
-                      <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                      <div className="mb-0.5 flex items-center justify-center gap-1.5">
                         <h3 className="font-semibold text-xs">{model.name}</h3>
                         {model.badge && (
-                          <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">
+                          <Badge variant="secondary" className="h-4 px-1 py-0 text-[10px]">
                             {model.badge}
                           </Badge>
                         )}
                       </div>
-                      <p className="text-[10px] text-muted-foreground line-clamp-2 leading-tight">{model.description}</p>
+                      <p className="line-clamp-2 text-[10px] text-muted-foreground leading-tight">
+                        {model.description}
+                      </p>
                     </div>
                     {selectedModel === model.id && (
-                      <Check className="h-3.5 w-3.5 text-primary absolute top-1.5 right-1.5" />
+                      <Check className="absolute top-1.5 right-1.5 h-3.5 w-3.5 text-primary" />
                     )}
                   </div>
                 </button>
@@ -390,12 +437,12 @@ export default function ImageToPromptPage() {
         {/* 3. Language Selection, Generate Button, and Generated Prompt - All in one row */}
         <Card>
           <CardContent className="p-6">
-            <Label className="text-base font-semibold mb-4 block">Step 3: Generate Prompt</Label>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <Label className="mb-4 block font-semibold text-base">Step 3: Generate Prompt</Label>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
               {/* Language Selection and Generate Button */}
-              <div className="lg:col-span-1 space-y-3">
+              <div className="space-y-3 lg:col-span-1">
                 <div>
-                  <Label className="text-sm mb-2 block">Prompt Language</Label>
+                  <Label className="mb-2 block text-sm">Prompt Language</Label>
                   <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
                     <SelectTrigger className="h-10">
                       <SelectValue placeholder="Select language" />
@@ -409,8 +456,8 @@ export default function ImageToPromptPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                
-                <Button 
+
+                <Button
                   onClick={handleGeneratePrompt}
                   disabled={isLoading || (!imageFile && !imageUrl)}
                   size="lg"
@@ -428,32 +475,40 @@ export default function ImageToPromptPage() {
                     </>
                   )}
                 </Button>
-                
+
                 {!user && (
-                  <p className="text-xs text-muted-foreground text-center mt-2">
-                    {creditsConfig.consumption.imageToPrompt[selectedModel as keyof typeof creditsConfig.consumption.imageToPrompt] || 2} credits per generation
+                  <p className="mt-2 text-center text-muted-foreground text-xs">
+                    {creditsConfig.consumption.imageToPrompt[
+                      selectedModel as keyof typeof creditsConfig.consumption.imageToPrompt
+                    ] || 2}{' '}
+                    credits per generation
                   </p>
                 )}
-                
+
                 {user && usage.imageToText.daily >= usage.imageToText.dailyLimit && (
-                  <p className="text-xs text-muted-foreground text-center mt-2">
-                    {creditsConfig.consumption.imageToPrompt[selectedModel as keyof typeof creditsConfig.consumption.imageToPrompt] || 2} credits per generation
+                  <p className="mt-2 text-center text-muted-foreground text-xs">
+                    {creditsConfig.consumption.imageToPrompt[
+                      selectedModel as keyof typeof creditsConfig.consumption.imageToPrompt
+                    ] || 2}{' '}
+                    credits per generation
                   </p>
                 )}
               </div>
 
               {/* Generated Prompt Output */}
               <div className="lg:col-span-2">
-                <Label className="text-sm mb-3 block">Generated Prompt</Label>
+                <Label className="mb-3 block text-sm">Generated Prompt</Label>
                 {generatedPrompt ? (
-                  <PromptPreview 
-                    prompt={generatedPrompt} 
+                  <PromptPreview
+                    prompt={generatedPrompt}
                     negativePrompt={negativePrompt}
                     modelStyle={selectedModel}
                   />
                 ) : (
-                  <div className="min-h-[300px] border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground text-sm">
-                    {isLoading ? "Generating your prompt..." : "Your generated prompt will appear here..."}
+                  <div className="flex min-h-[300px] items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground text-sm">
+                    {isLoading
+                      ? 'Generating your prompt...'
+                      : 'Your generated prompt will appear here...'}
                   </div>
                 )}
               </div>
@@ -463,27 +518,42 @@ export default function ImageToPromptPage() {
       </div>
 
       {/* Bottom Section */}
-      <div className="text-center space-y-6 mt-12">
-        <p className="text-sm text-muted-foreground">
+      <div className="mt-12 space-y-6 text-center">
+        <p className="text-muted-foreground text-sm">
           Want to enhance your prompts further? Try our{' '}
-          <a href="/text-to-prompt" className="text-primary hover:underline">text to prompt enhancer</a>{' '}
+          <a href="/text-to-prompt" className="text-primary hover:underline">
+            text to prompt enhancer
+          </a>{' '}
           or generate images directly with our{' '}
-          <a href="/text-to-image" className="text-primary hover:underline">AI image generator</a>.
+          <a href="/text-to-image" className="text-primary hover:underline">
+            AI image generator
+          </a>
+          .
         </p>
-        
+
         <Card className="mx-auto max-w-3xl">
           <CardContent className="p-8">
-            <h2 className="text-2xl font-bold mb-4">Sora 2 Prompt Examples & Nano Banana YouTube Thumbnail Prompts</h2>
-            <p className="text-muted-foreground mb-4">
-              Convert original images to prompts optimized for Sora 2 video generation, Nano Banana YouTube thumbnails, and Midjourney portraits. Our AI extracts highly accurate prompts that work perfectly with each model's specific requirements.
+            <h2 className="mb-4 font-bold text-2xl">
+              Sora 2 Prompt Examples & Nano Banana YouTube Thumbnail Prompts
+            </h2>
+            <p className="mb-4 text-muted-foreground">
+              Convert original images to prompts optimized for Sora 2 video generation, Nano Banana
+              YouTube thumbnails, and Midjourney portraits. Our AI extracts highly accurate prompts
+              that work perfectly with each model's specific requirements.
             </p>
-            <h3 className="text-xl font-semibold mb-2">How to Generate YouTube Thumbnail with AI</h3>
-            <p className="text-muted-foreground mb-4">
-              Upload your image, select Nano Banana format, and generate prompts optimized for YouTube thumbnails. Download the prompt template and use it with AI image generators to create eye-catching thumbnails that increase click-through rates.
+            <h3 className="mb-2 font-semibold text-xl">
+              How to Generate YouTube Thumbnail with AI
+            </h3>
+            <p className="mb-4 text-muted-foreground">
+              Upload your image, select Nano Banana format, and generate prompts optimized for
+              YouTube thumbnails. Download the prompt template and use it with AI image generators
+              to create eye-catching thumbnails that increase click-through rates.
             </p>
-            <h3 className="text-xl font-semibold mb-2">How to Prompt Sora 2</h3>
+            <h3 className="mb-2 font-semibold text-xl">How to Prompt Sora 2</h3>
             <p className="text-muted-foreground">
-              Use our image-to-prompt tool to convert images into Sora 2 video prompts. Select Sora 2 format to get cinematic video prompts with proper structure and keywords that Sora 2 understands best.
+              Use our image-to-prompt tool to convert images into Sora 2 video prompts. Select Sora
+              2 format to get cinematic video prompts with proper structure and keywords that Sora 2
+              understands best.
             </p>
           </CardContent>
         </Card>

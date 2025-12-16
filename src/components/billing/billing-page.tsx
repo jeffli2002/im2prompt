@@ -1,21 +1,21 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SubscriptionCard } from '@/components/payment/subscription-card';
-import { getBillingInfo } from '@/server/actions/payment/get-billing-info';
-import type { BillingInfo } from '@/server/actions/payment/get-billing-info';
-import { useEffect, useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, CreditCard, RefreshCw } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
-import { toast } from 'sonner';
-import { ErrorLogger } from '@/lib/logger/logger-utils';
-import { syncSingleSubscription } from '@/server/actions/payment/sync-subscription-periods';
-import { useTranslations, useLocale } from 'next-intl';
-import Link from 'next/link';
-import { usePaymentPlan } from '@/hooks/use-config';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { creditsConfig } from '@/config/credits.config';
+import { usePaymentPlan } from '@/hooks/use-config';
+import { ErrorLogger } from '@/lib/logger/logger-utils';
+import { getBillingInfo } from '@/server/actions/payment/get-billing-info';
+import type { BillingInfo } from '@/server/actions/payment/get-billing-info';
+import { syncSingleSubscription } from '@/server/actions/payment/sync-subscription-periods';
+import { Calendar, CreditCard, RefreshCw } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const billingErrorLogger = new ErrorLogger('billing-page');
 
@@ -97,18 +97,18 @@ export function BillingPage() {
     if (success === 'true') {
       // Mark as completed immediately to prevent duplicate calls
       setSyncCompleted(true);
-      
+
       // In dev mode, manually sync the subscription
       const syncSubscription = async () => {
         try {
           console.log('[Billing] Starting subscription sync...');
-          
+
           // Get interval from URL params
           const interval = searchParams.get('interval') || 'month';
           const isYearly = interval === 'year';
-          
+
           console.log('[Billing] Sync params:', { planId, interval, isYearly });
-          
+
           const response = await fetch('/api/creem/sync-checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -130,13 +130,18 @@ export function BillingPage() {
             window.history.replaceState({}, '', window.location.pathname);
           } else {
             console.error('[Billing] Sync failed:', data);
-            toast.warning(`Payment succeeded but sync failed: ${data.error}. Please refresh the page.`, { duration: 7000 });
+            toast.warning(
+              `Payment succeeded but sync failed: ${data.error}. Please refresh the page.`,
+              { duration: 7000 }
+            );
             // Clean URL
             window.history.replaceState({}, '', window.location.pathname);
           }
         } catch (error) {
           console.error('[Billing] Sync error:', error);
-          toast.warning('Payment succeeded but sync failed. Please refresh the page.', { duration: 5000 });
+          toast.warning('Payment succeeded but sync failed. Please refresh the page.', {
+            duration: 5000,
+          });
           // Clean URL
           window.history.replaceState({}, '', window.location.pathname);
         }
@@ -290,29 +295,27 @@ export function BillingPage() {
           <CardContent className="space-y-4">
             <div className="space-y-4 rounded-xl border bg-muted/40 p-4">
               <div>
-                <p className="text-sm font-medium">{t('freePlan.dailyQuotaTitle')}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="font-medium text-sm">{t('freePlan.dailyQuotaTitle')}</p>
+                <p className="text-muted-foreground text-sm">
                   {t('freePlan.dailyQuotaValue', { count: freeDailyQuota })}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium">{t('freePlan.monthlyQuotaTitle')}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="font-medium text-sm">{t('freePlan.monthlyQuotaTitle')}</p>
+                <p className="text-muted-foreground text-sm">
                   {t('freePlan.monthlyQuotaValue', { count: freeMonthlyQuota })}
                 </p>
               </div>
               {signupBonusCredits > 0 && (
                 <div>
-                  <p className="text-sm font-medium">{t('freePlan.signupBonusTitle')}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium text-sm">{t('freePlan.signupBonusTitle')}</p>
+                  <p className="text-muted-foreground text-sm">
                     {t('freePlan.signupBonusValue', { credits: signupBonusCredits })}
                   </p>
                 </div>
               )}
             </div>
-            <p className="text-sm text-muted-foreground">
-              {t('freePlan.ctaDescription')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('freePlan.ctaDescription')}</p>
             <Button asChild size="lg" className="w-full sm:w-auto">
               <Link href="/#pricing">{t('freePlan.upgradeButton')}</Link>
             </Button>
@@ -346,18 +349,19 @@ export function BillingPage() {
                         {getStatusText(payment.status)}
                       </Badge>
                     </div>
-                    <div className='flex items-center gap-2 text-muted-foreground text-sm'>
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
                       <Calendar className="h-4 w-4" />
                       <span>{formatDate(payment.createdAt)}</span>
                     </div>
                     {payment.interval && (
-                      <div className='text-muted-foreground text-sm'>
-                        {t('billingCycle')}：{payment.interval === 'month' ? t('monthly') : t('yearly')}
+                      <div className="text-muted-foreground text-sm">
+                        {t('billingCycle')}：
+                        {payment.interval === 'month' ? t('monthly') : t('yearly')}
                       </div>
                     )}
                   </div>
                   <div className="text-right">
-                    <div className='text-muted-foreground text-sm'>{t('priceId')}</div>
+                    <div className="text-muted-foreground text-sm">{t('priceId')}</div>
                     <div className="font-mono text-sm">{payment.priceId}</div>
                   </div>
                 </div>

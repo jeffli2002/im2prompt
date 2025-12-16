@@ -9,7 +9,7 @@ export interface BaseTemplateParams {
 
 export function renderBaseTemplate(params: BaseTemplateParams): string {
   const { title, preheader = '', content, footerContent } = params;
-  
+
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -40,13 +40,16 @@ export function renderBaseTemplate(params: BaseTemplateParams): string {
       ${content}
     </div>
     <div class="footer">
-      ${footerContent || `
+      ${
+        footerContent ||
+        `
         <p>&copy; ${new Date().getFullYear()} ${EMAIL_CONFIG.templates.brandName}. All rights reserved.</p>
         <p>
           <a href="${EMAIL_CONFIG.templates.baseUrl}" style="color: #71717a;">Visit Website</a> | 
           <a href="mailto:${EMAIL_CONFIG.templates.supportEmail}" style="color: #71717a;">Contact Support</a>
         </p>
-      `}
+      `
+      }
     </div>
   </div>
 </body>
@@ -62,5 +65,5 @@ export function escapeHtml(text: string): string {
     '"': '&quot;',
     "'": '&#039;',
   };
-  return text.replace(/[&<>"']/g, m => map[m]);
+  return text.replace(/[&<>"']/g, (m) => map[m]);
 }

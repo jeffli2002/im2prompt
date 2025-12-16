@@ -1,4 +1,13 @@
-import type { Organization, WebSite, BreadcrumbList, WebPage, SoftwareApplication, FAQPage, HowTo, HowToStep } from 'schema-dts';
+import type {
+  BreadcrumbList,
+  FAQPage,
+  HowTo,
+  HowToStep,
+  Organization,
+  SoftwareApplication,
+  WebPage,
+  WebSite,
+} from 'schema-dts';
 
 export function getOrganizationSchema(): Organization {
   return {
@@ -12,10 +21,9 @@ export function getOrganizationSchema(): Organization {
       width: '512',
       height: '512',
     },
-    sameAs: [
-      'https://twitter.com/im2prompt',
-    ],
-    description: 'AI-powered image to prompt extraction and generation tools supporting Sora 2, Nano Banana, Midjourney, Flux. Generate YouTube thumbnails, TikTok covers, and AI video prompts.',
+    sameAs: ['https://twitter.com/im2prompt'],
+    description:
+      'AI-powered image to prompt extraction and generation tools supporting Sora 2, Nano Banana, Midjourney, Flux. Generate YouTube thumbnails, TikTok covers, and AI video prompts.',
     foundingDate: '2024',
     knowsAbout: [
       'Sora 2 prompts',
@@ -35,7 +43,8 @@ export function getWebsiteSchema(): WebSite {
     '@id': 'https://www.im2prompt.com/#website',
     url: 'https://www.im2prompt.com',
     name: 'im2Prompt',
-    description: 'Convert images to Sora 2 prompts, Nano Banana YouTube thumbnails, and Midjourney templates. Free image to prompt tool with downloadable templates. Extract prompts for Flux, Stable Diffusion, and create stunning AI visuals.',
+    description:
+      'Convert images to Sora 2 prompts, Nano Banana YouTube thumbnails, and Midjourney templates. Free image to prompt tool with downloadable templates. Extract prompts for Flux, Stable Diffusion, and create stunning AI visuals.',
     publisher: {
       '@id': 'https://www.im2prompt.com/#organization',
     },
@@ -47,7 +56,8 @@ export function getWebsiteSchema(): WebSite {
       },
       'query-input': 'required name=search_term_string',
     },
-    keywords: 'Sora 2 prompts, Nano Banana prompts, image to prompt, YouTube thumbnail prompt, Midjourney prompts, Flux prompts, AI video generation',
+    keywords:
+      'Sora 2 prompts, Nano Banana prompts, image to prompt, YouTube thumbnail prompt, Midjourney prompts, Flux prompts, AI video generation',
   };
 }
 
@@ -67,7 +77,8 @@ export function getSoftwareApplicationSchema(): SoftwareApplication {
       ratingValue: '4.8',
       ratingCount: '150',
     },
-    description: 'AI-powered image to prompt extraction tool supporting Sora 2, Nano Banana, Midjourney, Flux, Stable Diffusion. Generate YouTube thumbnails, TikTok covers, and AI video prompts.',
+    description:
+      'AI-powered image to prompt extraction tool supporting Sora 2, Nano Banana, Midjourney, Flux, Stable Diffusion. Generate YouTube thumbnails, TikTok covers, and AI video prompts.',
     featureList: [
       'Image to Prompt conversion',
       'Sora 2 prompt generation',
@@ -206,7 +217,8 @@ export function getDefaultFAQSchema(): FAQPage {
 export function getImageToPromptHowToSchema(): HowTo {
   return getHowToSchema({
     name: 'How to Convert Image to Prompt',
-    description: 'Learn how to extract AI prompts from images using im2Prompt. Supports Sora 2, Nano Banana, Midjourney, Flux, and Stable Diffusion formats.',
+    description:
+      'Learn how to extract AI prompts from images using im2Prompt. Supports Sora 2, Nano Banana, Midjourney, Flux, and Stable Diffusion formats.',
     steps: [
       {
         name: 'Upload Your Image',

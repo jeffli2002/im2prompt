@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LogoImage } from '@/components/ui/logo-image';
+import { FREE_SIGNUP_CREDITS } from '@/config/payment.config';
 import { RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -14,7 +15,7 @@ export default function DebugPage() {
 
   // Test data for credits
   const testPlans = [
-    { name: 'Free', credits: { monthly: 0, onSubscribe: 0, onSignup: 15 } },
+    { name: 'Free', credits: { monthly: 0, onSubscribe: 0, onSignup: FREE_SIGNUP_CREDITS } },
     { name: 'Pro', credits: { monthly: 500, onSubscribe: 0, onSignup: 0 } },
     { name: 'Pro+', credits: { monthly: 900, onSubscribe: 0, onSignup: 0 } },
   ];

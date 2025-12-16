@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { FREE_SIGNUP_CREDITS } from '@/config/payment.config';
 import {
   AlertCircle,
   ArrowLeft,
@@ -83,11 +84,11 @@ We will investigate legitimate billing errors and issue corrections or refunds w
       title: '5. Credit Expiration',
       icon: Calendar,
       content: `Credits have the following policies:
-
+      
 • Monthly subscription credits reset at the start of each billing cycle
 • Unused credits do not roll over to the next month
 • No refunds for expired or unused credits
-• Free plan users receive 15 credits on signup (one-time only, no daily/monthly resets)`,
+      • Free plan users receive ${FREE_SIGNUP_CREDITS} credits on signup (one-time only, no daily/monthly resets)`,
     },
     {
       title: '6. Account Termination',
@@ -118,8 +119,8 @@ Chargebacks may result in immediate account suspension.`,
       title: '8. Free Plan Policy',
       icon: CheckCircle,
       content: `Our free plan offers:
-
-• 15 credits on signup (one-time)
+      
+      • ${FREE_SIGNUP_CREDITS} credits on signup (one-time)
 • 3 Image-to-Prompt conversions per day (10/month)
 • Unlimited Text-to-Prompt generation
 • Credits can be used for generation (5 credits/Nano Banana image, 15 credits/Sora 2 video)`,

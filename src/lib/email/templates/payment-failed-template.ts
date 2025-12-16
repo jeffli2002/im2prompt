@@ -1,14 +1,17 @@
 import type { PaymentFailedParams } from '../email-types';
-import { renderBaseTemplate, escapeHtml } from './base-template';
+import { escapeHtml, renderBaseTemplate } from './base-template';
 
 export function renderPaymentFailedTemplate(params: PaymentFailedParams): string {
-  const urgencyLevel = params.retryAttempt >= 3 ? 'critical' : params.retryAttempt >= 2 ? 'high' : 'medium';
-  const alertColor = urgencyLevel === 'critical' ? '#ef4444' : urgencyLevel === 'high' ? '#f59e0b' : '#f59e0b';
-  
+  const urgencyLevel =
+    params.retryAttempt >= 3 ? 'critical' : params.retryAttempt >= 2 ? 'high' : 'medium';
+  const alertColor =
+    urgencyLevel === 'critical' ? '#ef4444' : urgencyLevel === 'high' ? '#f59e0b' : '#f59e0b';
+
   const attemptText = params.retryAttempt === 1 ? '1st' : params.retryAttempt === 2 ? '2nd' : '3rd';
-  const urgencyText = params.retryAttempt >= 3 
-    ? 'Your subscription will be cancelled in 24 hours' 
-    : `We'll retry in 3 days (Attempt ${params.retryAttempt} of ${params.maxRetries})`;
+  const urgencyText =
+    params.retryAttempt >= 3
+      ? 'Your subscription will be cancelled in 24 hours'
+      : `We'll retry in 3 days (Attempt ${params.retryAttempt} of ${params.maxRetries})`;
 
   const content = `
     <div style="background-color: ${alertColor}; color: white; padding: 16px; text-align: center; border-radius: 8px; margin-bottom: 24px;">
@@ -62,11 +65,15 @@ export function renderPaymentFailedTemplate(params: PaymentFailedParams): string
       </a>
     </p>
 
-    ${params.retryDate ? `
+    ${
+      params.retryDate
+        ? `
       <p style="text-align: center; color: #71717a; font-size: 14px;">
         Automatic retry scheduled for: <strong>${escapeHtml(params.retryDate)}</strong>
       </p>
-    ` : ''}
+    `
+        : ''
+    }
 
     <p style="margin-top: 32px; font-size: 14px; color: #71717a;">
       If you believe this is an error or need assistance, please contact our support team immediately.

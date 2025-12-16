@@ -15,7 +15,7 @@ import {
   Video,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface HistoryItem {
   id: string;
@@ -73,34 +73,37 @@ export default function HistoryPage() {
   const [page, setPage] = useState(1);
   const limit = 20;
 
-  const fetchHistory = async (contentType?: string) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const fetchHistory = useCallback(
+    async (contentType?: string) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
-      });
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: limit.toString(),
+        });
 
-      if (contentType && contentType !== 'all') {
-        params.append('contentType', contentType);
+        if (contentType && contentType !== 'all') {
+          params.append('contentType', contentType);
+        }
+
+        const response = await fetch(`/api/v1/history?${params.toString()}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch history');
+        }
+
+        const data = await response.json();
+        setHistory(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
       }
-
-      const response = await fetch(`/api/v1/history?${params.toString()}`);
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch history');
-      }
-
-      const data = await response.json();
-      setHistory(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [page]
+  );
 
   useEffect(() => {
     fetchHistory(activeTab);

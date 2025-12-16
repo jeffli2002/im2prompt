@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { seoPages } from '@/config/seo.config';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: seoPages.home.title,
@@ -19,4 +19,3 @@ export const metadata: Metadata = {
     images: seoPages.home.openGraph.images,
   },
 };
-

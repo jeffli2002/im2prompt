@@ -1,5 +1,8 @@
 export class EmailServiceError extends Error {
-  constructor(message: string, public code?: string) {
+  constructor(
+    message: string,
+    public code?: string
+  ) {
     super(message);
     this.name = 'EmailServiceError';
   }
@@ -13,7 +16,10 @@ export class EmailValidationError extends EmailServiceError {
 }
 
 export class EmailDeliveryError extends EmailServiceError {
-  constructor(message: string, public statusCode?: number) {
+  constructor(
+    message: string,
+    public statusCode?: number
+  ) {
     super(message, 'DELIVERY_ERROR');
     this.name = 'EmailDeliveryError';
   }

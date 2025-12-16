@@ -1,5 +1,5 @@
-import type { CreditsRefilledParams} from '../email-types';
-import { renderBaseTemplate, escapeHtml } from './base-template';
+import type { CreditsRefilledParams } from '../email-types';
+import { escapeHtml, renderBaseTemplate } from './base-template';
 
 export function renderCreditsRefilledTemplate(params: CreditsRefilledParams): string {
   const estimatedImages = Math.floor(params.newBalance / 5);

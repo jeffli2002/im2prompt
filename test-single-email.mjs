@@ -1,5 +1,5 @@
-import { Resend } from 'resend';
 import { config } from 'dotenv';
+import { Resend } from 'resend';
 
 config({ path: '.env.production' });
 

@@ -1,5 +1,5 @@
 import type { AlertEmailParams } from '../email-types';
-import { renderBaseTemplate, escapeHtml } from './base-template';
+import { escapeHtml, renderBaseTemplate } from './base-template';
 
 const ALERT_COLORS = {
   error: '#ef4444',
@@ -9,7 +9,7 @@ const ALERT_COLORS = {
 
 export function renderAlertTemplate(params: AlertEmailParams): string {
   const color = ALERT_COLORS[params.alertType];
-  
+
   const content = `
     <div style="border-left: 4px solid ${color}; padding-left: 16px; margin-bottom: 24px;">
       <h2 style="color: ${color}; margin-top: 0;">
@@ -26,10 +26,14 @@ export function renderAlertTemplate(params: AlertEmailParams): string {
     <h3>Description:</h3>
     <p>${escapeHtml(params.message)}</p>
 
-    ${params.stackTrace ? `
+    ${
+      params.stackTrace
+        ? `
       <h3>Stack Trace:</h3>
       <pre style="background-color: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 12px;">${escapeHtml(params.stackTrace)}</pre>
-    ` : ''}
+    `
+        : ''
+    }
   `;
 
   return renderBaseTemplate({

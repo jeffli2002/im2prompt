@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
 import { emailService } from '@/lib/email';
 import type { FeedbackEmailParams } from '@/lib/email/email-types';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {

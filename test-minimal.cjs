@@ -34,7 +34,7 @@ const options = {
   path: '/emails',
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${RESEND_API_KEY}`,
+    Authorization: `Bearer ${RESEND_API_KEY}`,
     'Content-Type': 'application/json',
     'Content-Length': data.length,
   },
@@ -52,7 +52,7 @@ const req = https.request(options, (res) => {
   res.on('end', () => {
     try {
       const response = JSON.parse(responseData);
-      
+
       if (res.statusCode >= 200 && res.statusCode < 300) {
         console.log('✅ Email sent successfully!');
         console.log('Message ID:', response.id);

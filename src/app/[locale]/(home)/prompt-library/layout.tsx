@@ -1,11 +1,15 @@
-import type { Metadata } from 'next';
 import { seoPages } from '@/config/seo.config';
-import { generateStructuredData, getOrganizationSchema, getWebPageSchema } from '@/lib/seo/structured-data';
+import {
+  generateStructuredData,
+  getOrganizationSchema,
+  getWebPageSchema,
+} from '@/lib/seo/structured-data';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: seoPages.promptLibrary.title,
   description: seoPages.promptLibrary.description,
-  keywords: seoPages.promptLibrary.keywords,
+  keywords: seoPages.promptLibrary.keywords.join(', '),
   alternates: {
     canonical: 'https://www.im2prompt.com/prompt-library',
   },
@@ -48,10 +52,8 @@ export default function PromptLibraryLayout({ children }: { children: React.Reac
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: structuredData }}
-      />
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Structured data JSON-LD is safe and required for SEO */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData }} />
       {children}
     </>
   );

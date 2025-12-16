@@ -1,11 +1,16 @@
-import type { Metadata } from 'next';
 import { seoPages } from '@/config/seo.config';
-import { generateStructuredData, getOrganizationSchema, getWebPageSchema, getSoftwareApplicationSchema } from '@/lib/seo/structured-data';
+import {
+  generateStructuredData,
+  getOrganizationSchema,
+  getSoftwareApplicationSchema,
+  getWebPageSchema,
+} from '@/lib/seo/structured-data';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: seoPages.textToVideo.title,
   description: seoPages.textToVideo.description,
-  keywords: seoPages.textToVideo.keywords,
+  keywords: seoPages.textToVideo.keywords.join(', '),
   alternates: {
     canonical: 'https://www.im2prompt.com/text-to-video',
   },
@@ -49,10 +54,8 @@ export default function TextToVideoLayout({ children }: { children: React.ReactN
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: structuredData }}
-      />
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Structured data JSON-LD is safe and required for SEO */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData }} />
       {children}
     </>
   );

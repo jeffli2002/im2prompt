@@ -1,5 +1,5 @@
 import type { EmailVerificationParams } from '../email-types';
-import { renderBaseTemplate, escapeHtml } from './base-template';
+import { escapeHtml, renderBaseTemplate } from './base-template';
 
 export function renderEmailVerificationTemplate(params: EmailVerificationParams): string {
   const content = `

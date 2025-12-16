@@ -1,5 +1,5 @@
 import type { NotificationEmailParams } from '../email-types';
-import { renderBaseTemplate, escapeHtml } from './base-template';
+import { escapeHtml, renderBaseTemplate } from './base-template';
 
 export function renderNotificationTemplate(params: NotificationEmailParams): string {
   const content = `
@@ -7,11 +7,15 @@ export function renderNotificationTemplate(params: NotificationEmailParams): str
     
     <p>${escapeHtml(params.message)}</p>
 
-    ${params.actionUrl && params.actionLabel ? `
+    ${
+      params.actionUrl && params.actionLabel
+        ? `
       <p style="margin-top: 24px;">
         <a href="${escapeHtml(params.actionUrl)}" class="button">${escapeHtml(params.actionLabel)}</a>
       </p>
-    ` : ''}
+    `
+        : ''
+    }
 
     <p style="margin-top: 24px; color: #71717a; font-size: 14px;">
       This is an automated notification. Please do not reply to this email.

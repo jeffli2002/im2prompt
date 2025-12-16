@@ -340,14 +340,15 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                                 +{plan.credits.onSubscribe} Bonus
                               </Badge>
                             )}
-                          {typeof plan.credits.onSignup === 'number' && plan.credits.onSignup > 0 && (
-                            <Badge
-                              variant="outline"
-                              className="rounded-xl border-purple-200 px-3 py-2 text-purple-700 dark:border-purple-800 dark:text-purple-300"
-                            >
-                              {plan.credits.onSignup} Free Credits
-                            </Badge>
-                          )}
+                          {typeof plan.credits.onSignup === 'number' &&
+                            plan.credits.onSignup > 0 && (
+                              <Badge
+                                variant="outline"
+                                className="rounded-xl border-purple-200 px-3 py-2 text-purple-700 dark:border-purple-800 dark:text-purple-300"
+                              >
+                                {plan.credits.onSignup} Free Credits
+                              </Badge>
+                            )}
                         </div>
                       </>
                     )}

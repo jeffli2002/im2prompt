@@ -1,6 +1,9 @@
 import type { PaymentConfig } from '@/types';
 // Note: Credit costs (5 credits/image, 15 credits/video) are defined in credits.config.ts
 
+// Central place to configure how many credits free users get on signup.
+export const FREE_SIGNUP_CREDITS = 15;
+
 export const paymentConfig: PaymentConfig = {
   provider: 'stripe',
 
@@ -30,12 +33,12 @@ export const paymentConfig: PaymentConfig = {
       interval: null,
       credits: {
         monthly: 0,
-        onSignup: 15,
+        onSignup: FREE_SIGNUP_CREDITS,
       },
       features: [
         '3 Image-to-Prompt per day (10/month)',
         'Unlimited Text-to-Prompt',
-        '15 credits on signup (one-time)',
+        `${FREE_SIGNUP_CREDITS} credits on signup (one-time)`,
         'Use credits for image/video generation',
         'No watermark for image',
         'Personal use',

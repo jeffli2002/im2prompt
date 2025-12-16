@@ -1,4 +1,4 @@
-export type EmailCategory = 
+export type EmailCategory =
   | 'feedback'
   | 'support'
   | 'notification'
