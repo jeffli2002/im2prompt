@@ -159,7 +159,7 @@ Additional States:
 const PLAN_CREDITS = {
   free: {
     monthly: 0,
-    onSignup: 30,
+    onSignup: 15,
   },
   pro: {
     monthly: 500,

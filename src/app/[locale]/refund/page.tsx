@@ -87,7 +87,7 @@ We will investigate legitimate billing errors and issue corrections or refunds w
 • Monthly subscription credits reset at the start of each billing cycle
 • Unused credits do not roll over to the next month
 • No refunds for expired or unused credits
-• Free plan users receive 30 credits on signup (one-time only, no daily/monthly resets)`,
+• Free plan users receive 15 credits on signup (one-time only, no daily/monthly resets)`,
     },
     {
       title: '6. Account Termination',
@@ -119,7 +119,7 @@ Chargebacks may result in immediate account suspension.`,
       icon: CheckCircle,
       content: `Our free plan offers:
 
-• 30 credits on signup (one-time)
+• 15 credits on signup (one-time)
 • 3 Image-to-Prompt conversions per day (10/month)
 • Unlimited Text-to-Prompt generation
 • Credits can be used for generation (5 credits/Nano Banana image, 15 credits/Sora 2 video)`,

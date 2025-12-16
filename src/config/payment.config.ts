@@ -30,12 +30,12 @@ export const paymentConfig: PaymentConfig = {
       interval: null,
       credits: {
         monthly: 0,
-        onSignup: 30,
+        onSignup: 15,
       },
       features: [
         '3 Image-to-Prompt per day (10/month)',
         'Unlimited Text-to-Prompt',
-        '30 credits on signup (one-time)',
+        '15 credits on signup (one-time)',
         'Use credits for image/video generation',
         'No watermark for image',
         'Personal use',

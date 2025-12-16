@@ -44,7 +44,7 @@ import { renderWelcomeTemplate } from '@/lib/email/templates';
 await emailService.sendEmail(
   {
     to: user.email,
-    subject: 'Welcome to im2prompt! Your 30 Free Credits Are Ready',
+    subject: 'Welcome to im2prompt! Your 15 Free Credits Are Ready',
     category: 'welcome',
     priority: 'normal',
   },
@@ -52,7 +52,7 @@ await emailService.sendEmail(
     userName: user.name,
     userEmail: user.email,
     signupMethod: authProvider, // 'email' | 'google' | 'github'
-    signupCredits: 30,
+    signupCredits: 15,
     dashboardUrl: `${BASE_URL}/dashboard`,
     imageToPromptUrl: `${BASE_URL}/image-to-prompt`,
     textToPromptUrl: `${BASE_URL}/text-to-prompt`,
@@ -62,7 +62,7 @@ await emailService.sendEmail(
 
 **Conditions:**
 - User successfully creates account
-- Credits initialized (30 for new users)
+- Credits initialized (15 for new users)
 - Send immediately after signup
 
 ---

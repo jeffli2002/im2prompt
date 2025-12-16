@@ -22,14 +22,14 @@ describe('Email Template Tests', () => {
         userName: 'John Doe',
         userEmail: 'john@example.com',
         signupMethod: 'email',
-        signupCredits: 30,
+        signupCredits: 15,
         dashboardUrl: 'https://im2prompt.com/dashboard',
         imageToPromptUrl: 'https://im2prompt.com/image-to-prompt',
         textToPromptUrl: 'https://im2prompt.com/text-to-prompt',
       });
 
       expect(html).toContain('John Doe');
-      expect(html).toContain('30 Credits');
+      expect(html).toContain('15 Credits');
       expect(html).toContain('Welcome to im2prompt');
       expect(html).toContain('https://im2prompt.com/dashboard');
       expect(html).not.toContain('<script');
@@ -40,7 +40,7 @@ describe('Email Template Tests', () => {
         userName: '<script>alert("xss")</script>',
         userEmail: 'test@example.com',
         signupMethod: 'google',
-        signupCredits: 30,
+        signupCredits: 15,
         dashboardUrl: 'https://im2prompt.com/dashboard',
         imageToPromptUrl: 'https://im2prompt.com/image-to-prompt',
         textToPromptUrl: 'https://im2prompt.com/text-to-prompt',
@@ -217,7 +217,7 @@ describe('Email Template Tests', () => {
         warningThreshold: 20,
         percentageRemaining: 20,
         planName: 'Free',
-        monthlyAllocation: 30,
+        monthlyAllocation: 15,
         upgradeUrl: 'https://im2prompt.com/upgrade',
         usageRate: 2.5,
         estimatedRunoutDays: 2,
@@ -258,12 +258,12 @@ describe('Email Template Tests', () => {
         userEmail: 'exhausted@example.com',
         planName: 'Free',
         exhaustionDate: '2025-01-15',
-        totalCreditsUsedThisCycle: 30,
+        totalCreditsUsedThisCycle: 15,
         upgradeUrl: 'https://im2prompt.com/upgrade',
       });
 
       expect(html).toContain('0');
-      expect(html).toContain('30 credits');
+      expect(html).toContain('15 credits');
       expect(html).toContain('Upgrade');
       expect(html).toContain('Pro Plan');
       expect(html).toContain('Pro+ Plan');
@@ -413,7 +413,7 @@ describe('Email Template Tests', () => {
           userName: maliciousInput,
           userEmail: 'test@example.com',
           signupMethod: 'email',
-          signupCredits: 30,
+          signupCredits: 15,
           dashboardUrl: 'https://safe.com',
           imageToPromptUrl: 'https://safe.com',
           textToPromptUrl: 'https://safe.com',
@@ -450,7 +450,7 @@ describe('Email Template Tests', () => {
           userName: 'Test',
           userEmail: 'test@example.com',
           signupMethod: 'email',
-          signupCredits: 30,
+          signupCredits: 15,
           dashboardUrl: 'https://test.com',
           imageToPromptUrl: 'https://test.com',
           textToPromptUrl: 'https://test.com',

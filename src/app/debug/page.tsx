@@ -14,7 +14,7 @@ export default function DebugPage() {
 
   // Test data for credits
   const testPlans = [
-    { name: 'Free', credits: { monthly: 0, onSubscribe: 0, onSignup: 30 } },
+    { name: 'Free', credits: { monthly: 0, onSubscribe: 0, onSignup: 15 } },
     { name: 'Pro', credits: { monthly: 500, onSubscribe: 0, onSignup: 0 } },
     { name: 'Pro+', credits: { monthly: 900, onSubscribe: 0, onSignup: 0 } },
   ];

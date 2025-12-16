@@ -26,7 +26,7 @@
 #### Authentication & Onboarding (3 templates):
 1. ✅ **Welcome Email** (`welcome-template.ts`)
    - Greets new users
-   - Shows 30 signup credits
+   - Shows 15 signup credits
    - Quick start guide
    
 2. ✅ **Email Verification** (`email-verification-template.ts`)
@@ -224,7 +224,7 @@ import { emailService } from '@/lib/email';
 await emailService.sendEmail(
   {
     to: user.email,
-    subject: 'Welcome to im2prompt! Your 30 Free Credits Are Ready',
+    subject: 'Welcome to im2prompt! Your 15 Free Credits Are Ready',
     category: 'welcome',
     priority: 'normal',
   },
@@ -232,7 +232,7 @@ await emailService.sendEmail(
     userName: user.name,
     userEmail: user.email,
     signupMethod: 'email',
-    signupCredits: 30,
+    signupCredits: 15,
     dashboardUrl: 'https://im2prompt.com/dashboard',
     imageToPromptUrl: 'https://im2prompt.com/image-to-prompt',
     textToPromptUrl: 'https://im2prompt.com/text-to-prompt',

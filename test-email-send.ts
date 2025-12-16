@@ -1,19 +1,19 @@
-import { Resend } from 'resend';
 import * as dotenv from 'dotenv';
+import { Resend } from 'resend';
 import {
-  renderWelcomeTemplate,
-  renderEmailVerificationTemplate,
-  renderPasswordResetTemplate,
-  renderSubscriptionConfirmationTemplate,
-  renderPaymentFailedTemplate,
-  renderCreditsLowWarningTemplate,
+  renderAlertTemplate,
   renderCreditsExhaustedTemplate,
+  renderCreditsLowWarningTemplate,
   renderCreditsRefilledTemplate,
+  renderEmailVerificationTemplate,
+  renderFeedbackTemplate,
   renderGenerationCompleteTemplate,
   renderGenerationFailedTemplate,
-  renderFeedbackTemplate,
   renderNotificationTemplate,
-  renderAlertTemplate,
+  renderPasswordResetTemplate,
+  renderPaymentFailedTemplate,
+  renderSubscriptionConfirmationTemplate,
+  renderWelcomeTemplate,
 } from './src/lib/email/templates';
 
 dotenv.config({ path: '.env.production' });
@@ -40,7 +40,7 @@ let failed = 0;
 async function sendTestEmail(name: string, html: string, subject: string): Promise<boolean> {
   try {
     console.log(`📤 Sending: ${name}...`);
-    
+
     const response = await resend.emails.send({
       from: FROM_EMAIL,
       to: TEST_EMAIL,
@@ -73,7 +73,7 @@ async function runTests() {
       userName: 'Jeff Lee',
       userEmail: TEST_EMAIL,
       signupMethod: 'email',
-      signupCredits: 30,
+      signupCredits: 15,
       dashboardUrl: 'https://im2prompt.com/dashboard',
       imageToPromptUrl: 'https://im2prompt.com/image-to-prompt',
       textToPromptUrl: 'https://im2prompt.com/text-to-prompt',
@@ -81,7 +81,7 @@ async function runTests() {
     'Welcome to im2prompt!'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Email Verification',
@@ -95,7 +95,7 @@ async function runTests() {
     'Verify Your Email Address'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Password Reset',
@@ -111,7 +111,7 @@ async function runTests() {
     'Reset Your Password'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Subscription Confirmation',
@@ -133,7 +133,7 @@ async function runTests() {
     'Pro Subscription Activated'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Payment Failed',
@@ -153,7 +153,7 @@ async function runTests() {
     'Payment Failed - Action Required'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Credits Low Warning',
@@ -174,7 +174,7 @@ async function runTests() {
     'Credits Running Low'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Credits Exhausted',
@@ -191,7 +191,7 @@ async function runTests() {
     'Credits Exhausted'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Credits Refilled',
@@ -209,7 +209,7 @@ async function runTests() {
     'Credits Refilled Successfully'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Generation Complete (Image)',
@@ -230,7 +230,7 @@ async function runTests() {
     'Your Image is Ready'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Generation Complete (Video)',
@@ -251,7 +251,7 @@ async function runTests() {
     'Your Video is Ready'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Generation Failed',
@@ -272,7 +272,7 @@ async function runTests() {
     'Generation Failed - Credits Refunded'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Feedback Email',
@@ -293,7 +293,7 @@ async function runTests() {
     '[FEATURE] Request for new feature'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Notification Email',
@@ -302,7 +302,8 @@ async function runTests() {
       userEmail: TEST_EMAIL,
       userId: 'test-user-123',
       title: 'New Feature Available',
-      message: 'We have just released a new feature: Batch Image Processing. You can now process multiple images at once!',
+      message:
+        'We have just released a new feature: Batch Image Processing. You can now process multiple images at once!',
       actionUrl: 'https://im2prompt.com/features/batch-processing',
       actionText: 'Try It Now',
       notificationType: 'announcement',
@@ -310,7 +311,7 @@ async function runTests() {
     'New Feature Available'
   );
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   await sendTestEmail(
     'Alert Email',
