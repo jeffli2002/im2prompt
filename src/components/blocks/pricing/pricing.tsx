@@ -424,11 +424,11 @@ const Pricing = ({ heading, description, plans }: Pricing2Props) => {
                               → Up to{' '}
                               {plan.id === 'pro'
                                 ? isYearly
-                                  ? '300'
-                                  : '25'
+                                  ? '240'
+                                  : '20'
                                 : isYearly
-                                  ? '540'
-                                  : '45'}{' '}
+                                  ? '432'
+                                  : '36'}{' '}
                               Sora 2 videos{isYearly ? '/year' : '/month'}
                             </span>
                           </li>

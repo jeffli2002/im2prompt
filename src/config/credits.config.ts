@@ -77,7 +77,7 @@ export const creditsConfig: CreditsConfig = {
       'stable-diffusion': 5,
     },
     videoGeneration: {
-      'sora-2': 15,
+      'sora-2': 25,
     },
     storage: {
       costPerGBPerMonth: 10,

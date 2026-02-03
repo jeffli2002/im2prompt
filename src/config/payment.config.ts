@@ -1,5 +1,5 @@
 import type { PaymentConfig } from '@/types';
-// Note: Credit costs (5 credits/image, 15 credits/video) are defined in credits.config.ts
+// Note: Credit costs (5 credits/image, 25 credits/video) are defined in credits.config.ts
 
 // Central place to configure how many credits free users get on signup.
 export const FREE_SIGNUP_CREDITS = 15;

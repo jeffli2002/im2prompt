@@ -51,9 +51,32 @@ export async function POST(request: NextRequest) {
       prompt_upsampling = false,
       seed,
       safety_tolerance = 2,
-      output_format = 'jpeg',
+      output_format: requestedOutputFormat,
       image,
     } = await request.json();
+
+    const normalizeOutputFormat = (format?: string) => {
+      if (!format || typeof format !== 'string') {
+        return undefined;
+      }
+      const lower = format.toLowerCase();
+      if (lower === 'jpg' || lower === 'jpeg' || lower === 'png') {
+        return lower;
+      }
+      return undefined;
+    };
+
+    const isNanoBananaPro = model === 'nano-banana-pro';
+    const isNanoBanana = model === 'nano-banana';
+    let outputFormat = normalizeOutputFormat(requestedOutputFormat);
+
+    if (isNanoBananaPro) {
+      outputFormat = 'jpg';
+    } else if (isNanoBanana) {
+      outputFormat = 'jpeg';
+    } else if (!outputFormat) {
+      outputFormat = 'jpeg';
+    }
 
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json(
@@ -106,7 +129,6 @@ export async function POST(request: NextRequest) {
     }
 
     const isStableDiffusion = model === 'stable-diffusion';
-    const isNanoBanana = model === 'nano-banana';
 
     if (isNanoBanana) {
       const openRouterApiKey = process.env.OPENROUTER_API_KEY;
@@ -229,7 +251,7 @@ export async function POST(request: NextRequest) {
 
       const formData = new FormData();
       formData.append('prompt', prompt);
-      formData.append('output_format', output_format || 'jpeg');
+      formData.append('output_format', outputFormat);
       formData.append('mode', 'text-to-image');
       if (aspect_ratio) {
         formData.append('aspect_ratio', aspect_ratio);
@@ -258,7 +280,7 @@ export async function POST(request: NextRequest) {
 
       const imageBuffer = await response.arrayBuffer();
       const base64Image = Buffer.from(imageBuffer).toString('base64');
-      const imageUrl = `data:image/${output_format || 'jpeg'};base64,${base64Image}`;
+      const imageUrl = `data:image/${outputFormat};base64,${base64Image}`;
 
       await quotaService.incrementImageGenerationUsage(userId);
 
@@ -319,9 +341,7 @@ export async function POST(request: NextRequest) {
       if (safety_tolerance !== undefined) {
         requestBody.safety_tolerance = safety_tolerance;
       }
-      if (output_format) {
-        requestBody.output_format = output_format;
-      }
+      requestBody.output_format = outputFormat;
     } else {
       if (aspect_ratio) {
         const aspectRatioToDimensions: Record<string, { width: number; height: number }> = {
